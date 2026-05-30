@@ -2,10 +2,10 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 // Vite の設定。
-// base: "./" にすると、公開用ファイルが部品(JS/CSS)を「相対パス」で読み込む。
-// → GitHub Pages（/リポジトリ名/ 配下）でも、Vercel でも、dist を直接開いても
-//    真っ白にならず表示される。公開先を問わず動く安全設定。
+// base は GitHub Pages のリポジトリ名と完全一致させる（公開URL github.io/ここ/）。
+// リポジトリ名: math-labo3 → base: "/math-labo3/"
+// ※ ここがズレると公開時に真っ白になる。リポジトリ名を変えたらここも直すこと。
 export default defineConfig({
-  base: "./",
+  base: "/math-labo3/",
   plugins: [react()],
 });
