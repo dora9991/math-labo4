@@ -1,11 +1,10 @@
 // Header.jsx — 画面上部の共通ヘッダー（XP・レベル・連続日数 or 戻るボタン）
-import { levelFromXp, levelProgress, LEVEL_NAMES } from "../engine/scoring.js";
-
-const LV_COLORS = ["", "#94a3b8", "#60a5fa", "#4ade80", "#fb923c", "#f87171", "#e879f9", "#fbbf24", "#f97316", "#ef4444", "#dc2626"];
+import { levelFromXp, levelProgress, levelColor, levelTitle } from "../engine/scoring.js";
 
 export default function Header({ player, back, onBack }) {
   const lv = levelFromXp(player.xp);
   const pct = levelProgress(player.xp);
+  const col = levelColor(lv);
   return (
     <div className="hdr">
       <span className="logo">📐 数学ラボ</span>
@@ -16,8 +15,8 @@ export default function Header({ player, back, onBack }) {
           <>
             <div className="chip cs">🔥{player.streaks}日</div>
             <div className="chip cl">
-              <span style={{ fontSize: 11, fontWeight: 700, color: LV_COLORS[lv] }}>Lv.{lv}</span>
-              <div className="xpm"><div className="xpf" style={{ width: pct + "%", background: LV_COLORS[lv] }} /></div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: col }}>Lv.{lv}</span>
+              <div className="xpm"><div className="xpf" style={{ width: pct + "%", background: col }} /></div>
               <span className="xpt">{player.xp}XP</span>
             </div>
           </>
@@ -26,5 +25,3 @@ export default function Header({ player, back, onBack }) {
     </div>
   );
 }
-
-export { LV_COLORS, LEVEL_NAMES };

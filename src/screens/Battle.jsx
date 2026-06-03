@@ -14,7 +14,14 @@ import { isCorrect, levelFromXp } from "../engine/scoring.js";
 
 export default function Battle({ player, monster, onResult, onExit }) {
   const lv = levelFromXp(player.xp);
-  const stats = useRef(getPlayerBattleStats(lv)).current;
+  // 制限時間 = 基本の制限時間 × (自分のレベル+10) ÷ (敵の適正レベル+10)（切り上げ）
+  //  +10で格差をマイルドに。自分が強いほど長く、格上の敵だと短くなる。最低1秒。
+  const stats = useRef((() => {
+    const base = getPlayerBattleStats(lv);
+    const ratio = (lv + 10) / ((monster.minLv || 1) + 10);
+    const timer = Math.max(1, Math.ceil(base.timer * ratio));
+    return { ...base, timer };
+  })()).current;
 
   const [playerHp, setPlayerHp] = useState(stats.maxHp);
   const [monsterHp, setMonsterHp] = useState(monster.hp);
@@ -230,11 +237,11 @@ export default function Battle({ player, monster, onResult, onExit }) {
               <div className="bt-q-text">{q.q}</div>
               <div className={"ans-row" + (shakeAns ? " answer-shake" : "")}>
                 <input
-                  ref={inputRef} className="ans-in" type="number" inputMode="decimal" value={input}
+                  ref={inputRef} className="ans-in" type="text" inputMode="text" value={input}
                   disabled={locked}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") answer(input); }}
-                  placeholder="答えを入力…"
+                  placeholder="例: -5 や 1/2"
                 />
                 <button className="ok-btn" data-sfx="none" disabled={locked || input === ""} onClick={() => answer(input)}>⚔️</button>
               </div>

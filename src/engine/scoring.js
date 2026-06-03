@@ -3,29 +3,74 @@
 // 「ゲームのルール」をここに集約。バランス調整はこのファイルだけ触ればよい。
 // ============================================================
 
-// レベルの定義（必要XPのしきい値）
-export const LEVEL_THRESHOLDS = [0, 50, 150, 350, 700, 1200, 2000, 3000, 4500, 6500, 9999];
-export const LEVEL_NAMES = ["", "ビギナー", "まなび中", "がんばり屋", "数学好き", "エキスパート", "マスター", "勇者", "英雄", "伝説", "神話"];
+// ── レベル（Lv1〜99）──────────────────────────────
+// 「次のレベルに必要なXX（増分）」を、序盤は増えていき、後半は上限で頭打ちにする。
+//  → 累計XPのグラフが √ のような形（後半はゆるやかに直線的）になる。
+//  序盤は今まで通り上がりやすく、後半は1レベルぶんの必要XPが一定に。
+//
+//  次のレベルに必要なXP（増分）= min(INC_A + INC_B*(lv-1), INC_MAX)
+//    Lv1→2:150, Lv2→3:170, Lv3→4:190, … と20ずつ増え、1000で頭打ち
+export const MAX_LEVEL = 99;
+const INC_A = 130;    // Lv1→2の増分が INC_A+INC_B=150 になるよう設定
+const INC_B = 20;     // 1レベルごとに増える量
+const INC_MAX = 1000; // 増分の上限（1000で頭打ち＝フラットに）
 
-/** 累計XPから現在レベルを求める（1〜10） */
+// 起動時に「各レベルに到達する累計XP」のテーブルを作っておく
+const XP_TABLE = [0, 0]; // XP_TABLE[1]=0（Lv1は0XP）
+for (let lv = 2; lv <= MAX_LEVEL; lv++) {
+  XP_TABLE[lv] = XP_TABLE[lv - 1] + Math.min(INC_A + INC_B * (lv - 1), INC_MAX);
+}
+
+/** レベル lv に到達するのに必要な累計XP */
+export function xpForLevel(lv) {
+  return XP_TABLE[Math.max(1, Math.min(MAX_LEVEL, lv))];
+}
+
+/** 累計XPから現在レベルを求める（1〜99） */
 export function levelFromXp(xp) {
   let lv = 1;
-  for (let i = 1; i < LEVEL_THRESHOLDS.length; i++) {
-    if (xp >= LEVEL_THRESHOLDS[i]) lv = i + 1;
-  }
-  return Math.min(lv, 10);
+  while (lv < MAX_LEVEL && xp >= XP_TABLE[lv + 1]) lv++;
+  return lv;
 }
 
 /** 次のレベルまでの進捗（0〜100） */
 export function levelProgress(xp) {
   const lv = levelFromXp(xp);
-  if (lv >= 10) return 100;
-  const lo = LEVEL_THRESHOLDS[lv - 1];
-  const hi = LEVEL_THRESHOLDS[lv];
+  if (lv >= MAX_LEVEL) return 100;
+  const lo = xpForLevel(lv);
+  const hi = xpForLevel(lv + 1);
   return ((xp - lo) / (hi - lo)) * 100;
 }
 
-// タイムアタックの星の目標（正解数）
+// レベル帯ごとの称号と色（99レベルを帯でまとめる）
+const LEVEL_TIERS = [
+  { min: 99, name: "数学神", color: "#fde047" },
+  { min: 80, name: "神話", color: "#dc2626" },
+  { min: 60, name: "伝説", color: "#ef4444" },
+  { min: 45, name: "英雄", color: "#f97316" },
+  { min: 30, name: "勇者", color: "#fbbf24" },
+  { min: 20, name: "マスター", color: "#e879f9" },
+  { min: 15, name: "エキスパート", color: "#f87171" },
+  { min: 10, name: "数学好き", color: "#fb923c" },
+  { min: 6, name: "がんばり屋", color: "#4ade80" },
+  { min: 3, name: "まなび中", color: "#60a5fa" },
+  { min: 1, name: "ビギナー", color: "#94a3b8" },
+];
+
+/** レベルから称号を返す */
+export function levelTitle(lv) {
+  return (LEVEL_TIERS.find((t) => lv >= t.min) || LEVEL_TIERS[LEVEL_TIERS.length - 1]).name;
+}
+
+/** レベルから色を返す */
+export function levelColor(lv) {
+  return (LEVEL_TIERS.find((t) => lv >= t.min) || LEVEL_TIERS[LEVEL_TIERS.length - 1]).color;
+}
+
+// 旧コード互換（配列で参照していた箇所が残っていても落ちないように）
+export const LEVEL_NAMES = new Proxy({}, { get: (_, k) => levelTitle(Number(k) || 1) });
+
+// ── タイムアタックの星 ────────────────────────────
 export const STAR_TARGET = {
   easy: { s1: 6, s2: 9, s3: 12 },
   standard: { s1: 4, s2: 6, s3: 8 },
@@ -67,9 +112,24 @@ export function unitTestXp({ correct, total }) {
   return correct * 10 + (total > 0 && correct === total ? 30 : 0);
 }
 
-/** 答え合わせ（小数誤差を許容） */
+/** 入力文字列を数値に変換（分数 "1/2" や マイナス "-5" に対応） */
+export function parseAnswer(s) {
+  if (typeof s === "number") return s;
+  if (s == null) return NaN;
+  let str = String(s).trim().replace(/\s/g, "");
+  // 全角マイナス・全角スラッシュも一応許容
+  str = str.replace(/ー|−|―/g, "-").replace(/／/g, "/");
+  if (str.includes("/")) {
+    const [a, b] = str.split("/");
+    const n = parseFloat(a), d = parseFloat(b);
+    if (d) return n / d;
+  }
+  return parseFloat(str);
+}
+
+/** 答え合わせ（小数誤差を許容。分数・マイナス入力もOK） */
 export function isCorrect(userAnswer, ans) {
-  return Math.abs(parseFloat(userAnswer) - ans) < 0.05;
+  return Math.abs(parseAnswer(userAnswer) - ans) < 0.05;
 }
 
 // 同じ問題（単元×難易度ごと）をくり返したときのXP倍率

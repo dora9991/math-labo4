@@ -26,6 +26,8 @@ import BattleSelect from "./screens/BattleSelect.jsx";
 import Battle from "./screens/Battle.jsx";
 import UnitTestSelect from "./screens/UnitTestSelect.jsx";
 import UnitTest from "./screens/UnitTest.jsx";
+import StepUp from "./screens/StepUp.jsx";
+import { CHAPTERS } from "./data/index.js";
 
 const todayStr = () => new Date().toLocaleDateString("ja-JP");
 
@@ -132,18 +134,46 @@ export default function App() {
     setData((d) => ({ ...d, mistakes }));
   }
 
+  // ステップアップ（弱点克服）モード：1問ごとの結果を保存
+  //  - スキル習熟度(skillStats)を更新（mNew は画面側のEloで算出済み）
+  //  - 間違いはスキル付きでノートへ
+  //  - XPはささやか＆ペナルティなし（自己肯定を下げない）
+  function recordStepAttempt({ skill, level, templateId, ok, q, ans, mNew }) {
+    const sid = data.player.studentId;
+    updatePlayer((p) => {
+      const prev = (p.skillStats && p.skillStats[skill]) || { m: 0.5, n: 0 };
+      return {
+        ...p,
+        skillStats: { ...(p.skillStats || {}), [skill]: { m: mNew, n: prev.n + 1, last: todayStr() } },
+      };
+    });
+    if (!ok) {
+      const newMistakes = store.addMistakes([
+        makeMistake({ studentId: sid, chapterId: "c1", level, q, ans, skill, templateId }),
+      ]);
+      setData((d) => ({ ...d, mistakes: newMistakes }));
+    }
+    addXp(ok ? 5 : 0);
+  }
+
   // バトルの結果。true=勝利, false=敗北, "retry"=やり直し
   function handleBattleResult(outcome) {
     if (outcome === "retry") { setBattleKey((k) => k + 1); return; }
     if (!battleMonster) return;
     const win = outcome === true;
+    // この勝利より前に同じモンスターを倒したことがあるか
+    const alreadyCleared = (data.records || []).some(
+      (r) => r.mode === "battle" && r.extra && r.extra.result === "win" && r.extra.monsterId === battleMonster.id
+    );
+    // 撃破済みなら報酬は半分（切り上げ）
+    const gained = win ? (alreadyCleared ? Math.ceil(battleMonster.reward / 2) : battleMonster.reward) : 0;
     store.addRecord(makeRecord({
       studentId: data.player.studentId, mode: "battle",
-      xp: win ? battleMonster.reward : 0,
+      xp: gained,
       extra: { monsterId: battleMonster.id, result: win ? "win" : "lose" },
     }));
     setData((d) => ({ ...d, records: store.load().records }));
-    if (win) addXp(battleMonster.reward);
+    if (win) addXp(gained);
   }
 
   // 効果音：ボタンのクリック（決定/戻る）を全体で拾う（ホバーの移動音は無し）
@@ -166,6 +196,7 @@ export default function App() {
     if (screen === "title") { bgm.play("op"); return; }
     if (screen === "timeAttack") { bgm.play("timeattack"); return; }
     if (screen === "slow") { bgm.play("slow"); return; }
+    if (screen === "stepUp") { bgm.play("slow"); return; }
     if (screen === "unitTest") { bgm.play(utChapter ? "unittest" : "menu"); return; }
     if (screen === "battle") {
       if (battleMonster) bgm.play(battleMonster.minLv >= 7 ? "boss" : "battle");
@@ -233,12 +264,31 @@ export default function App() {
     return <Notebook mistakes={data.mistakes} onRemove={removeNote} onBack={() => setScreen("home")} />;
   }
 
+  // ステップアップ（弱点克服）モード：c1（正負の数）をアダプティブに出題
+  if (screen === "stepUp") {
+    return (
+      <StepUp
+        player={data.player}
+        chapter={CHAPTERS[0]}
+        onAttempt={recordStepAttempt}
+        onHome={() => setScreen("home")}
+      />
+    );
+  }
+
   // バトルモード：相手選択 → 戦闘
   if (screen === "battle") {
     if (!battleMonster) {
+      // これまでに撃破したモンスターのIDを集める
+      const clearedIds = new Set(
+        (data.records || [])
+          .filter((r) => r.mode === "battle" && r.extra && r.extra.result === "win")
+          .map((r) => r.extra.monsterId)
+      );
       return (
         <BattleSelect
           player={data.player}
+          clearedIds={clearedIds}
           onSelect={(m) => { setBattleMonster(m); setBattleKey((k) => k + 1); }}
           onBack={() => setScreen("home")}
         />
@@ -280,7 +330,7 @@ export default function App() {
       onTimeAttack={() => goChapter("timeAttack")}
       onSlow={() => goChapter("slow")}
       onBattle={() => setScreen("battle")}
-      onUnitTest={() => setScreen("unitTest")}
+      onStepUp={() => setScreen("stepUp")}
       onNotebook={() => setScreen("notebook")}
     />
   );

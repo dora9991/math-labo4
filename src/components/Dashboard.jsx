@@ -3,15 +3,46 @@
 //  ・ステータス（レベル・XP・連続日数・累計★・正答率）
 //  ・章ごとのクリア進捗バー
 //  ・得意／苦手な単元（記録の正答率から）
+//  ・直近3日分の学習履歴（日ごとの解答数・正解数）
 // ============================================================
 import { CHAPTERS, LEVEL_KEYS } from "../data/index.js";
-import { levelFromXp, levelProgress, LEVEL_NAMES } from "../engine/scoring.js";
+import { levelFromXp, levelProgress, levelTitle, levelColor } from "../engine/scoring.js";
 
-const LV_COLORS = ["", "#94a3b8", "#60a5fa", "#4ade80", "#fb923c", "#f87171", "#e879f9", "#fbbf24", "#f97316", "#ef4444", "#dc2626"];
+// 記録(records)を createdAt で日ごとにまとめ、解答数・正解数を集計する。
+// 解答のある日だけを新しい順に並べ、先頭 maxDays 日ぶんを返す。
+// （バトルのみで解答数0の日は履歴に出さない）
+function dailyHistory(records, maxDays = 3) {
+  const byDay = {};
+  for (const r of records) {
+    if (!r || !r.createdAt) continue;
+    const d = new Date(r.createdAt);
+    if (isNaN(d.getTime())) continue;
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const e = byDay[key] || (byDay[key] = { key, date: d, solved: 0, correct: 0 });
+    e.solved += (r.correct || 0) + (r.wrong || 0);
+    e.correct += r.correct || 0;
+  }
+  return Object.values(byDay)
+    .filter((e) => e.solved > 0)
+    .sort((a, b) => (a.key < b.key ? 1 : -1))
+    .slice(0, maxDays);
+}
+
+// 日付を「今日 / 昨日 / おととい / M/D」に整形する
+function dayLabel(date) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const d = new Date(date); d.setHours(0, 0, 0, 0);
+  const diff = Math.round((today - d) / 86400000);
+  if (diff === 0) return "今日";
+  if (diff === 1) return "昨日";
+  if (diff === 2) return "おととい";
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+}
 
 export default function Dashboard({ player, records = [] }) {
   const lv = levelFromXp(player.xp);
   const xpPct = levelProgress(player.xp);
+  const lvCol = levelColor(lv);
   const stars = player.stars || {};
 
   // 記録から単元ごとの正誤を集計
@@ -49,6 +80,9 @@ export default function Dashboard({ player, records = [] }) {
 
   const pct = (n) => Math.round(n * 100);
 
+  // 直近3日分の学習履歴
+  const history = dailyHistory(records, 3);
+
   return (
     <div>
       {/* ステータス */}
@@ -57,15 +91,15 @@ export default function Dashboard({ player, records = [] }) {
           <div style={{
             width: 54, height: 54, borderRadius: "50%", flexShrink: 0,
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-            background: `conic-gradient(${LV_COLORS[lv]} ${xpPct}%, rgba(255,255,255,.1) 0)`,
+            background: `conic-gradient(${lvCol} ${xpPct}%, rgba(255,255,255,.1) 0)`,
           }}>
             <div style={{ width: 42, height: 42, borderRadius: "50%", background: "#1a1a2e", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
               <span style={{ fontSize: 9, color: "rgba(255,255,255,.5)", lineHeight: 1 }}>Lv</span>
-              <span style={{ fontSize: 18, fontWeight: 900, color: LV_COLORS[lv], lineHeight: 1 }}>{lv}</span>
+              <span style={{ fontSize: 18, fontWeight: 900, color: lvCol, lineHeight: 1 }}>{lv}</span>
             </div>
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 900, color: LV_COLORS[lv] }}>{LEVEL_NAMES[lv]}</div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: lvCol }}>{levelTitle(lv)}</div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)" }}>次のレベルまで {Math.round(xpPct)}%</div>
           </div>
           <div style={{ textAlign: "center" }}>
@@ -123,6 +157,38 @@ export default function Dashboard({ player, records = [] }) {
               ))}
             </div>
           </div>
+        )}
+      </div>
+
+      {/* 直近3日分の学習履歴 */}
+      <div className="glass" style={{ padding: "13px 14px" }}>
+        <div className="slbl">🗓️ 学習の記録（直近3日）</div>
+        {history.length === 0 ? (
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", textAlign: "center", padding: "8px 0" }}>
+            問題を解くと、その日の記録がここに残ります！
+          </div>
+        ) : (
+          history.map((h) => {
+            const a = h.solved > 0 ? Math.round((h.correct / h.solved) * 100) : 0;
+            return (
+              <div key={h.key} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 9 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.7)", width: 54, flexShrink: 0 }}>
+                  {dayLabel(h.date)}
+                </span>
+                <div style={{ display: "flex", gap: 14, flex: 1 }}>
+                  <span style={{ fontSize: 12 }}>
+                    <span style={{ fontWeight: 900, color: "#60a5fa" }}>{h.solved}</span>
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,.45)" }}> 問</span>
+                  </span>
+                  <span style={{ fontSize: 12 }}>
+                    <span style={{ fontWeight: 900, color: "#4ade80" }}>{h.correct}</span>
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,.45)" }}> 正解</span>
+                  </span>
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 800, color: "#fbbf24", minWidth: 36, textAlign: "right" }}>{a}%</span>
+              </div>
+            );
+          })
         )}
       </div>
     </div>

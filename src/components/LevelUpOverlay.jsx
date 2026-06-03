@@ -3,9 +3,8 @@
 //  紙吹雪＋「LEVEL UP!」＋新しいレベル/称号を表示。約2.4秒で自動的に閉じる。
 // ============================================================
 import { useEffect, useMemo } from "react";
-import { LEVEL_NAMES } from "../engine/scoring.js";
+import { levelTitle, levelColor } from "../engine/scoring.js";
 
-const LV_COLORS = ["", "#94a3b8", "#60a5fa", "#4ade80", "#fb923c", "#f87171", "#e879f9", "#fbbf24", "#f97316", "#ef4444", "#dc2626"];
 const CONFETTI = ["#fbbf24", "#4ade80", "#60a5fa", "#f472b6", "#a855f7", "#34d399"];
 
 export default function LevelUpOverlay({ level, onDone }) {
@@ -39,8 +38,8 @@ export default function LevelUpOverlay({ level, onDone }) {
       <div className="lvup-box">
         <div className="lvup-burst">⭐</div>
         <div className="lvup-title">LEVEL UP!</div>
-        <div className="lvup-lv" style={{ color: LV_COLORS[level] }}>Lv.{level}</div>
-        <div className="lvup-name">{LEVEL_NAMES[level]} になった！</div>
+        <div className="lvup-lv" style={{ color: levelColor(level) }}>Lv.{level}</div>
+        <div className="lvup-name">{levelTitle(level)} になった！</div>
       </div>
     </div>
   );

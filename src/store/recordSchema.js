@@ -10,7 +10,7 @@
 // Supabase に作る予定のテーブルと1対1で対応：
 //   records      … 1回の挑戦の結果（下の makeRecord）
 //   mistakes     … 間違えた問題（下の makeMistake）
-//   player_state … XP・レベル・単元ごとの星（PlayerState）
+//   player_state … XP・レベル・単元ごとの星・スキル習熟度（PlayerState）
 // ============================================================
 
 /** 端末ローカルの仮の生徒ID（サーバー化したら本物のIDに置き換える） */
@@ -31,7 +31,7 @@ function now() {
 
 /**
  * 1回の挑戦の記録を作る。
- * mode: "timeAttack" | "slow" | "battle" | "unitTest"
+ * mode: "timeAttack" | "slow" | "battle" | "unitTest" | "stepUp"
  */
 export function makeRecord({
   studentId, mode, chapterId, unitId, level,
@@ -53,8 +53,11 @@ export function makeRecord({
   };
 }
 
-/** 間違えた問題の記録を作る（間違いノート＆教員分析の元データ） */
-export function makeMistake({ studentId, chapterId, unitId, level, q, ans }) {
+/**
+ * 間違えた問題の記録を作る（間違いノート＆教員分析の元データ）。
+ * skill / templateId を持たせ、スキル単位の弱点分析・診断に使えるようにする。
+ */
+export function makeMistake({ studentId, chapterId, unitId, level, q, ans, skill = null, templateId = null }) {
   return {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     studentId,
@@ -63,6 +66,8 @@ export function makeMistake({ studentId, chapterId, unitId, level, q, ans }) {
     level: level ?? null,
     q,
     ans,
+    skill,            // どのスキルの問題か（data/skills.js の id）
+    templateId,       // どのテンプレか（再出題・分析用）
     createdAt: now(),
   };
 }
@@ -76,6 +81,7 @@ export function initialPlayerState(studentId) {
     lastDate: null,    // 最後に学習した日
     stars: {},         // { "u1-easy": 3, ... }
     playLog: {},       // { "u1-easy": { cleared: true, lastDate: "2026/5/30" }, ... } くり返しXP用
+    skillStats: {},    // { "S-NEG-012": { m: 0.62, n: 8, last: "2026/6/2" }, ... } アダプティブ習熟度
     updatedAt: now(),
   };
 }

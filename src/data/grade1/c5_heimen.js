@@ -60,19 +60,19 @@ export const chapter = {
       id: "z3",
       name: "おうぎ形①（弧・面積）",
       emoji: "🍕",
-      desc: "弧の長さと面積（π=3.14）",
+      desc: "答えは「□π」の□（係数）を答える",
       problems: {
         easy: [
-          p("z3e1", (r) => { const rad = r(2, 7); return { q: `半径${rad}cmの円の面積は？（π=3.14）`, ans: r2(3.14 * rad * rad), h1: "π×r²", h2: `3.14×${rad}²=${r2(3.14 * rad * rad)}cm²` }; }),
-          p("z3e2", (r) => { const rad = r(2, 7); return { q: `半径${rad}cmの円の円周は？（π=3.14）`, ans: r2(2 * 3.14 * rad), h1: "2×π×r", h2: `2×3.14×${rad}=${r2(2 * 3.14 * rad)}cm` }; }),
+          p("z3e1", (r) => { const rad = r(2, 9); return { q: `半径${rad}cmの円の面積は □π cm²。□は？`, ans: rad * rad, h1: "面積=π×r²なので□=r²", h2: `${rad}²=${rad * rad}` }; }),
+          p("z3e2", (r) => { const rad = r(2, 9); return { q: `半径${rad}cmの円の円周は □π cm。□は？`, ans: 2 * rad, h1: "円周=2×π×rなので□=2r", h2: `2×${rad}=${2 * rad}` }; }),
         ],
         standard: [
-          p("z3s1", (r) => { const rad = r(2, 6), ang = r(1, 3) * 90; return { q: `半径${rad}cm・中心角${ang}°のおうぎ形の面積は？（π=3.14）`, ans: r2(3.14 * rad * rad * ang / 360), h1: "円×(中心角/360)", h2: `=${r2(3.14 * rad * rad * ang / 360)}cm²` }; }),
-          p("z3s2", (r) => { const rad = r(2, 6), ang = r(1, 3) * 90; return { q: `半径${rad}cm・中心角${ang}°のおうぎ形の弧の長さは？（π=3.14）`, ans: r2(2 * 3.14 * rad * ang / 360), h1: "円周×(中心角/360)", h2: `=${r2(2 * 3.14 * rad * ang / 360)}cm` }; }),
+          p("z3s1", (r) => { const rad = r(1, 3) * 2, ang = r(1, 3) * 90; return { q: `半径${rad}cm・中心角${ang}°のおうぎ形の面積は □π cm²。□は？`, ans: rad * rad * ang / 360, h1: "□=r²×(中心角/360)", h2: `${rad * rad}×${ang}/360=${rad * rad * ang / 360}` }; }),
+          p("z3s2", (r) => { const rad = r(1, 3) * 3, ang = r(1, 5) * 60; return { q: `半径${rad}cm・中心角${ang}°のおうぎ形の弧の長さは □π cm。□は？`, ans: 2 * rad * ang / 360, h1: "□=2r×(中心角/360)", h2: `2×${rad}×${ang}/360=${2 * rad * ang / 360}` }; }),
         ],
         advanced: [
-          p("z3a1", (r) => { const r1 = r(2, 4), ro = r(5, 7); return { q: `半径${ro}cmの円から半径${r1}cmの円をくり抜いた面積は？（π=3.14）`, ans: r2(3.14 * (ro * ro - r1 * r1)), h1: "π(R²−r²)", h2: `=${r2(3.14 * (ro * ro - r1 * r1))}cm²` }; }),
-          p("z3a2", (r) => { const rad = r(2, 6), ang = r(2, 4) * 30; return { q: `半径${rad}cm・中心角${ang}°のおうぎ形の周の長さ（弧+半径×2）は？（π=3.14）`, ans: r2(2 * 3.14 * rad * ang / 360 + 2 * rad), h1: "弧+半径×2", h2: `=${r2(2 * 3.14 * rad * ang / 360 + 2 * rad)}cm` }; }),
+          p("z3a1", (r) => { const r1 = r(2, 4), ro = r(5, 8); return { q: `半径${ro}cmの円から半径${r1}cmの円をくり抜いた面積は □π cm²。□は？`, ans: ro * ro - r1 * r1, h1: "□=R²−r²", h2: `${ro * ro}−${r1 * r1}=${ro * ro - r1 * r1}` }; }),
+          p("z3a2", (r) => { const rad = r(2, 6), n = r(3, 6); return { q: `半径${rad}cmの円を${n}等分したおうぎ形1つの面積は □π cm²。□は？`, ans: r2(rad * rad / n), h1: `□=r²÷${n}`, h2: `${rad * rad}÷${n}=${r2(rad * rad / n)}` }; }),
         ],
       },
     },
@@ -80,17 +80,17 @@ export const chapter = {
       id: "z4",
       name: "おうぎ形②（中心角）",
       emoji: "🧭",
-      desc: "弧から中心角を求める",
+      desc: "弧・割合から中心角を求める",
       problems: {
         easy: [
           p("z4e1", (r) => { const rad = r(2, 6); return { q: `半径${rad}cmの円で、面積が全体の1/4のおうぎ形の中心角は？`, ans: 90, h1: "360×1/4", h2: "90°" }; }),
           p("z4e2", (r) => { const rad = r(2, 6); return { q: `半径${rad}cmの円で、全体の1/3のおうぎ形の中心角は？`, ans: 120, h1: "360×1/3", h2: "120°" }; }),
         ],
         standard: [
-          p("z4s1", (r) => { const rad = r(2, 5), ang = r(1, 4) * 60; const arc = r2(2 * 3.14 * rad * ang / 360); return { q: `半径${rad}cm・弧の長さ${arc}cmのおうぎ形の中心角は？（π=3.14）`, ans: ang, h1: "中心角=弧×360÷(2πr)", h2: `${ang}°` }; }),
+          p("z4s1", (r) => { const rad = r(1, 3) * 3, ang = r(1, 4) * 60; const arc = 2 * rad * ang / 360; return { q: `半径${rad}cm・弧の長さ ${arc}π cm のおうぎ形の中心角は？`, ans: ang, h1: "中心角=弧÷(2r)×360", h2: `${arc}÷${2 * rad}×360=${ang}°` }; }),
         ],
         advanced: [
-          p("z4a1", (r) => { const rad = r(2, 5), n = r(3, 5); return { q: `半径${rad}cmの円を${n}等分したおうぎ形1つの面積は？（π=3.14）`, ans: r2(3.14 * rad * rad / n), h1: `πr²÷${n}`, h2: `=${r2(3.14 * rad * rad / n)}cm²` }; }),
+          p("z4a1", (r) => { const rad = r(2, 6); const part = r(1, 5); const ang = part * 30; return { q: `半径${rad}cm・面積 ${r2(rad * rad * ang / 360)}π cm² のおうぎ形の中心角は？`, ans: ang, h1: "中心角=面積÷r²×360", h2: `${ang}°` }; }),
         ],
       },
     },
