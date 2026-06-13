@@ -1,36 +1,50 @@
 // ============================================================
-// TitleScreen.jsx — タイトル画面。OP曲が流れる（再生はStartで開始済み）。
-//  「はじめる」でメニュー（ホーム）へ。
+// TitleScreen.jsx — タイトル画面（リッチ演出）
+//  ・回転する光のリング＋浮遊するロゴ＋シマーするタイトル
+//  ・「はじめる」でホームへ。遊び方・キャラへの導線も。
+//  ・📐を5回すばやくタップで管理用モード（隠しコマンド・生徒には見えない）。
 // ============================================================
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { MathBackdrop } from "../components/Decorations.jsx";
 import * as bgm from "../audio/bgm.js";
 
-export default function TitleScreen({ onEnter }) {
+export default function TitleScreen({ onEnter, onAdmin, onHowTo, onCharacter }) {
   useEffect(() => { bgm.play("op"); }, []); // 念のためOPを継続
+
+  // 隠しコマンド：📐を5回すばやくタップで管理用モードへ
+  const tapRef = useRef({ n: 0, t: 0 });
+  function secretTap() {
+    const now = Date.now();
+    const s = tapRef.current;
+    s.n = now - s.t < 800 ? s.n + 1 : 1;
+    s.t = now;
+    if (s.n >= 5) { s.n = 0; onAdmin?.(); }
+  }
 
   return (
     <div className="app" style={{ alignItems: "center", justifyContent: "center" }}>
       <MathBackdrop />
-      <div style={{ position: "relative", zIndex: 1, textAlign: "center", padding: 24 }}>
-        <div style={{ fontSize: 72, marginBottom: 4, animation: "startPulse 2s ease-in-out infinite" }}>📐</div>
-        <div style={{ fontFamily: "'M PLUS Rounded 1c',sans-serif", fontSize: 48, fontWeight: 900, background: "linear-gradient(90deg,#818cf8,#c084fc,#38bdf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: 3, textShadow: "0 0 40px rgba(129,140,248,.4)" }}>
-          数学ラボ
+      <div className="title-wrap">
+        <div className="title-stage">
+          <div className="title-ring" />
+          <div className="title-ring2" />
+          <div className="title-logo" onClick={secretTap} style={{ cursor: "default", userSelect: "none" }}>📐</div>
         </div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,.55)", marginTop: 8, letterSpacing: 4 }}>～ MATH LAB ～</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 20, marginBottom: 26 }}>
-          解いて、戦って、レベルアップ！
+
+        <div className="title-name">数学ラボ</div>
+        <div className="title-sub">～ MATH LAB ～</div>
+        <div className="title-tag">解いて、戦って、レベルアップ！</div>
+
+        <div style={{ marginTop: 26 }}>
+          <button className="title-cta" onClick={onEnter}>▶ はじめる</button>
         </div>
-        <button
-          onClick={onEnter}
-          style={{
-            border: "none", borderRadius: 16, padding: "15px 44px", cursor: "pointer",
-            fontFamily: "'M PLUS Rounded 1c',sans-serif", fontSize: 19, fontWeight: 900, color: "#fff",
-            background: "linear-gradient(135deg,#059669,#047857)", boxShadow: "0 10px 30px rgba(5,150,105,.45)",
-          }}
-        >
-          ▶ はじめる
-        </button>
+
+        <div className="title-links">
+          {onHowTo && <button className="title-link" onClick={onHowTo}>📖 遊び方</button>}
+          {onCharacter && <button className="title-link" onClick={onCharacter}>🎨 キャラ</button>}
+        </div>
+
+        <div className="title-hint">♪ 音楽が流れます</div>
       </div>
     </div>
   );

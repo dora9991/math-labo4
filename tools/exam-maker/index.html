@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>定期テスト作成ツール（中1 数学・100点/50分）</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#fff; --ink:#1f2937; --sub:#6b7280; --line:#e5e7eb;
+    --accent:#3b6ef6; --accent-d:#2a55cf; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+    --know:#2563eb; --think:#9333ea; --chip:#eef2ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+       background:var(--bg);color:var(--ink);line-height:1.6}
+  header{background:linear-gradient(135deg,#3b6ef6,#6d5ef6);color:#fff;padding:18px 24px}
+  header h1{margin:0;font-size:20px}
+  header p{margin:4px 0 0;opacity:.92;font-size:13px}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px;display:grid;grid-template-columns:340px 1fr;gap:20px}
+  @media(max-width:920px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  .card h2{margin:0 0 12px;font-size:15px;display:flex;align-items:center;gap:8px}
+  label{display:block;font-size:13px;color:var(--sub);margin:12px 0 4px;font-weight:600}
+  select,input[type=text],input[type=number]{width:100%;padding:9px 10px;border:1px solid var(--line);
+       border-radius:9px;font-size:14px;background:#fff;font-family:inherit}
+  input[type=range]{width:100%}
+  .row{display:flex;gap:8px}
+  .row>*{flex:1}
+  .units{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+  .unitrow{border:1px solid var(--line);border-radius:9px;padding:6px 8px}
+  .unitrow>.uhead{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;cursor:pointer}
+  .unitrow>.uhead input{width:auto;margin:0}
+  .unitrow .ucount{margin-left:auto;font-size:11px;color:var(--sub);font-weight:400}
+  .subs{display:none;flex-wrap:wrap;gap:5px;margin:8px 0 2px;padding-left:24px}
+  .subs.open{display:flex}
+  .subchip{font-size:11px;padding:3px 8px;border:1px solid var(--line);border-radius:999px;
+       background:#f8fafc;cursor:pointer;color:var(--sub);user-select:none}
+  .subchip.on{background:var(--chip);border-color:#c7d2fe;color:var(--accent-d);font-weight:600}
+  .toggleSub{font-size:11px;color:var(--accent);cursor:pointer;margin-left:6px;font-weight:600}
+  .btn{display:block;width:100%;padding:11px;border:0;border-radius:10px;background:var(--accent);
+       color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:10px}
+  .btn:hover{background:var(--accent-d)}
+  .btn.sec{background:#fff;color:var(--accent);border:1.5px solid var(--accent)}
+  .btn.sec:hover{background:#f0f5ff}
+  .rangeval{float:right;font-weight:700;color:var(--ink)}
+  .hint{font-size:11.5px;color:var(--sub);margin:4px 0 0}
+  .stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 14px;text-align:center;flex:1;min-width:90px}
+  .stat .v{font-size:20px;font-weight:800}
+  .stat .l{font-size:11px;color:var(--sub)}
+  .stat.warnv .v{color:var(--bad)}
+  .difg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+  .difg .dlab{display:block;font-size:11px;font-weight:700;text-align:center;margin-bottom:2px}
+  .difg input{padding:6px 4px;text-align:center;font-size:13px}
+  .diffbar{display:flex;width:100%;height:26px;border-radius:7px;overflow:hidden;border:1px solid var(--line);margin-bottom:14px;font-size:11px}
+  .diffbar .seg{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;white-space:nowrap;min-width:0}
+  .diffbar .seg.s1{background:var(--ok)} .diffbar .seg.s2{background:var(--accent)}
+  .diffbar .seg.s3{background:var(--warn)} .diffbar .seg.s4{background:var(--bad)}
+  .diffnote{font-size:11.5px;color:var(--warn);margin:-6px 0 12px}
+  .empty{color:var(--sub);text-align:center;padding:50px 20px;font-size:14px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+       background:#111827;color:#fff;padding:10px 18px;border-radius:10px;opacity:0;transition:.25s;font-size:14px;z-index:99}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ===== 試験用紙レイアウト ===== */
+  .paper{background:#fff;border:1px solid var(--line);border-radius:10px;padding:30px 34px;
+       font-size:14px;color:#111}
+  .examhead{border-bottom:2.5px solid #111;padding-bottom:10px;margin-bottom:6px}
+  .examhead .ttl{font-size:21px;font-weight:800;text-align:center;letter-spacing:.06em}
+  .examhead .meta{display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px;font-size:12.5px}
+  .namebox{border:1px solid #111;border-radius:4px;padding:4px 8px;font-size:12px}
+  .scorebox{border:2px solid #111;border-radius:4px;padding:2px 0;width:120px;text-align:center}
+  .scorebox .lab{font-size:10px;border-bottom:1px solid #111;padding:2px 0}
+  .scorebox .num{font-size:13px;padding:9px 0 4px}
+  .sectiontag{margin:20px 0 8px;font-weight:800;font-size:14px;padding:5px 12px;border-radius:6px;display:inline-block}
+  .sectiontag.know{background:#dbeafe;color:#1e40af}
+  .sectiontag.think{background:#f3e8ff;color:#6b21a8}
+  .daimon{margin:14px 0 16px;page-break-inside:avoid}
+  .daimon .dhead{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:14.5px;margin-bottom:8px;
+       border-left:5px solid var(--accent);padding-left:8px}
+  .daimon .dhead .dno{font-size:15px}
+  .daimon .dhead .dunit{font-size:11px;color:var(--sub);font-weight:600}
+  .daimon .dhead .dpts{margin-left:auto;font-size:12px;color:var(--sub);font-weight:600}
+  .daimon.knowd .dhead{border-color:var(--know)}
+  .daimon.thinkd .dhead{border-color:var(--think)}
+  .items{display:grid;grid-template-columns:1fr 1fr;gap:6px 26px}
+  .items.single{grid-template-columns:1fr}
+  .qit{display:flex;gap:7px;align-items:flex-start;font-size:13.5px;padding:3px 0;position:relative}
+  .qit .qn{font-weight:700;min-width:30px}
+  .qit .qbody{flex:1}
+  .qit .qpt{font-size:10.5px;color:var(--sub);margin-left:4px}
+  .qit .ans-space{display:inline-block;border-bottom:1px solid #999;min-width:130px;height:1.25em;vertical-align:bottom;margin-left:4px}
+  .swap{position:absolute;right:-6px;top:2px;font-size:10px;color:var(--accent);cursor:pointer;
+       opacity:0;border:1px solid var(--line);border-radius:5px;padding:0 4px;background:#fff}
+  .qit:hover .swap{opacity:1}
+  .answerkey{margin-top:26px;border-top:2px dashed #999;padding-top:14px;page-break-before:always}
+  .answerkey h3{margin:0 0 10px;font-size:15px}
+  .akgrid{columns:2;font-size:12.5px;color:#111}
+  .akgrid .akd{break-inside:avoid;margin-bottom:8px}
+  .akgrid .akd b{color:var(--accent-d)}
+  .akgrid .akans{color:var(--ok);margin-right:10px}
+
+  @media print{
+    body{background:#fff}
+    .noprint{display:none !important}
+    .wrap{display:block;max-width:none;padding:0;margin:0}
+    .paper{border:0;border-radius:0;padding:0}
+    header{display:none}
+    @page{margin:14mm 12mm}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>定期テスト作成ツール <span style="font-weight:400;opacity:.85;font-size:14px">中1 数学</span></h1>
+  <p>問題データベースから、範囲・観点・配点に合わせてパターンの異なる問題を自動編成（100点/50分のめやす）</p>
+</header>
+
+<div class="wrap">
+  <!-- 左：設定 -->
+  <div class="noprint">
+    <div class="card">
+      <h2>① テスト範囲</h2>
+      <div class="row" style="margin-bottom:6px">
+        <button class="btn sec" style="margin:0;padding:7px;font-size:12px" id="selAll">全選択</button>
+        <button class="btn sec" style="margin:0;padding:7px;font-size:12px" id="selNone">全解除</button>
+      </div>
+      <div class="units" id="units"></div>
+      <p class="hint">単元名をクリック→「小単元で絞る」で細かい範囲指定もできます。</p>
+    </div>
+
+    <div class="card">
+      <h2>② 配点・時間</h2>
+      <div class="row">
+        <div><label>満点</label><input type="number" id="points" value="100" min="10" max="200" step="5"></div>
+        <div><label>時間(分)</label><input type="number" id="minutes" value="50" min="10" max="120" step="5"></div>
+      </div>
+      <label>思考・判断・表現の割合 <span class="rangeval" id="thinkVal">30%</span></label>
+      <input type="range" id="thinkRatio" min="0" max="60" value="30" step="5">
+      <p class="hint">知識・技能 <span id="knowPct">70</span>点 ／ 思考・判断・表現 <span id="thinkPct">30</span>点</p>
+      <label>問題量（1問あたりのゆとり）</label>
+      <select id="volume">
+        <option value="2.4">少なめ（じっくり）</option>
+        <option value="1.8" selected>標準</option>
+        <option value="1.35">多め（手早く）</option>
+      </select>
+      <label>難易度の割合（目安）<span class="rangeval" id="ratioSum"></span></label>
+      <div class="difg">
+        <div><span class="dlab" style="color:var(--ok)">基礎</span><input type="number" id="r1" value="30" min="0" max="100" step="5"></div>
+        <div><span class="dlab" style="color:var(--accent)">標準</span><input type="number" id="r2" value="40" min="0" max="100" step="5"></div>
+        <div><span class="dlab" style="color:var(--warn)">応用</span><input type="number" id="r3" value="20" min="0" max="100" step="5"></div>
+        <div><span class="dlab" style="color:var(--bad)">入試</span><input type="number" id="r4" value="10" min="0" max="100" step="5"></div>
+      </div>
+      <p class="hint">合計が100%でなくても比率として扱います。0%にした難易度は出題されません。</p>
+      <label><input type="checkbox" id="normPts" checked style="width:auto"> 配点を満点ぴったりに自動調整</label>
+    </div>
+
+    <div class="card">
+      <h2>③ 仕上げ</h2>
+      <label>テスト名</label>
+      <input type="text" id="title" value="第1回 定期テスト　数学">
+      <label><input type="checkbox" id="showAns" style="width:auto"> 画面に解答を表示</label>
+      <button class="btn" id="gen">🎲 テストを自動作成</button>
+      <button class="btn sec" id="printBtn">🖨 印刷 / PDF保存</button>
+    </div>
+  </div>
+
+  <!-- 右：プレビュー -->
+  <div>
+    <div class="stats noprint" id="stats"></div>
+    <div class="noprint" id="diffwrap"></div>
+    <div class="paper" id="paper">
+      <div class="empty">左の設定で範囲を選び「テストを自動作成」を押してください。</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="problem_bank.js"></script>
+<script>
+const BANK = (window.PROBLEM_BANK||[]).map(p=>({...p}));
+const UNIT_ORDER=['正の数・負の数','文字の式','方程式','比例と反比例','平面図形','空間図形','データの活用'];
+let exam=null;
+
+/* ---------- ユーティリティ ---------- */
+function $(id){return document.getElementById(id);}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1900);}
+
+/* ---------- 範囲UI ---------- */
+function buildUnitUI(){
+  const box=$('units');
+  box.innerHTML='';
+  UNIT_ORDER.forEach(u=>{
+    const subs=[...new Set(BANK.filter(p=>p.unit===u).map(p=>p.subunit))];
+    const n=BANK.filter(p=>p.unit===u).length;
+    const row=document.createElement('div');row.className='unitrow';
+    row.innerHTML=`
+      <div class="uhead">
+        <input type="checkbox" class="uchk" data-unit="${esc(u)}" checked>
+        <span class="uname">${esc(u)}</span>
+        <span class="ucount">${n}問</span>
+        <span class="toggleSub">小単元で絞る ▾</span>
+      </div>
+      <div class="subs">
+        ${subs.map(s=>`<span class="subchip on" data-unit="${esc(u)}" data-sub="${esc(s)}">${esc(s)}</span>`).join('')}
+      </div>`;
+    box.appendChild(row);
+  });
+  // events
+  box.querySelectorAll('.toggleSub').forEach(t=>t.onclick=e=>{
+    e.stopPropagation();
+    t.closest('.unitrow').querySelector('.subs').classList.toggle('open');
+  });
+  box.querySelectorAll('.uname').forEach(t=>t.onclick=()=>{
+    const c=t.closest('.uhead').querySelector('.uchk');c.checked=!c.checked;c.dispatchEvent(new Event('change'));
+  });
+  box.querySelectorAll('.uchk').forEach(c=>c.onchange=()=>{
+    const u=c.dataset.unit;
+    c.closest('.unitrow').querySelectorAll('.subchip').forEach(s=>s.classList.toggle('on',c.checked));
+  });
+  box.querySelectorAll('.subchip').forEach(s=>s.onclick=()=>{
+    s.classList.toggle('on');
+    const row=s.closest('.unitrow');
+    const any=[...row.querySelectorAll('.subchip')].some(x=>x.classList.contains('on'));
+    row.querySelector('.uchk').checked=any;
+  });
+}
+function getFilter(){
+  const subs=new Set();
+  document.querySelectorAll('.subchip.on').forEach(s=>subs.add(s.dataset.unit+''+s.dataset.sub));
+  return p=>subs.has(p.unit+''+p.subunit);
+}
+
+/* ---------- 難易度の段階（tier） ----------
+   1=基礎 2=標準 3=応用 4=入試レベル。入試はDB未収録だがlevel4/「入試」表記を将来対応。 */
+const TIER_NAME={1:'基礎',2:'標準',3:'応用',4:'入試'};
+function tierOf(p){
+  const ds=String(p.difficulty||'');
+  if((p.level||0)>=4 || ds.includes('入試') || ds.includes('★4')) return 4;
+  return p.level||2;
+}
+function getRatios(){
+  const v={1:Math.max(0,+$('r1').value||0),2:Math.max(0,+$('r2').value||0),
+           3:Math.max(0,+$('r3').value||0),4:Math.max(0,+$('r4').value||0)};
+  const sum=v[1]+v[2]+v[3]+v[4]||1;
+  return {1:v[1]/sum,2:v[2]/sum,3:v[3]/sum,4:v[4]/sum};
+}
+
+/* ---------- 多様性を最大化して抽出（時間予算ベース） ----------
+   小単元→スキルタグの重複を避けて「パターンの違う問題」を優先しつつ、
+   難易度の割合(ratios)に近づくよう、目標より少ない段階の問題を優先する。
+   pace は実際の解答ペースを見込んだ時間係数（DBのtimeSecに掛ける）。 */
+function diversePick(pool, budgetSec, pace, ratios){
+  const tagU={}, subU={}, tierU={1:0,2:0,3:0,4:0}, res=[]; let t=0;
+  const eff=p=>(p.timeSec||30)*pace;
+  let cand=shuffle(pool.filter(p=>ratios[tierOf(p)]>0));   // 0%の段階は除外
+  const score=p=>{
+    const tier=tierOf(p);
+    const share=res.length?tierU[tier]/res.length:0;
+    let s=-(ratios[tier]-share)*34;                // 目標に足りない段階ほど優先（=スコア低）
+    s+=(subU[p.subunit]||0)*5;                     // 小単元の重複を嫌う
+    (p.skillTags||[]).forEach(tg=>s+=(tagU[tg]||0)*2);
+    return s;
+  };
+  const take=p=>{res.push(p);t+=eff(p);tierU[tierOf(p)]++;subU[p.subunit]=(subU[p.subunit]||0)+1;(p.skillTags||[]).forEach(tg=>tagU[tg]=(tagU[tg]||0)+1);};
+  while(cand.length && t<budgetSec){
+    cand.sort((a,b)=>score(a)-score(b));
+    const next=cand[0];
+    if(t>0 && t+eff(next)>budgetSec*1.1){           // 予算を大きく超えそうなら収まる問題を探す
+      const small=cand.find(x=>t+eff(x)<=budgetSec*1.1);
+      if(!small) break;
+      cand.splice(cand.indexOf(small),1);take(small);continue;
+    }
+    cand.shift();take(next);
+  }
+  return res;
+}
+
+/* ---------- 大問へグルーピング ---------- */
+function mkDaimon(cog,unit,instr,items){
+  // 出題は level→subunit順で読みやすく（keepOrder時は渡された順＝単元順を保持）
+  items=items.slice();
+  if(!arguments[4]) items.sort((a,b)=>(a.level-b.level)||a.subunit.localeCompare(b.subunit,'ja'));
+  return {cog,unit,instr,items:items.map(p=>({...p,pts:p.points||2}))};
+}
+function instrFor(items){
+  const fmts=new Set(items.map(p=>p.format));
+  if(fmts.size===1 && fmts.has('作図')) return '次の作図をしなさい。（コンパスと定規を使い、作図に用いた線は消さずに残すこと）';
+  if(fmts.size===1 && fmts.has('計算')) return '次の計算をしなさい。';
+  return '次の問いに答えなさい。';
+}
+function buildExam(){
+  const filt=getFilter();
+  const minutes=+$('minutes').value||50, points=+$('points').value||100;
+  const thinkRatio=(+$('thinkRatio').value||0)/100;
+  const pace=+$('volume').value||1.8;
+  const ratios=getRatios();
+  const pool=BANK.filter(p=>filt(p));
+  if(!pool.length){toast('範囲に問題がありません。範囲を広げてください。');return null;}
+  const know=pool.filter(p=>p.cognitive==='知識・技能');
+  const think=pool.filter(p=>p.cognitive==='思考・判断・表現');
+  const totSec=minutes*60;
+  const knowSec=Math.round(totSec*(1-thinkRatio));
+  const thinkSec=totSec-knowSec;
+  const knowPicks=diversePick(know,knowSec,pace,ratios);
+  const thinkPicks=thinkRatio>0?diversePick(think,thinkSec,pace,ratios):[];
+
+  const daimon=[];
+  // 知識・技能①：計算問題は単元ごとに1つの大問へ集約
+  for(const u of UNIT_ORDER){
+    const it=knowPicks.filter(p=>p.unit===u && p.format==='計算');
+    if(it.length) daimon.push(mkDaimon('知識・技能',u,'次の計算をしなさい。',it));
+  }
+  // 知識・技能②：計算以外の小問は1つの「小問集合」大問にまとめ、断片化を防ぐ
+  const knowMisc=UNIT_ORDER.flatMap(u=>knowPicks.filter(p=>p.unit===u && p.format!=='計算'));
+  if(knowMisc.length){
+    const d=mkDaimon('知識・技能','小問集合','次の問いに答えなさい。',knowMisc,true);
+    d.mixed=true;            // 単元が混在するので問題ごとに単元を表示
+    daimon.push(d);
+  }
+  // 思考・判断・表現：単元ごとに集約（計算形式でも「問い」として扱う）
+  for(const u of UNIT_ORDER){
+    const it=thinkPicks.filter(p=>p.unit===u);
+    if(!it.length) continue;
+    const allDraw=it.every(p=>p.format==='作図');
+    const instr=allDraw?'次の作図をしなさい。（コンパスと定規を使い、作図に用いた線は消さずに残すこと）':'次の問いに答えなさい。';
+    daimon.push(mkDaimon('思考・判断・表現',u,instr,it));
+  }
+  // 配点正規化
+  const knowTarget=Math.round(points*(1-thinkRatio));
+  if($('normPts').checked){
+    normalize(daimon,'知識・技能',knowTarget);
+    if(thinkRatio>0) normalize(daimon,'思考・判断・表現',points-knowTarget);
+  }
+  daimon.forEach((d,i)=>{d.no=i+1;d.total=d.items.reduce((s,x)=>s+x.pts,0);});
+  return {daimon,minutes,points,pace,ratios};
+}
+
+function normalize(daimon,cog,target){
+  const items=[];
+  daimon.filter(d=>d.cog===cog).forEach(d=>d.items.forEach(it=>items.push(it)));
+  if(!items.length) return;
+  const sum=items.reduce((s,it)=>s+(it.points||2),0);
+  const scaled=items.map(it=>(it.points||2)/sum*target);
+  let floors=scaled.map(x=>Math.max(1,Math.floor(x)));
+  let rem=target-floors.reduce((a,b)=>a+b,0);
+  const frac=scaled.map((x,i)=>({i,f:x-Math.floor(x)})).sort((a,b)=>b.f-a.f);
+  let k=0;
+  while(rem>0 && frac.length){floors[frac[k%frac.length].i]++;rem--;k++;}
+  while(rem<0){
+    const big=floors.map((v,i)=>({v,i})).filter(o=>o.v>1).sort((a,b)=>b.v-a.v)[0];
+    if(!big) break; floors[big.i]--; rem++;
+  }
+  items.forEach((it,i)=>it.pts=floors[i]);
+}
+
+/* ---------- 描画 ---------- */
+function render(){
+  if(!exam){return;}
+  const {daimon,minutes,points,pace}=exam;
+  const title=$('title').value||'定期テスト';
+  const totPts=daimon.reduce((s,d)=>s+d.total,0);
+  const totSec=daimon.reduce((s,d)=>s+d.items.reduce((a,x)=>a+(x.timeSec||30)*(pace||1.8),0),0);
+  const cnt=daimon.reduce((s,d)=>s+d.items.length,0);
+  const knowPts=daimon.filter(d=>d.cog==='知識・技能').reduce((s,d)=>s+d.total,0);
+  const thinkPts=totPts-knowPts;
+
+  // 統計
+  const overTime=totSec>minutes*60*1.05;
+  $('stats').innerHTML=`
+    <div class="stat"><div class="v">${totPts}</div><div class="l">合計点</div></div>
+    <div class="stat"><div class="v">${cnt}</div><div class="l">問題数</div></div>
+    <div class="stat${overTime?' warnv':''}"><div class="v">${Math.round(totSec/60)}<span style="font-size:12px">分</span></div><div class="l">想定解答時間</div></div>
+    <div class="stat"><div class="v" style="color:var(--know)">${knowPts}</div><div class="l">知識・技能</div></div>
+    <div class="stat"><div class="v" style="color:var(--think)">${thinkPts}</div><div class="l">思考・判断・表現</div></div>
+    <div class="stat"><div class="v">${daimon.length}</div><div class="l">大問数</div></div>`;
+
+  // 難易度の内訳（実際の構成）
+  renderDiffBar(daimon, totPts);
+
+  // 用紙
+  let html=`<div class="examhead">
+    <div class="ttl">${esc(title)}</div>
+    <div class="meta">
+      <div>
+        <span class="namebox">年　組　番　氏名：　　　　　　　　　　　</span>
+        <div style="margin-top:6px;color:#555">制限時間 ${minutes}分／${points}点満点</div>
+      </div>
+      <div class="scorebox"><div class="lab">得点</div><div class="num">／ ${totPts}</div></div>
+    </div>
+  </div>`;
+
+  let lastCog=null;
+  daimon.forEach(d=>{
+    if(d.cog!==lastCog){
+      const isKnow=d.cog==='知識・技能';
+      html+=`<div class="sectiontag ${isKnow?'know':'think'}">${isKnow?'知識・技能':'思考・判断・表現'}</div>`;
+      lastCog=d.cog;
+    }
+    const isKnow=d.cog==='知識・技能';
+    const single=d.items.some(p=>['文章題','作図','選択'].includes(p.format)) || d.cog==='思考・判断・表現';
+    html+=`<div class="daimon ${isKnow?'knowd':'thinkd'}">
+      <div class="dhead">
+        <span class="dno">${d.no}</span>
+        <span>${esc(d.instr)}</span>
+        <span class="dunit">${d.mixed?'':'［'+esc(d.unit)+'］'}</span>
+        <span class="dpts">${ptsLabel(d)}</span>
+      </div>
+      <div class="items ${single?'single':''}">`;
+    d.items.forEach((p,i)=>{
+      const num=`(${i+1})`;
+      const showSpace=!single;
+      const utag=d.mixed?`<span class="dunit" style="margin-right:4px">［${esc(p.unit)}］</span>`:'';
+      html+=`<div class="qit" data-d="${d.no}" data-i="${i}">
+        <span class="qn">${num}</span>
+        <span class="qbody">${utag}${esc(p.q)}${showSpace?'<span class="ans-space"></span>':''}<span class="qpt">[${p.pts}点]</span></span>
+        <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+
+  // 解答
+  if($('showAns').checked){
+    html+=answerKeyHtml(daimon);
+  }else{
+    // 印刷時だけ解答ページを別途付けるため、非表示で持たせる
+    html+=`<div class="answerkey" style="display:none" id="ansForPrint">${answerKeyBody(daimon)}</div>`;
+  }
+
+  $('paper').innerHTML=html;
+  bindSwap();
+}
+function renderDiffBar(daimon, totPts){
+  const items=daimon.flatMap(d=>d.items);
+  const cnt={1:0,2:0,3:0,4:0}, pts={1:0,2:0,3:0,4:0};
+  items.forEach(p=>{const t=tierOf(p);cnt[t]++;pts[t]+=p.pts;});
+  const n=items.length||1;
+  let seg='';
+  [1,2,3,4].forEach(t=>{
+    if(!cnt[t]) return;
+    const pct=Math.round(cnt[t]/n*100);
+    seg+=`<div class="seg s${t}" style="flex:${cnt[t]}" title="${TIER_NAME[t]}：${cnt[t]}問・${pts[t]}点">${TIER_NAME[t]} ${pct}%</div>`;
+  });
+  // 目標を指定したのに範囲内に問題が無い段階の注意書き
+  const r=exam?exam.ratios:getRatios();
+  const miss=[1,2,3,4].filter(t=>r[t]>0 && cnt[t]===0).map(t=>TIER_NAME[t]);
+  $('diffwrap').innerHTML=
+    `<div style="font-size:12px;color:var(--sub);margin-bottom:4px;font-weight:600">難易度の内訳（実際）</div>`+
+    `<div class="diffbar">${seg}</div>`+
+    (miss.length?`<div class="diffnote">⚠ 「${miss.join('・')}」レベルの問題が選んだ範囲に無いため出題されていません。${miss.includes('入試')?'（入試レベルは現在DBに未収録です）':''}</div>`:'');
+}
+function ptsLabel(d){
+  const uniq=[...new Set(d.items.map(x=>x.pts))];
+  return uniq.length===1 ? `（各${uniq[0]}点・計${d.total}点）` : `（計${d.total}点）`;
+}
+function answerKeyBody(daimon){
+  let s='';
+  daimon.forEach(d=>{
+    const list=d.items.map((p,i)=>`<span class="akans">(${i+1}) ${esc(p.answer)}</span>`).join(' ');
+    s+=`<div class="akd"><b>大問${d.no}</b>（${esc(d.unit)}）<br>${list}</div>`;
+  });
+  return `<h3>【解答】</h3><div class="akgrid">${s}</div>`;
+}
+function answerKeyHtml(daimon){
+  return `<div class="answerkey">${answerKeyBody(daimon)}</div>`;
+}
+
+/* ---------- 1問差し替え ---------- */
+function bindSwap(){
+  $('paper').querySelectorAll('.swap').forEach(b=>b.onclick=()=>{
+    const qit=b.closest('.qit');
+    const dno=+qit.dataset.d, idx=+qit.dataset.i;
+    const d=exam.daimon.find(x=>x.no===dno);if(!d)return;
+    const old=d.items[idx];
+    const usedIds=new Set(exam.daimon.flatMap(x=>x.items.map(y=>y.id)));
+    // まず同単元・同小単元・同難易度の別問題を探し、難易度の割合を保つ
+    let pool=BANK.filter(p=>p.unit===old.unit && p.subunit===old.subunit
+        && p.cognitive===old.cognitive && p.format===old.format
+        && p.difficulty===old.difficulty && !usedIds.has(p.id));
+    if(!pool.length) pool=BANK.filter(p=>p.unit===old.unit && p.cognitive===old.cognitive
+        && p.difficulty===old.difficulty && !usedIds.has(p.id));
+    if(!pool.length) pool=BANK.filter(p=>p.unit===old.unit && p.cognitive===old.cognitive
+        && !usedIds.has(p.id));
+    if(!pool.length){toast('差し替えできる別問題がありません');return;}
+    const rep={...shuffle(pool)[0],pts:old.pts};
+    d.items[idx]=rep;
+    // 再正規化（観点ごと）
+    if($('normPts').checked){
+      const points=+$('points').value||100, thinkRatio=(+$('thinkRatio').value||0)/100;
+      const knowTarget=Math.round(points*(1-thinkRatio));
+      normalize(exam.daimon,'知識・技能',knowTarget);
+      if(thinkRatio>0) normalize(exam.daimon,'思考・判断・表現',points-knowTarget);
+    }
+    exam.daimon.forEach(x=>x.total=x.items.reduce((s,y)=>s+y.pts,0));
+    render();
+    toast('差し替えました');
+  });
+}
+
+/* ---------- イベント ---------- */
+function syncRatio(){
+  const tr=+$('thinkRatio').value, pts=+$('points').value||100;
+  $('thinkVal').textContent=tr+'%';
+  const kt=Math.round(pts*(1-tr/100));
+  $('knowPct').textContent=kt; $('thinkPct').textContent=pts-kt;
+  const rs=(+$('r1').value||0)+(+$('r2').value||0)+(+$('r3').value||0)+(+$('r4').value||0);
+  $('ratioSum').textContent=`計${rs}%`;
+  $('ratioSum').style.color = rs===100?'var(--ok)':'var(--sub)';
+}
+$('thinkRatio').oninput=syncRatio;
+$('points').oninput=syncRatio;
+['r1','r2','r3','r4'].forEach(id=>$(id).oninput=syncRatio);
+$('selAll').onclick=()=>{document.querySelectorAll('.uchk').forEach(c=>{c.checked=true;c.dispatchEvent(new Event('change'));});};
+$('selNone').onclick=()=>{document.querySelectorAll('.uchk').forEach(c=>{c.checked=false;c.dispatchEvent(new Event('change'));});};
+$('gen').onclick=()=>{
+  const e=buildExam();
+  if(!e)return;
+  exam=e;render();
+  toast(`大問${e.daimon.length}・${e.daimon.reduce((s,d)=>s+d.items.length,0)}問を作成しました`);
+};
+$('showAns').onchange=()=>{if(exam)render();};
+$('printBtn').onclick=()=>{
+  if(!exam){toast('先にテストを作成してください');return;}
+  // 印刷時は解答ページも出す
+  const hid=$('ansForPrint'); if(hid) hid.style.display='block';
+  window.print();
+  setTimeout(()=>{if(hid)hid.style.display='none';},500);
+};
+
+/* ---------- init ---------- */
+buildUnitUI();
+syncRatio();
+</script>
+</body>
+</html>

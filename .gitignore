@@ -18,3 +18,10 @@ yarn-error.log*
 # エディタ設定
 .vscode/
 .idea/
+
+# Claude Code のローカル設定
+.claude/
+
+# 別プロジェクト／入れ子の git リポジトリ（submodule化を防ぐため追跡しない）
+math-labo4/
+chienkan-guest/

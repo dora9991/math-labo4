@@ -11,7 +11,7 @@ import DrawPad from "../components/DrawPad.jsx";
 import * as sfx from "../audio/sfx.js";
 import { isCorrect } from "../engine/scoring.js";
 import {
-  CHALLENGE_UNITS, LEVEL_LABEL, clearedCount, unitRank,
+  CHALLENGE_UNITS, LEVEL_LABEL, LEVEL_STARS, clearedCount, unitRank,
   toNextRank, masteredUnits, totalCleared, challengeXp,
 } from "../data/challenge.js";
 
@@ -29,12 +29,15 @@ export default function Challenge({ player, onClear, onHome }) {
   const [rankUp, setRankUp] = useState(null);    // 階級アップ演出 { unit, rank }
   const [msg, setMsg] = useState("");
 
+  function openUnit(unit) { setCurUnit(unit); setView("levels"); }
+
   function openProblem(unit, p) {
     setCurUnit(unit); setCur(p); setInput(""); setResult(null); setWrong(0);
     setHintLv(0); setMsg(""); setPadKey((k) => k + 1); setShowPad(true); setView("solve");
   }
 
-  function backToUnits() { setView("units"); setCur(null); }
+  function backToUnits() { setView("units"); setCur(null); setCurUnit(null); }
+  function backToLevels() { setView("levels"); setCur(null); }
 
   function submit() {
     if (!cur || result === "correct" || input.trim() === "") return;
@@ -66,7 +69,7 @@ export default function Challenge({ player, onClear, onHome }) {
     const already = !!player.challengeCleared?.[cur.id];
     return (
       <div className="app">
-        <Header player={player} back="単元へ" onBack={backToUnits} />
+        <Header player={player} back="級・段へ" onBack={backToLevels} />
         <div className="content">
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <span className="ch-tier-pill">{curUnit.emoji} {curUnit.name}</span>
@@ -135,7 +138,7 @@ export default function Challenge({ player, onClear, onHome }) {
                     <button onClick={reveal} data-sfx="none" style={ghostBtn}>答えを見る</button>
                   )}
                   {result === "revealed" && (
-                    <button onClick={backToUnits} data-sfx="none" style={ghostBtn}>単元へもどる</button>
+                    <button onClick={backToLevels} data-sfx="none" style={ghostBtn}>級・段へもどる</button>
                   )}
                 </div>
               </>
@@ -146,11 +149,11 @@ export default function Challenge({ player, onClear, onHome }) {
                 <div style={{ fontSize: 13, color: "rgba(255,255,255,.6)", marginTop: 4 }}>
                   {already ? "さすが、もう一度解けたね。" : `${curUnit.name}の難問を攻略！ +${challengeXp(cur.level)}XP`}
                 </div>
-                <button onClick={backToUnits} data-sfx="none" style={{
+                <button onClick={backToLevels} data-sfx="none" style={{
                   marginTop: 16, padding: "12px 26px", borderRadius: 12, border: "none",
                   cursor: "pointer", fontSize: 15, fontWeight: 900, color: "#fff", background: "#6366f1",
                 }}>
-                  単元へもどる →
+                  級・段へもどる →
                 </button>
               </div>
             )}
@@ -194,6 +197,97 @@ export default function Challenge({ player, onClear, onHome }) {
     );
   }
 
+  // ============ 級・段（単元内のレベル選択）ビュー ============
+  if (view === "levels" && curUnit) {
+    const unit = curUnit;
+    const c = clearedCount(unit, cleared);
+    const total = unit.problems.length;
+    const rank = unitRank(unit, cleared);
+    const nxt = toNextRank(unit, cleared);
+    const allDone = c >= total;
+    return (
+      <div className="app">
+        <Header player={player} back="単元へ" onBack={backToUnits} />
+        <div className="content">
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+            <span style={{ fontSize: 30 }}>{unit.emoji}</span>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{unit.name}</div>
+              <div className="pg-sub" style={{ margin: 0 }}>級から段へ。1問ずつ攻略して階級を上げよう</div>
+            </div>
+          </div>
+
+          {/* いまの階級＋進捗 */}
+          <div className="glass" style={{ padding: "13px 15px", borderLeft: `4px solid ${unit.color}` }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>いまの階級</span>
+              <span style={{
+                display: "inline-flex", alignItems: "center", gap: 4, fontSize: 13, fontWeight: 900,
+                color: rank.color, background: `${rank.color}22`, border: `1px solid ${rank.color}66`,
+                borderRadius: 999, padding: "3px 11px",
+              }}>{rank.icon} {rank.name}</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ flex: 1, height: 7, borderRadius: 999, background: "rgba(255,255,255,.08)", overflow: "hidden" }}>
+                <div style={{ width: `${(c / total) * 100}%`, height: "100%", background: rank.color, borderRadius: 999, transition: "width .3s" }} />
+              </div>
+              <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.55)" }}>{c}/{total}</span>
+            </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", marginTop: 7 }}>
+              {allDone
+                ? <span style={{ color: "#f472b6", fontWeight: 800 }}>👑 この単元を制覇！</span>
+                : nxt
+                  ? <>あと <strong style={{ color: nxt.rank.color }}>{nxt.remain}問</strong> で <strong style={{ color: nxt.rank.color }}>{nxt.rank.name}</strong></>
+                  : null}
+            </div>
+          </div>
+
+          {/* 級・段ごとに3問ずつ（1級 → 初段 → 二段 → 三段 → 四段） */}
+          {[1, 2, 3, 4, 5].map((L) => {
+            const probs = unit.problems.filter((p) => p.level === L);
+            const doneInLevel = probs.filter((p) => cleared[p.id]).length;
+            const levelDone = doneInLevel === probs.length;
+            return (
+              <div key={L} className="glass" style={{ padding: "12px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 15, fontWeight: 900, color: levelDone ? "#4ade80" : unit.color }}>
+                      {LEVEL_LABEL[L]}
+                    </span>
+                    <span style={{ fontSize: 11, color: "#fde047" }}>{LEVEL_STARS[L]}</span>
+                    {levelDone && <span style={{ fontSize: 11, fontWeight: 800, color: "#4ade80" }}>制覇！</span>}
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.5)" }}>{doneInLevel}/{probs.length}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {probs.map((p, i) => {
+                    const ok = cleared[p.id];
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => openProblem(unit, p)}
+                        data-sfx="none"
+                        style={{
+                          flex: 1, padding: "11px 6px", borderRadius: 11, cursor: "pointer",
+                          fontSize: 13, fontWeight: 800,
+                          border: `2px solid ${ok ? "#4ade80" : "rgba(255,255,255,.15)"}`,
+                          background: ok ? "rgba(74,222,128,.12)" : "rgba(255,255,255,.05)",
+                          color: ok ? "#4ade80" : "#fff",
+                        }}
+                      >
+                        {ok ? "✓ " : ""}問{i + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   // ============ 単元一覧（選択）ビュー ============
   const done = totalCleared(cleared);
   const mastered = masteredUnits(cleared);
@@ -220,79 +314,55 @@ export default function Challenge({ player, onClear, onHome }) {
           </div>
         </div>
 
-        {/* 単元別カード（それぞれに階級） */}
+        <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,.5)", margin: "4px 2px" }}>
+          単元をえらぶ
+        </div>
+
+        {/* 7単元の選択ボタン（押すと、その単元の級・段が出る） */}
         {CHALLENGE_UNITS.map((unit) => {
           const c = clearedCount(unit, cleared);
           const total = unit.problems.length;
           const rank = unitRank(unit, cleared);
-          const nxt = toNextRank(unit, cleared);
           const allDone = c >= total;
           return (
-            <div key={unit.id} className="glass" style={{ padding: "12px 14px", borderLeft: `4px solid ${unit.color}` }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 18 }}>{unit.emoji}</span>
-                  <span style={{ fontSize: 15, fontWeight: 900, color: "#fff" }}>{unit.name}</span>
+            <button
+              key={unit.id}
+              onClick={() => openUnit(unit)}
+              data-sfx="none"
+              className="glass"
+              style={{
+                width: "100%", textAlign: "left", cursor: "pointer",
+                padding: "13px 15px", borderLeft: `4px solid ${unit.color}`,
+                border: "1px solid rgba(255,255,255,.1)", borderLeftWidth: 4, borderLeftColor: unit.color,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 24, flexShrink: 0 }}>{unit.emoji}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 900, color: "#fff" }}>{unit.name}</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 5 }}>
+                    <div style={{ flex: 1, height: 6, borderRadius: 999, background: "rgba(255,255,255,.08)", overflow: "hidden" }}>
+                      <div style={{ width: `${(c / total) * 100}%`, height: "100%", background: rank.color, borderRadius: 999 }} />
+                    </div>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.5)" }}>{c}/{total}</span>
+                  </div>
                 </div>
-                {/* 階級バッジ */}
-                <span style={{
-                  display: "inline-flex", alignItems: "center", gap: 4,
-                  fontSize: 12, fontWeight: 900, color: rank.color,
-                  background: `${rank.color}22`, border: `1px solid ${rank.color}66`,
-                  borderRadius: 999, padding: "3px 10px",
-                }}>
-                  {rank.icon} {rank.name}
-                </span>
-              </div>
-
-              {/* 進捗バー */}
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 9 }}>
-                <div style={{ flex: 1, height: 7, borderRadius: 999, background: "rgba(255,255,255,.08)", overflow: "hidden" }}>
-                  <div style={{ width: `${(c / total) * 100}%`, height: "100%", background: rank.color, borderRadius: 999, transition: "width .3s" }} />
+                <div style={{ flexShrink: 0, textAlign: "right" }}>
+                  <span style={{
+                    display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 900,
+                    color: rank.color, background: `${rank.color}22`, border: `1px solid ${rank.color}66`,
+                    borderRadius: 999, padding: "3px 10px",
+                  }}>{rank.icon} {rank.name}</span>
+                  {allDone && <div style={{ fontSize: 10, color: "#f472b6", fontWeight: 800, marginTop: 3 }}>👑 制覇</div>}
                 </div>
-                <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.55)" }}>{c}/{total}</span>
               </div>
-
-              {/* 問題ボタン（難易度★つき） */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {unit.problems.map((p, i) => {
-                  const ok = cleared[p.id];
-                  return (
-                    <button
-                      key={p.id}
-                      onClick={() => openProblem(unit, p)}
-                      data-sfx="none"
-                      style={{
-                        flex: "1 1 30%", minWidth: 86, padding: "9px 6px", borderRadius: 11, cursor: "pointer",
-                        fontSize: 12, fontWeight: 800, lineHeight: 1.35,
-                        border: `2px solid ${ok ? "#4ade80" : "rgba(255,255,255,.15)"}`,
-                        background: ok ? "rgba(74,222,128,.12)" : "rgba(255,255,255,.05)",
-                        color: ok ? "#4ade80" : "#fff",
-                      }}
-                    >
-                      {ok ? "✓ " : ""}問{i + 1}
-                      <br />
-                      <span style={{ fontSize: 10, color: ok ? "#4ade80" : "#fde047" }}>{LEVEL_LABEL[p.level]}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* 次の階級への案内 */}
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", marginTop: 8 }}>
-                {allDone
-                  ? <span style={{ color: "#f472b6", fontWeight: 800 }}>👑 この単元を制覇！</span>
-                  : nxt
-                    ? <>あと <strong style={{ color: nxt.rank.color }}>{nxt.remain}問</strong> で <strong style={{ color: nxt.rank.color }}>{nxt.rank.name}</strong></>
-                    : null}
-              </div>
-            </div>
+            </button>
           );
         })}
 
         <div style={{ marginTop: 10, fontSize: 11, color: "rgba(255,255,255,.4)", textAlign: "center", lineHeight: 1.6 }}>
-          ※ 各単元は、解いた難問の数で <strong>階級</strong> が上がります（全問クリアで👑マスター）。<br />
-          頭の中だけでは解けない問題ばかり。計算スペースを使って挑もう。
+          ※ 単元を選ぶと、1級→初段→二段… の難問が出ます。<br />
+          解いた数で <strong>階級</strong> が上がります（全問クリアで👑マスター）。
         </div>
       </div>
     </div>

@@ -6,13 +6,17 @@
 // ============================================================
 import { useState, useEffect, useRef } from "react";
 import MonsterSprite from "../components/MonsterSprite.jsx";
+import Avatar from "../components/Avatar.jsx";
 import { BigWord, StarField } from "../components/Decorations.jsx";
 import * as bgm from "../audio/bgm.js";
 import * as sfx from "../audio/sfx.js";
-import { getPlayerBattleStats, calcDamage, genBattleProblem } from "../engine/battle.js";
+import { getPlayerBattleStats, calcDamage, genBattleProblem, getEquippedSkills, SP_MAX, ultimateDamage, enemyDecide } from "../engine/battle.js";
+import { findItem } from "../engine/items.js";
 import { isCorrect, levelFromXp } from "../engine/scoring.js";
 
-export default function Battle({ player, monster, onResult, onExit }) {
+const ENEMY_CHARGE_NEED = 2; // super型が超必殺を撃つまでのチャージ回数（engine ENEMY_AI.super と一致）
+
+export default function Battle({ player, monster, onResult, onSpChange, onItemUse, onHpChange, onExit }) {
   const lv = levelFromXp(player.xp);
   // 制限時間 = 基本の制限時間 × (自分のレベル+10) ÷ (敵の適正レベル+10)（切り上げ）
   //  +10で格差をマイルドに。自分が強いほど長く、格上の敵だと短くなる。最低1秒。
@@ -23,11 +27,20 @@ export default function Battle({ player, monster, onResult, onExit }) {
     return { ...base, timer };
   })()).current;
 
-  const [playerHp, setPlayerHp] = useState(stats.maxHp);
+  // バトル開始HP：前回の続き(currentHp)があればそこから。null=満タン。最低1。
+  const startHp = player.currentHp == null ? stats.maxHp : Math.max(1, Math.min(stats.maxHp, player.currentHp));
+  const [playerHp, setPlayerHp] = useState(startHp);
   const [monsterHp, setMonsterHp] = useState(monster.hp);
   const [q, setQ] = useState(() => genBattleProblem(monster));
   const [timer, setTimer] = useState(stats.timer);
   const [combo, setCombo] = useState(0);
+  const [sp, setSp] = useState(() => Math.min(SP_MAX, player.sp ?? 0)); // スキルポイント（永続）
+  const [skillFx, setSkillFx] = useState(null);  // 発動中スキル/アイテムの画面演出 { name, icon, color }
+  const [item, setItem] = useState(player.item || null); // 所持アイテム（1つ）
+  const [atkBuff, setAtkBuff] = useState(null); // 攻撃バフ { turns, mult }（アイテム/スキル）
+  const [guardBuff, setGuardBuff] = useState(null); // 防御バフ { turns, reduce }（アイテム）
+  const [regen, setRegen] = useState(null); // 継続回復 { turns, pct }（リジェネ）
+  const equipped = getEquippedSkills(player); // 装備中スキル（スロット1/2）
   const [phase, setPhase] = useState("intro"); // intro | fight | win | lose
   const [input, setInput] = useState("");      // 文字入力の答え
   const [locked, setLocked] = useState(false);
@@ -42,17 +55,33 @@ export default function Battle({ player, monster, onResult, onExit }) {
   const [monDmg, setMonDmg] = useState(null);        // モンスターのダメージ数字
   const [dmgKey, setDmgKey] = useState(0);
   const [deadParticles, setDeadParticles] = useState([]);
+  const [enemyFx, setEnemyFx] = useState(null);      // 敵の行動演出 { icon, label, color }
+  const [enemyIntent, setEnemyIntent] = useState(null); // 敵の「ため」状態の予告 { text, color }
+  const [charging, setCharging] = useState(false);   // ためている間のオーラ
+  const aiStateRef = useRef({ charged: false, superCount: 0 }); // 敵のためチャージ状態
 
   // 安定参照（タイマーから最新処理を呼ぶ）
   const lockedRef = useRef(false);
   const phaseRef = useRef("intro");
+  const endedRef = useRef(false); // 勝敗確定の二重発火を防ぐ
+  const atkBuffRef = useRef(null); // 攻撃バフ { turns, mult }（setTimeout経由でも正しく参照）
+  const guardBuffRef = useRef(null); // 防御バフ { turns, reduce }
+  const regenRef = useRef(null); // 継続回復 { turns, pct }
   const timerRef = useRef(stats.timer);
   const actionsRef = useRef({});
   const inputRef = useRef(null);
+  const playerHpRef = useRef(startHp); // 最新の自分のHP（戦闘終了時に持ち越し保存する用）
+  useEffect(() => { playerHpRef.current = playerHp; }, [playerHp]);
+  // maxHp と同じなら満タン扱い(null)。それ以外は実数で持ち越す。
+  const saveHp = (hp) => onHpChange?.(hp >= stats.maxHp ? null : Math.max(0, Math.round(hp)));
   // 新しい問題になったら（ロック解除中は）入力欄にフォーカス
   useEffect(() => { if (!locked && phaseRef.current === "fight") inputRef.current?.focus(); }, [q, locked]);
 
   const setTimerBoth = (v) => { timerRef.current = v; setTimer(v); };
+  // バフは ref（即時参照）と state（表示）を両方更新する
+  const setAtkBuffBoth = (v) => { atkBuffRef.current = v; setAtkBuff(v); };
+  const setGuardBuffBoth = (v) => { guardBuffRef.current = v; setGuardBuff(v); };
+  const setRegenBoth = (v) => { regenRef.current = v; setRegen(v); };
 
   // 毎秒のカウントダウン（ロック中・戦闘終了中は止める）
   useEffect(() => {
@@ -66,13 +95,109 @@ export default function Battle({ player, monster, onResult, onExit }) {
   }, []); // eslint-disable-line
 
   function nextQuestion() {
+    // 継続回復（リジェネ）：1ターンごとに少しずつ回復し、残りターンを減らす
+    const rg = regenRef.current;
+    if (rg && rg.turns > 0) {
+      const amt = Math.max(1, Math.round(stats.maxHp * rg.pct));
+      setPlayerHp((hp) => Math.min(stats.maxHp, hp + amt));
+      const left = rg.turns - 1;
+      setRegenBoth(left > 0 ? { ...rg, turns: left } : null);
+    }
     setQ((cur) => genBattleProblem(monster, cur?.id));
     setInput("");
     setLocked(false); lockedRef.current = false;
     setTimerBoth(stats.timer);
   }
 
+  // SPを変更して即保存（バトルをまたいで維持されるよう App 側へ通知）
+  function changeSp(nv) {
+    const v = Math.max(0, Math.min(SP_MAX, nv));
+    setSp(v);
+    onSpChange?.(v);
+    return v;
+  }
+
+  // スキル発動（SPを消費）。time2x=回答時間2倍 / ultimate=必殺技（基本ダメージのmult倍）
+  function useSkill(skill) {
+    if (phaseRef.current !== "fight" || endedRef.current || lockedRef.current) return;
+    if (sp < skill.cost) return;
+    changeSp(sp - skill.cost);
+    sfx.levelUp();
+    setSkillFx({ name: skill.name, icon: skill.icon, color: skill.color });
+    setTimeout(() => setSkillFx(null), 1100);
+
+    if (skill.kind === "time2x") {
+      const mult = skill.timeMult ?? 2;
+      setTimerBoth(Math.min(99, Math.ceil(timerRef.current * mult)));
+      setLog(`${skill.icon} ${skill.name}！ 考える時間が${mult}倍になった！`);
+    } else if (skill.kind === "heal") {
+      const amt = Math.round(stats.maxHp * (skill.value ?? 0.3));
+      setPlayerHp((hp) => Math.min(stats.maxHp, hp + amt));
+      setLog(`${skill.icon} ${skill.name}！ HPが ${amt} 回復した！`);
+    } else if (skill.kind === "regen") {
+      setRegenBoth({ turns: skill.turns ?? 3, pct: skill.pct ?? 0.15 });
+      setLog(`${skill.icon} ${skill.name}！ ${skill.turns}ターン 毎ターン回復し続ける！`);
+    } else if (skill.kind === "guard") {
+      setGuardBuffBoth({ turns: skill.turns ?? 2, reduce: skill.reduce ?? 0.5 });
+      setLog(`${skill.icon} ${skill.name}！ ${skill.turns}ターン 受けるダメージを軽減！`);
+    } else if (skill.kind === "dmgup") {
+      setAtkBuffBoth({ turns: skill.turns ?? 2, mult: skill.mult ?? 1.5 });
+      setLog(`${skill.icon} ${skill.name}！ ${skill.turns}ターン 与ダメージ${skill.mult}倍！`);
+    } else if (skill.kind === "ultimate" || skill.kind === "drain") {
+      const dmg = ultimateDamage(stats.atk, skill.mult);
+      setMonState("damage"); setAnimKey((k) => k + 1);
+      setMonDmg(`-${dmg}`); setDmgKey((k) => k + 1);
+      setShowRing(true); setTimeout(() => setShowRing(false), 700);
+      if (skill.kind === "drain") {
+        const heal = Math.round(dmg * (skill.drain ?? 0.4));
+        setPlayerHp((hp) => Math.min(stats.maxHp, hp + heal));
+        setLog(`${skill.icon} ${skill.name}！ ${dmg}ダメージ＋HP ${heal} 回復！`);
+      } else {
+        setLog(`${skill.icon} ${skill.name}さくれつ！ ${dmg}ダメージ！`);
+      }
+      setMonsterHp((hp) => {
+        const nv = Math.max(0, hp - dmg);
+        if (nv <= 0) setTimeout(triggerWin, 400);
+        else setTimeout(() => setMonState("idle"), 700);
+        return nv;
+      });
+    }
+  }
+
+  // アイテムを使う（1つだけ所持・使うと消費して永続データからも消す）
+  function useItem() {
+    if (!item || phaseRef.current !== "fight" || endedRef.current) return;
+    const it = findItem(item);
+    if (!it) return;
+    setItem(null); onItemUse?.(); // 在庫から消す（バトルをまたいで消費が残る）
+    setSkillFx({ name: it.name, icon: it.icon, color: it.color });
+    setTimeout(() => setSkillFx(null), 1100);
+    sfx.levelUp();
+
+    if (it.kind === "heal") {
+      const amt = Math.round(stats.maxHp * (it.value ?? 0.5));
+      setPlayerHp((hp) => Math.min(stats.maxHp, hp + amt));
+      setLog(`${it.icon} ${it.name}！ HPが ${amt} 回復した！`);
+    } else if (it.kind === "atk2x") {
+      const turns = it.turns ?? 1;
+      setAtkBuffBoth({ turns, mult: 2 });
+      setLog(`${it.icon} ${it.name}！ ${turns === 1 ? "次の攻撃" : `${turns}ターン`}ダメージが2倍だ！`);
+    } else if (it.kind === "guard") {
+      const turns = it.turns ?? 2;
+      const reduce = it.reduce ?? 0.5;
+      setGuardBuffBoth({ turns, reduce });
+      setLog(`${it.icon} ${it.name}！ ${turns}ターン 受けるダメージが${reduce <= 0.25 ? "1/4" : reduce <= 0.34 ? "約1/3" : "1/2"}になる！`);
+    } else if (it.kind === "sp" || it.kind === "sp5") {
+      const amt = it.value ?? 5;
+      changeSp(sp + amt);
+      setLog(`${it.icon} ${it.name}！ スキルポイントが ${amt} 増えた！`);
+    }
+  }
+
   function triggerWin() {
+    if (endedRef.current) return;
+    endedRef.current = true;
+    saveHp(playerHpRef.current); // 勝っても全快しない：残りHPを持ち越す
     setPhase("win"); phaseRef.current = "win";
     bgm.play("victory", { loop: false });
     setMonState("dead"); setAnimKey((k) => k + 1);
@@ -92,24 +217,83 @@ export default function Battle({ player, monster, onResult, onExit }) {
   }
 
   function triggerLose() {
+    if (endedRef.current) return;
+    endedRef.current = true;
+    saveHp(1); // 敗北：HP1で生き残る（ショップで治療して再挑戦）
     setPhase("lose"); phaseRef.current = "lose";
     bgm.play("defeat", { loop: false });
     setLog("あなたはたおれてしまった…💀");
     setTimeout(() => onResult(false), 1200);
   }
 
-  // 被ダメ共通（不正解・時間切れ）
-  function takeHit(reason) {
-    setCombo(0);
+  // 敵の演出を中央に一瞬出す
+  function showEnemyFx(fx) {
+    setEnemyFx(fx);
+    setTimeout(() => setEnemyFx(null), 1100);
+  }
+
+  // 敵の攻撃を実際に当てる（ガード・画面ゆれ・被ダメ・敗北判定）
+  function enemyHit(rawDmg, label, fx) {
+    // 1パン防止：1回の被ダメは最大HPの70%まで（満タンからの即死を避ける）
+    let dmg = Math.max(1, Math.min(Math.round(rawDmg), Math.ceil(stats.maxHp * 0.7)));
+    let guarded = false;
+    const gb = guardBuffRef.current;
+    if (gb && gb.turns > 0) {
+      dmg = Math.max(1, Math.round(dmg * gb.reduce));
+      guarded = true;
+      const left = gb.turns - 1;
+      setGuardBuffBoth(left > 0 ? { ...gb, turns: left } : null);
+    }
     setShakeAns(true); setTimeout(() => setShakeAns(false), 460);
     setHurt(true); setTimeout(() => setHurt(false), 520);
     setMonState("attack"); setAnimKey((k) => k + 1);
-    setLog(`${reason} ${monster.name} の攻撃！ -${monster.atk}`);
+    if (fx) showEnemyFx(fx);
+    setLog(`${label} -${dmg}` + (guarded ? "（🛡️ガード！）" : ""));
     setPlayerHp((hp) => {
-      const nv = Math.max(0, hp - monster.atk);
+      const nv = Math.max(0, hp - dmg);
       if (nv <= 0) setTimeout(triggerLose, 500);
       return nv;
     });
+  }
+
+  // 敵のターン（プレイヤーの不正解・時間切れで回ってくる）。AIに従って行動を分岐。
+  function enemyTurn(reason) {
+    setCombo(0);
+    const { st, act } = enemyDecide(monster.ai || "plain", aiStateRef.current, monster);
+    aiStateRef.current = st;
+    const pre = reason ? reason + " " : "";
+
+    // 敵の「ため」状態を予告バッジに反映
+    if (monster.ai === "charger") setEnemyIntent(st.charged ? { text: "⚡ ためた！次の一撃は2倍", color: "#fbbf24" } : null);
+    else if (monster.ai === "super") setEnemyIntent(st.superCount > 0 ? { text: `💥 超必殺まであと ${ENEMY_CHARGE_NEED - st.superCount + 1}`, color: "#f472b6" } : null);
+
+    if (act.kind === "charge") {
+      setCharging(true);
+      setMonState("idle"); setAnimKey((k) => k + 1);
+      showEnemyFx({ icon: "⚡", label: monster.ai === "super" ? "チャージ中…" : "ためている…", color: "#fbbf24" });
+      setLog(`${pre}${monster.name} は ${act.label}`);
+      return;
+    }
+    setCharging(false);
+
+    if (act.kind === "heal") {
+      const amt = Math.max(1, Math.round(monster.hp * act.healPct));
+      setMonsterHp((hp) => Math.min(monster.hp, hp + amt));
+      setMonState("idle"); setAnimKey((k) => k + 1);
+      showEnemyFx({ icon: "💚", label: "かいふく！", color: "#4ade80" });
+      setLog(`${pre}${monster.name} は ${act.label} ＋${amt}`);
+      return;
+    }
+
+    // 攻撃系（attack / magic / fire / burst / super）
+    const FX = {
+      magic: { icon: "🔮", label: "まほう！", color: "#a78bfa" },
+      fire:  { icon: "🔥", label: "炎のブレス！", color: "#fb923c" },
+      burst: { icon: "💢", label: "ためた一撃！", color: "#f87171" },
+      super: { icon: "💥", label: "超必殺技！", color: "#f472b6" },
+    };
+    if (act.kind === "super" || act.kind === "burst") setEnemyIntent(null); // 撃ったので予告クリア
+    enemyHit(monster.atk * (act.mult || 1), `${pre}${monster.name} ${act.label}`, FX[act.kind] || null);
   }
 
   function answer(val) {
@@ -121,11 +305,23 @@ export default function Battle({ player, monster, onResult, onExit }) {
       sfx.correct();
       const newCombo = combo + 1;
       setCombo(newCombo);
-      const dmg = calcDamage(stats.atk, newCombo);
+      changeSp(sp + 1); // 正解でSP+1（5でスキル1、10でスキル2）
+      let dmg = calcDamage(stats.atk, newCombo);
+      let boosted = false;
+      const ab = atkBuffRef.current;
+      if (ab && ab.turns > 0) {
+        dmg = Math.round(dmg * ab.mult);
+        boosted = true;
+        const left = ab.turns - 1;
+        setAtkBuffBoth(left > 0 ? { ...ab, turns: left } : null);
+      }
       setShowRing(true); setTimeout(() => setShowRing(false), 700);
       setMonState("damage"); setAnimKey((k) => k + 1);
       setMonDmg(`-${dmg}`); setDmgKey((k) => k + 1);
-      setLog(newCombo >= 3 ? `正解！🔥${newCombo}コンボ ${dmg}ダメージ！` : `正解！${dmg}ダメージ！`);
+      setLog(
+        (boosted ? "💪パワーアップ！ " : "") +
+        (newCombo >= 3 ? `正解！🔥${newCombo}コンボ ${dmg}ダメージ！` : `正解！${dmg}ダメージ！`)
+      );
       setMonsterHp((hp) => {
         const nv = Math.max(0, hp - dmg);
         if (nv <= 0) setTimeout(triggerWin, 350);
@@ -134,7 +330,7 @@ export default function Battle({ player, monster, onResult, onExit }) {
       });
     } else {
       sfx.wrong();
-      takeHit(`不正解…(正解 ${q.ans})`);
+      enemyTurn(`不正解…(正解 ${q.ans})`);
       setTimeout(() => { if (phaseRef.current === "fight") { setMonState("idle"); nextQuestion(); } }, 950);
     }
   }
@@ -144,7 +340,7 @@ export default function Battle({ player, monster, onResult, onExit }) {
     if (lockedRef.current || phaseRef.current !== "fight") return;
     setLocked(true); lockedRef.current = true;
     sfx.wrong();
-    takeHit("⏰時間切れ！");
+    enemyTurn("⏰時間切れ！");
     setTimeout(() => { if (phaseRef.current === "fight") { setMonState("idle"); nextQuestion(); } }, 850);
   };
 
@@ -169,11 +365,15 @@ export default function Battle({ player, monster, onResult, onExit }) {
           <div style={{ fontSize: 13, color: "#cceebb", margin: "6px 0 14px" }}>
             {win ? `${monster.name} をたおした！ +${monster.reward}XP を獲得！` : `${monster.name} に やられてしまった…`}
           </div>
-          {!win && <div style={{ fontSize: 12, color: "#88aa88", marginBottom: 14, maxWidth: 300 }}>💡 XPを貯めてレベルを上げると、HP・攻撃力・考える時間が増えて有利になります。</div>}
-          <div style={{ display: "flex", gap: 10 }}>
-            <button className="bt-choice" style={{ padding: "12px 18px" }} onClick={onExit}>👾 相手を選ぶ</button>
-            <button className="bt-choice" style={{ padding: "12px 18px", borderColor: "#7fff7f" }} onClick={() => onResult("retry")}>🔁 もう一度</button>
-          </div>
+          {!win && <div style={{ fontSize: 12, color: "#88aa88", marginBottom: 14, maxWidth: 300 }}>💡 XPを貯めてレベルを上げると、HP・攻撃力・考える時間が増えて有利になります。<br />HP1でメニューに戻ります。ショップで治療してから再挑戦しよう。</div>}
+          {win ? (
+            <div style={{ display: "flex", gap: 10 }}>
+              <button className="bt-choice" style={{ padding: "12px 18px" }} onClick={onExit}>👾 相手を選ぶ</button>
+              <button className="bt-choice" style={{ padding: "12px 18px", borderColor: "#7fff7f" }} onClick={() => onResult("retry")}>🔁 もう一度</button>
+            </div>
+          ) : (
+            <div style={{ fontSize: 13, color: "#cceebb", fontWeight: 700 }}>メニューにもどります…</div>
+          )}
         </div>
       </div>
     );
@@ -187,12 +387,21 @@ export default function Battle({ player, monster, onResult, onExit }) {
       <StarField />
       <div className="bt-moon" />
       {hurt && <div className="bt-damage-overlay show" />}
+      {skillFx && (
+        <div className="bt-skill-fx" style={{ "--sc": skillFx.color }}>
+          <span className="ic">{skillFx.icon}</span>
+          <span className="nm">{skillFx.name}！</span>
+        </div>
+      )}
       <div className="battle-ground" />
       <div className="battle-content">
         {/* 敵ステータス */}
         <div className="bt-panel">
           <span className="bt-enemy-name" style={{ color: monster.color }}>{monster.name}</span>
           <span className="bt-enemy-theme">【{monster.unit}】</span>
+          {enemyIntent && (
+            <span className="bt-intent" style={{ "--ic": enemyIntent.color }}>{enemyIntent.text}</span>
+          )}
           <div className="bt-hp-row">
             <span className="bt-hp-label">HP</span>
             <div className="bt-hp-track"><div className="bt-hp-fill" style={{ width: monHpPct + "%", background: hpColor(monHpPct) }} /></div>
@@ -202,7 +411,14 @@ export default function Battle({ player, monster, onResult, onExit }) {
 
         {/* モンスター舞台 */}
         <div className="bt-stage">
+          {charging && <div className="bt-charge-aura" />}
           {monDmg && <div key={dmgKey} className="mon-dmg-num show">{monDmg}</div>}
+          {enemyFx && (
+            <div className="bt-enemy-fx" style={{ "--ec": enemyFx.color }}>
+              <span className="ic">{enemyFx.icon}</span>
+              <span className="nm">{enemyFx.label}</span>
+            </div>
+          )}
           {showRing && <><div className="correct-ring show" /><div className="correct-flash show" /></>}
           <MonsterSprite monster={monster} state={monState} animKey={animKey} />
           {deadParticles.length > 0 && (
@@ -249,19 +465,81 @@ export default function Battle({ player, monster, onResult, onExit }) {
           ) : <div style={{ color: "#cceebb" }}>問題を準備中…</div>}
         </div>
 
+        {/* スキル（SP） */}
+        <div className="bt-skill-bar">
+          <div className="bt-sp">
+            <span className="bt-sp-label">SP</span>
+            <div className="bt-sp-cells">
+              {Array.from({ length: SP_MAX }).map((_, i) => (
+                <span
+                  key={i}
+                  className={"bt-sp-cell" + (i < sp ? " on" : "") + (i === 4 || i === 9 ? " notch" : "")}
+                />
+              ))}
+            </div>
+            <span className="bt-sp-num">{sp}/{SP_MAX}</span>
+          </div>
+          <div className="bt-skill-btns">
+            {equipped.map((s) => {
+              const ready = sp >= s.cost;
+              return (
+                <button
+                  key={s.id}
+                  className={"bt-skill-btn" + (ready ? " ready" : "")}
+                  data-sfx="none"
+                  disabled={!ready || locked}
+                  onClick={() => useSkill(s)}
+                  style={{ "--sc": s.color }}
+                  title={s.desc}
+                >
+                  <span className="ic">{s.icon}</span>
+                  <span className="nm">{s.name}</span>
+                  <span className="ct">{s.cost} SP</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* アイテム（1つだけ持てる） */}
+          <div className="bt-item-row">
+            {(() => {
+              const it = item ? findItem(item) : null;
+              return it ? (
+                <button className="bt-item-btn" data-sfx="none" onClick={useItem} disabled={endedRef.current} title={it.desc}>
+                  <span className="ic">{it.icon}</span>
+                  <span className="nm">{it.name}</span>
+                  <span className="use">つかう</span>
+                </button>
+              ) : (
+                <div className="bt-item-empty">🎒 アイテムなし（ショップで買えます）</div>
+              );
+            })()}
+          </div>
+        </div>
+
+        {/* かかっている効果（アイテム/スキルのバフ・残ターン付き） */}
+        {(atkBuff || guardBuff || regen) && (
+          <div className="bt-buffs">
+            {atkBuff && <span className="bt-buff" style={{ "--bc": "#fbbf24" }}>💪 与ダメ{atkBuff.mult}倍（あと{atkBuff.turns}回）</span>}
+            {guardBuff && <span className="bt-buff" style={{ "--bc": "#60a5fa" }}>🛡️ 被ダメ軽減（あと{guardBuff.turns}回）</span>}
+            {regen && <span className="bt-buff" style={{ "--bc": "#34d399" }}>🌿 継続回復（あと{regen.turns}回）</span>}
+          </div>
+        )}
+
         {/* バトルログ */}
         <div className="bt-panel bt-log"><span className="new">{log}</span></div>
 
         {/* プレイヤー */}
         <div className="bt-panel bt-player">
-          <span className="bt-player-name">あなた（Lv.{lv}）</span>
+          <Avatar avatar={player.avatar} size={30} />
+          <span className="bt-player-name">{player.name ? player.name : "あなた"}（Lv.{lv}）</span>
           <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#7fff7f", fontSize: 12 }}>
             HP {Math.max(0, playerHp)}/{stats.maxHp}
             <div className="bt-hp-track" style={{ width: 110 }}><div className="bt-hp-fill" style={{ width: plHpPct + "%", background: hpColor(plHpPct) }} /></div>
           </div>
         </div>
 
-        <button className="back-btn" style={{ alignSelf: "center" }} onClick={onExit}>← にげる</button>
+        <button className="back-btn" style={{ alignSelf: "center" }} onClick={() => { if (!endedRef.current) saveHp(playerHpRef.current); onExit(); }}>← にげる</button>
       </div>
     </div>
   );

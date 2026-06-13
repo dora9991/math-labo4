@@ -68,9 +68,21 @@ export function pickNext(chapter, skillStats = {}, opts = {}) {
   // ── ② 期待正答率≈0.75 になる難易度を選ぶ ─────
   const want = targetDifficulty(mOf(target), 0.75);
   const levelsForSkill = [...new Set(index.filter((e) => e.skill === target).map((e) => e.level))];
-  const level = levelsForSkill
+  let level = levelsForSkill
     .map((l) => ({ l, d: levelDifficulty(l) }))
     .sort((x, y) => Math.abs(x.d - want) - Math.abs(y.d - want))[0]?.l || "easy";
+
+  // ── ②' 連続正解/不正解による難易度バイアス ───────
+  //  levelBias>0：連続正解 → 難しい方へ ／ levelBias<0：連続不正解 → 易しい方へ
+  if (opts.levelBias) {
+    const ORDER = ["easy", "standard", "advanced"];
+    const avail = ORDER.filter((l) => levelsForSkill.includes(l));
+    if (avail.length) {
+      const cur = Math.max(0, avail.indexOf(level));
+      const next = Math.max(0, Math.min(avail.length - 1, cur + opts.levelBias));
+      level = avail[next];
+    }
+  }
 
   // ── ③ (skill, level) の中からテンプレを1つ（直前と同じは避ける）──
   let cands = index.filter((e) => e.skill === target && e.level === level);

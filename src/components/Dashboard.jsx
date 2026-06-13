@@ -7,6 +7,7 @@
 // ============================================================
 import { CHAPTERS, LEVEL_KEYS } from "../data/index.js";
 import { levelFromXp, levelProgress, levelTitle, levelColor } from "../engine/scoring.js";
+import { getPlayerBattleStats, getEquippedSkills, SP_MAX } from "../engine/battle.js";
 
 // 記録(records)を createdAt で日ごとにまとめ、解答数・正解数を集計する。
 // 解答のある日だけを新しい順に並べ、先頭 maxDays 日ぶんを返す。
@@ -39,11 +40,13 @@ function dayLabel(date) {
   return `${date.getMonth() + 1}/${date.getDate()}`;
 }
 
-export default function Dashboard({ player, records = [] }) {
+export default function Dashboard({ player, records = [], onDetail }) {
   const lv = levelFromXp(player.xp);
   const xpPct = levelProgress(player.xp);
   const lvCol = levelColor(lv);
   const stars = player.stars || {};
+  const battle = getPlayerBattleStats(lv);     // バトル用 HP・攻撃力
+  const sp = Math.min(SP_MAX, player.sp ?? 0); // スキルポイント（永続）
 
   // 記録から単元ごとの正誤を集計
   const acc = {};
@@ -111,6 +114,34 @@ export default function Dashboard({ player, records = [] }) {
           <Stat label="累計⭐" value={`${totalStars}/${totalMax}`} color="#fbbf24" />
           <Stat label="解いた問題" value={solved} color="#60a5fa" />
           <Stat label="正答率" value={overallAcc == null ? "—" : overallAcc + "%"} color="#4ade80" />
+        </div>
+
+        {/* 単元・小単元ごとの理解度の詳細へ */}
+        {onDetail && (
+          <button
+            onClick={onDetail}
+            data-sfx="none"
+            style={{
+              width: "100%", marginTop: 10, padding: "9px", borderRadius: 11,
+              border: "1px solid rgba(129,140,248,.4)", background: "rgba(129,140,248,.12)",
+              color: "#c7d2fe", fontFamily: "inherit", fontWeight: 800, fontSize: 12, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            }}
+          >
+            📋 単元・小単元ごとの理解度を見る →
+          </button>
+        )}
+
+        {/* バトルステータス（HP・攻撃力・SP） */}
+        <div style={{ marginTop: 11, paddingTop: 11, borderTop: "1px solid rgba(255,255,255,.08)" }}>
+          <div style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.45)", marginBottom: 7 }}>
+            ⚔️ バトルステータス
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Stat label="現在のHP" value={`❤️ ${player.currentHp == null ? battle.maxHp : Math.max(0, Math.min(battle.maxHp, player.currentHp))}/${battle.maxHp}`} color="#f87171" />
+            <Stat label="こうげき力" value={`⚔️ ${battle.atk}`} color="#fbbf24" />
+          </div>
+          <SpGauge sp={sp} skills={getEquippedSkills(player)} />
         </div>
       </div>
 
@@ -190,6 +221,56 @@ export default function Dashboard({ player, records = [] }) {
             );
           })
         )}
+      </div>
+    </div>
+  );
+}
+
+// SP（スキルポイント）ゲージ。10目盛で、スキル1(5)・スキル2(10)に到達したかが分かる。
+function SpGauge({ sp, skills }) {
+  return (
+    <div style={{ marginTop: 9 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+        <span style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.5)" }}>⚡ SP（スキルポイント）</span>
+        <span style={{ fontSize: 11, fontWeight: 900, color: "#fbbf24" }}>{sp} / {SP_MAX}</span>
+      </div>
+      {/* 10目盛のゲージ。スキル発動ライン（5・10）に区切りを入れる */}
+      <div style={{ display: "flex", gap: 2 }}>
+        {Array.from({ length: SP_MAX }).map((_, i) => {
+          const on = i < sp;
+          const notch = i === 4 || i === 9; // 5個目・10個目の右にライン
+          return (
+            <span key={i} style={{
+              flex: 1, height: 12, borderRadius: 2,
+              background: on ? "linear-gradient(180deg,#fde047,#f59e0b)" : "rgba(255,255,255,.08)",
+              boxShadow: on ? "0 0 6px rgba(251,191,36,.6)" : "none",
+              borderRight: notch ? "3px solid #4ade80" : "none",
+            }} />
+          );
+        })}
+      </div>
+      {/* スキルが溜まっているかのバッジ */}
+      <div style={{ display: "flex", gap: 6, marginTop: 7 }}>
+        {skills.map((s) => {
+          const ready = sp >= s.cost;
+          return (
+            <div key={s.id} style={{
+              flex: 1, display: "flex", alignItems: "center", gap: 5, justifyContent: "center",
+              padding: "5px 6px", borderRadius: 9,
+              background: ready ? `color-mix(in srgb, ${s.color} 20%, transparent)` : "rgba(255,255,255,.04)",
+              border: `1px solid ${ready ? s.color : "rgba(255,255,255,.1)"}`,
+              opacity: ready ? 1 : 0.55,
+            }}>
+              <span style={{ fontSize: 14 }}>{s.icon}</span>
+              <span style={{ fontSize: 10, fontWeight: 800, color: ready ? "#fff" : "rgba(255,255,255,.5)" }}>
+                {s.name}
+              </span>
+              <span style={{ fontSize: 9, fontWeight: 700, color: ready ? s.color : "rgba(255,255,255,.4)" }}>
+                {ready ? "✓" : `${s.cost}`}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

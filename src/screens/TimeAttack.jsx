@@ -9,7 +9,7 @@ import { BigWord } from "../components/Decorations.jsx";
 import * as bgm from "../audio/bgm.js";
 import * as sfx from "../audio/sfx.js";
 import { genProblem, makeChoices } from "../engine/generator.js";
-import { calcStars, timeAttackXp, isCorrect, STAR_TARGET, XP_PENALTY_PER_WRONG, xpRepeatMultiplier } from "../engine/scoring.js";
+import { calcStars, timeAttackXp, timeAttackCoins, timeAttackStreakBonus, isCorrect, STAR_TARGET, XP_PENALTY_PER_WRONG, xpRepeatMultiplier } from "../engine/scoring.js";
 import { getStars } from "../engine/progress.js";
 
 const QUIZ_TIME = 40;
@@ -57,11 +57,13 @@ export default function TimeAttack({ player, chapter, unit, level, onComplete, o
     const stars = calcStars(correct, level);
     const prevStars = getStars(player, unit.id, level);
     const newStars = Math.max(0, stars - prevStars);
-    const baseXp = timeAttackXp({ correct, wrong, stars, newStars, maxStreak });
+    const streakBonus = timeAttackStreakBonus(results.map((r) => r.ok));
+    const baseXp = timeAttackXp({ correct, wrong, stars, newStars, streakBonus });
     const mult = xpRepeatMultiplier(player.playLog, `${unit.id}-${level}`, todayStr());
     const xp = Math.round(baseXp * mult);
-    setSummary({ xp, baseXp, mult, penalty: wrong * XP_PENALTY_PER_WRONG });
-    onComplete({ chapter, unit, level, correct, wrong, stars, maxStreak, xp, results });
+    const coins = timeAttackCoins({ correct, stars });
+    setSummary({ xp, baseXp, mult, penalty: wrong * XP_PENALTY_PER_WRONG, coins });
+    onComplete({ chapter, unit, level, correct, wrong, stars, maxStreak, xp, coins, results });
   }, [phase]); // eslint-disable-line
 
   function answer(val, idx) {
@@ -108,6 +110,11 @@ export default function TimeAttack({ player, chapter, unit, level, onComplete, o
               {summary && (
                 <div style={{ marginTop: 9 }}>
                   <span className="xp-pill">✨ +{summary.xp} XP</span>
+                  {summary.coins > 0 && (
+                    <span className="xp-pill" style={{ marginLeft: 6, background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#3a2a00" }}>
+                      💰 +{summary.coins} コイン
+                    </span>
+                  )}
                   {summary.mult < 1 && (
                     <div style={{ fontSize: 11, color: "#92400e", fontWeight: 700, marginTop: 5 }}>
                       {summary.mult === 0.5 ? "今日2回目以降のためXP½" : "クリア済みの再挑戦のためXP⅕"}（通常なら{summary.baseXp}XP）

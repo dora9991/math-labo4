@@ -125,6 +125,29 @@
   60% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(1.3); }
 }
+/* ステップアップ：4択のど真ん中に出る大きな「正解！」バッジ */
+.su-correct-pop {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none; z-index: 40;
+  animation: suCorrectPop 1.45s ease-out forwards;
+}
+.su-correct-pop .badge {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 30px; font-weight: 900; color: #fff; white-space: nowrap;
+  padding: 20px 30px; border-radius: 999px;
+  background: linear-gradient(135deg, #34d399, #16a34a);
+  border: 4px solid rgba(255,255,255,.9);
+  box-shadow: 0 0 30px #4ade80, 0 0 70px rgba(34,197,94,.75), 0 10px 30px rgba(0,0,0,.35);
+}
+@keyframes suCorrectPop {
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(.35) rotate(-12deg); }
+  28%  { opacity: 1; transform: translate(-50%,-50%) scale(1.14) rotate(0deg); }
+  44%  { transform: translate(-50%,-50%) scale(.98); }
+  80%  { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.1); }
+}
+
 /* 正解の閃光 */
 .correct-flash { position: fixed; inset: 0; background: radial-gradient(circle, rgba(74,222,128,.25) 0%, transparent 60%); opacity: 0; pointer-events: none; z-index: 25; }
 .correct-flash.show { animation: cFlash .5s ease-out forwards; }
@@ -189,3 +212,125 @@
 .bt-select-mini svg { width: 64px; height: 64px; overflow: visible; }
 .bt-select-stats { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
 .bt-select-stat { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; background: rgba(255,255,255,.08); color: #cceebb; }
+
+/* ===== スキル（SP）バー ===== */
+.bt-skill-bar { display: flex; flex-direction: column; gap: 8px; background: #0d1f0d; border: 2px solid #2d6e2d; border-radius: 5px; padding: 9px 11px; }
+.bt-sp { display: flex; align-items: center; gap: 8px; }
+.bt-sp-label { font-size: 11px; font-weight: 900; color: #fbbf24; letter-spacing: 1px; }
+.bt-sp-cells { flex: 1; display: flex; gap: 2px; }
+.bt-sp-cell { flex: 1; height: 11px; border-radius: 2px; background: #061206; border: 1px solid #234d23; transition: background .2s, box-shadow .2s; }
+.bt-sp-cell.on { background: linear-gradient(180deg,#fde047,#f59e0b); border-color: #fbbf24; box-shadow: 0 0 6px rgba(251,191,36,.7); }
+/* スキル発動ラインの目盛（5個目・10個目の右に区切り） */
+.bt-sp-cell.notch { border-right: 3px solid #7fff7f; }
+.bt-sp-num { font-size: 11px; font-weight: 900; color: #cceebb; min-width: 34px; text-align: right; }
+
+.bt-skill-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bt-skill-btn {
+  display: flex; align-items: center; gap: 6px; justify-content: center;
+  padding: 9px 6px; border-radius: 8px; cursor: pointer;
+  background: #061206; border: 2px solid #234d23; color: #6b8a6b;
+  font-family: 'M PLUS Rounded 1c', sans-serif; transition: all .15s; opacity: .65;
+}
+.bt-skill-btn .ic { font-size: 18px; }
+.bt-skill-btn .nm { font-size: 12px; font-weight: 900; }
+.bt-skill-btn .ct { font-size: 10px; font-weight: 700; opacity: .8; }
+.bt-skill-btn:disabled { cursor: not-allowed; }
+.bt-skill-btn.ready {
+  opacity: 1; color: #fff; border-color: var(--sc);
+  background: color-mix(in srgb, var(--sc) 22%, #061206);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--sc) 55%, transparent);
+  animation: skillReady 1.3s ease-in-out infinite;
+}
+.bt-skill-btn.ready:hover:not(:disabled) { transform: translateY(-2px); }
+@keyframes skillReady {
+  0%,100% { box-shadow: 0 0 10px color-mix(in srgb, var(--sc) 45%, transparent); }
+  50% { box-shadow: 0 0 18px color-mix(in srgb, var(--sc) 80%, transparent); }
+}
+
+/* 敵の「ため」予告バッジ */
+.bt-intent {
+  display: inline-block; margin-top: 4px; font-size: 11px; font-weight: 800;
+  color: #fff; padding: 2px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--ic) 28%, #0d1f0d); border: 1px solid var(--ic);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--ic) 50%, transparent);
+  animation: intentPulse 1s ease-in-out infinite;
+}
+@keyframes intentPulse { 0%,100% { opacity: .8; } 50% { opacity: 1; } }
+
+/* ためている間のオーラ */
+.bt-charge-aura {
+  position: absolute; top: 50%; left: 50%; width: 150px; height: 150px;
+  transform: translate(-50%,-50%); border-radius: 50%; pointer-events: none; z-index: 2;
+  background: radial-gradient(circle, rgba(251,191,36,.45) 0%, transparent 68%);
+  animation: chargeAura .9s ease-in-out infinite;
+}
+@keyframes chargeAura { 0%,100% { transform: translate(-50%,-50%) scale(.85); opacity: .5; } 50% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; } }
+
+/* 敵の行動演出（中央フラッシュ） */
+.bt-enemy-fx {
+  position: absolute; top: 18%; left: 50%; transform: translate(-50%,-50%);
+  z-index: 40; pointer-events: none; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  animation: enemyFx 1.1s ease-out forwards;
+}
+.bt-enemy-fx .ic { font-size: 50px; filter: drop-shadow(0 0 14px var(--ec)); }
+.bt-enemy-fx .nm {
+  font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 18px; font-weight: 900; color: #fff;
+  padding: 3px 16px; border-radius: 999px; white-space: nowrap;
+  background: var(--ec); border: 2px solid rgba(255,255,255,.85);
+  box-shadow: 0 0 20px var(--ec);
+}
+@keyframes enemyFx {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(.5); }
+  25% { opacity: 1; transform: translate(-50%,-50%) scale(1.12); }
+  45% { transform: translate(-50%,-50%) scale(1); }
+  80% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.08); }
+}
+
+/* アイテムスロット（1つだけ） */
+.bt-item-row { margin-top: 2px; }
+.bt-item-btn {
+  width: 100%; display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border-radius: 8px; cursor: pointer;
+  background: color-mix(in srgb, #34d399 18%, #061206);
+  border: 2px solid #34d399; color: #fff;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  box-shadow: 0 0 10px rgba(52,211,153,.4); transition: transform .15s;
+}
+.bt-item-btn:hover:not(:disabled) { transform: translateY(-2px); }
+.bt-item-btn:disabled { opacity: .5; cursor: not-allowed; }
+.bt-item-btn .ic { font-size: 20px; }
+.bt-item-btn .nm { font-size: 13px; font-weight: 900; flex: 1; text-align: left; }
+.bt-item-btn .use { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 8px; background: #34d399; color: #052e16; }
+.bt-item-empty { text-align: center; font-size: 11px; color: #6b8a6b; padding: 7px; border: 1px dashed #234d23; border-radius: 8px; }
+
+/* かかっている効果（バフ） */
+.bt-buffs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.bt-buff {
+  font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px;
+  color: #fff; background: color-mix(in srgb, var(--bc) 25%, transparent);
+  border: 1px solid var(--bc);
+}
+
+/* スキル発動の中央フラッシュ */
+.bt-skill-fx {
+  position: fixed; top: 42%; left: 50%; transform: translate(-50%,-50%);
+  z-index: 95; pointer-events: none; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  animation: skillFx 1.1s ease-out forwards;
+}
+.bt-skill-fx .ic { font-size: 72px; filter: drop-shadow(0 0 18px var(--sc)); }
+.bt-skill-fx .nm {
+  font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 26px; font-weight: 900; color: #fff;
+  padding: 6px 20px; border-radius: 999px; white-space: nowrap;
+  background: var(--sc); border: 3px solid rgba(255,255,255,.9);
+  box-shadow: 0 0 28px var(--sc), 0 8px 22px rgba(0,0,0,.4);
+}
+@keyframes skillFx {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(.4) rotate(-8deg); }
+  25% { opacity: 1; transform: translate(-50%,-50%) scale(1.15) rotate(0); }
+  45% { transform: translate(-50%,-50%) scale(1); }
+  78% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.12); }
+}

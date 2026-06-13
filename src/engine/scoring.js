@@ -86,14 +86,31 @@ export function calcStars(correct, level) {
   return 0;
 }
 
-// 1問あたりの基礎XP
-export const XP_PER_CORRECT = 8;
-// 間違い1問あたりの減点（＝2問分）。連打・あてずっぽうを抑止する。
-export const XP_PENALTY_PER_WRONG = XP_PER_CORRECT * 2; // = 16
+// タイムアタックの1問あたり基礎XP
+export const XP_PER_CORRECT = 5;
+// 間違い1問あたりの減点。連打・あてずっぽうを軽く抑止する程度に。
+export const XP_PENALTY_PER_WRONG = 3;
+
+/** タイムアタック1回で稼げるコイン（正解1問=3コイン＋星ボーナス）
+ *  アイテム購入の元手。XPと違ってくり返しでも減らさない（コツコツ稼げる）。 */
+export function timeAttackCoins({ correct = 0, stars = 0 }) {
+  return correct * 3 + stars * 10;
+}
+
+/** 連続正解ボーナス：5連続以上の正解は1問ごとに+1、10連続以上は+2 上乗せ。
+ *  oks は解いた順の正誤（true/false）の配列。 */
+export function timeAttackStreakBonus(oks = []) {
+  let run = 0, bonus = 0;
+  for (const ok of oks) {
+    if (ok) { run++; bonus += run >= 10 ? 2 : run >= 5 ? 1 : 0; }
+    else run = 0;
+  }
+  return bonus;
+}
 
 /** タイムアタック1回のXPを計算（間違いは2問分マイナス、0未満にはしない） */
-export function timeAttackXp({ correct, wrong = 0, stars, newStars, maxStreak }) {
-  const gained = correct * XP_PER_CORRECT + newStars * 25 + (stars === 3 ? 20 : 0) + maxStreak * 2;
+export function timeAttackXp({ correct, wrong = 0, stars, newStars, streakBonus = 0 }) {
+  const gained = correct * XP_PER_CORRECT + newStars * 25 + (stars === 3 ? 20 : 0) + streakBonus;
   const penalty = wrong * XP_PENALTY_PER_WRONG;
   return Math.max(0, gained - penalty);
 }

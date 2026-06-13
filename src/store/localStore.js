@@ -1,42 +1,78 @@
 // ============================================================
-// localStore.js — 保存層（ローカル実装）
+// localStore.js — 保存層（ローカル実装・データ消失に強い設計）
 //
 // 「保存・読み込みの窓口」をここに集約する。画面側はこの関数だけを呼ぶ。
-// 将来サーバー保存にするときは、同じ関数名で supabase 版を作り、
-// import 先を差し替えるだけでよい（ゲーム本体は一切触らない）。
 //
-//   load()              … プレイヤー状態＋記録をまとめて読む
-//   savePlayerState(s)  … プレイヤー状態を保存
-//   addRecord(r)        … 挑戦記録を1件追加
-//   addMistakes(ms)     … 間違いを追加（重複は除く）
-//   removeMistake(id)   … 間違いノートから1件削除
+// ★データを絶対に失わないための工夫★
+//  1) 二重保存：メインキーに加えて「自動バックアップキー」にも前回値を退避。
+//     → メインが壊れても、読み込み時にバックアップから自動復元する。
+//  2) 安全な読み込み：壊れたデータでも、初期化（空）で上書きしない。
+//     正規化(normalize)が失敗しても、生のデータをできるだけ残す。
+//  3) 手動バックアップ：exportData/importData でファイルに保存・復元できる。
+//     （ブラウザのキャッシュ削除や端末変更に備える）
+//
+// 将来サーバー保存にするときは、同じ関数名で supabase 版を作り、import 先を差し替える。
 // ============================================================
-import { getOrCreateLocalStudentId, initialPlayerState } from "./recordSchema.js";
+import { getOrCreateLocalStudentId, initialPlayerState, normalizePlayerState } from "./recordSchema.js";
 
 const KEY = "mathApp_data_v1";
+const BAK = "mathApp_data_v1_bak"; // 自動バックアップ（前回保存時の中身）
 
-function readAll() {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {
-    console.warn("保存データの読み込みに失敗:", e);
-  }
-  // 初期データ
-  const studentId = getOrCreateLocalStudentId();
-  return {
-    player: initialPlayerState(studentId),
-    records: [],
-    mistakes: [],
-  };
+function safeGet(k) {
+  try { return localStorage.getItem(k); } catch { return null; }
+}
+function safeSet(k, v) {
+  try { localStorage.setItem(k, v); return true; } catch (e) { console.warn("保存に失敗:", e); return false; }
 }
 
-function writeAll(data) {
+function freshData() {
+  return { player: initialPlayerState(getOrCreateLocalStudentId()), records: [], mistakes: [] };
+}
+
+// 生JSONを安全にデータ化（normalizeが失敗しても生プレイヤーを残す）
+function parseData(raw) {
+  const data = JSON.parse(raw); // 不正JSONならここで例外
   try {
-    localStorage.setItem(KEY, JSON.stringify(data));
+    data.player = normalizePlayerState(data.player);
   } catch (e) {
-    console.warn("保存に失敗:", e);
+    console.warn("正規化に失敗。生のプレイヤーデータを保持します:", e);
+    // player はそのまま残す（消さない）
   }
+  if (!Array.isArray(data.records)) data.records = [];
+  if (!Array.isArray(data.mistakes)) data.mistakes = [];
+  if (!data.player) data.player = initialPlayerState(getOrCreateLocalStudentId());
+  return data;
+}
+
+// 読み込み：メイン→（壊れていれば）バックアップ→（無ければ）初期データ
+function readAll() {
+  const raw = safeGet(KEY);
+  if (raw) {
+    try { return parseData(raw); }
+    catch (e) { console.warn("メインデータが読めません。バックアップから復元を試みます:", e); }
+  }
+  const bak = safeGet(BAK);
+  if (bak) {
+    try {
+      const d = parseData(bak);
+      console.warn("バックアップからデータを復元しました。");
+      // 復元できたらメインにも書き戻しておく（次回から正常に）
+      safeSet(KEY, JSON.stringify(d));
+      return d;
+    } catch (e) { console.warn("バックアップも読めません:", e); }
+  }
+  // 本当に何も無いときだけ初期データ（ここで既存データを壊すことはない）
+  return freshData();
+}
+
+// 書き込み：書く前に「今の中身」をバックアップへ退避してから上書きする
+function writeAll(data) {
+  let json;
+  try { json = JSON.stringify(data); } catch (e) { console.warn("保存データの変換に失敗:", e); return; }
+  const cur = safeGet(KEY);
+  // 直前の正常データをバックアップへ（破壊的更新の保険）。空→中身ありの初回は退避しない。
+  if (cur && cur !== json) safeSet(BAK, cur);
+  safeSet(KEY, json);
 }
 
 /** 全データを読み込む */
@@ -76,4 +112,30 @@ export function removeMistake(id) {
   data.mistakes = data.mistakes.filter((m) => m.id !== id);
   writeAll(data);
   return data.mistakes;
+}
+
+/** すべてのデータを初期状態に戻す（管理モードの「進捗リセット」用）。studentId は引き継ぐ */
+export function resetAll() {
+  const data = freshData();
+  writeAll(data);
+  return data;
+}
+
+// ── 手動バックアップ（ファイルへ保存／ファイルから復元） ─────────────
+/** 今のデータをJSON文字列で書き出す（ファイル保存用） */
+export function exportData() {
+  return JSON.stringify(readAll());
+}
+
+/** JSON文字列からデータを復元して保存する（ファイル復元用）。失敗時は例外を投げる */
+export function importData(json) {
+  const data = JSON.parse(json); // 不正JSONなら例外
+  if (!data || typeof data !== "object" || !data.player) {
+    throw new Error("バックアップの形式が正しくありません。");
+  }
+  data.player = normalizePlayerState(data.player);
+  if (!Array.isArray(data.records)) data.records = [];
+  if (!Array.isArray(data.mistakes)) data.mistakes = [];
+  writeAll(data);
+  return data;
 }

@@ -12,12 +12,11 @@
 //   art   … 見た目（下の ART ライブラリのキー）
 // ============================================================
 
-// 推奨レベルのプレイヤーHP(36+lv*14)から「6発でやられる」敵攻撃力を逆算
-// （battle.js の enemyAtkForLevel と同じ式。循環importを避けてここに定義）
-function enemyAtkForLevel(minLv) {
-  const playerHp = 36 + minLv * 14;
-  return Math.max(8, Math.round(playerHp / 6));
-}
+import { CHAPTERS } from "./index.js";
+import { playerAtkForLevel, playerHpForLevel, enemyAtkForLevel } from "../engine/battle.js";
+
+// 全小単元の数（推奨レベル＆ヒット数のスケールに使う）
+const TOTAL_UNITS = CHAPTERS.reduce((s, c) => s + c.units.length, 0);
 
 // ── SVGアート・ライブラリ（既存10種類） ─────────────
 const ART = {
@@ -90,95 +89,160 @@ const ART = {
   },
 };
 
-// ── 章テーマ（3体分の名前・アート・出題単元） ─────────
-//  各章のモンスター3体。pools がその体の出題範囲。
-const CHAPTER_MONSTERS = [
-  { c: "c1", entries: [
-    { name: "スウチビット",   art: "calc",  pools: ["u1", "u2"] },
-    { name: "フゴウイーター",  art: "prime", pools: ["u3", "u4"] },
-    { name: "ネガネーガ",      art: "speed", pools: ["u5", "u6"] },
-  ]},
-  { c: "c2", entries: [
-    { name: "モジカゲ",        art: "fraction", pools: ["v1", "v2"] },
-    { name: "ダイニュウマル",  art: "balance",  pools: ["v3"] },
-    { name: "シキガミ",        art: "calc",     pools: ["v4", "v5"] },
-  ]},
-  { c: "c3", entries: [
-    { name: "テンビンガエル",  art: "balance",  pools: ["e1", "e2"] },
-    { name: "イコールゴースト",art: "fraction", pools: ["e3"] },
-    { name: "カイホウドラゴ",  art: "prime",    pools: ["e4", "e5"] },
-  ]},
-  { c: "c4", entries: [
-    { name: "ヒレイクラゲ",    art: "wave",  pools: ["h1", "h2"] },
-    { name: "グラフリン",      art: "speed", pools: ["h3"] },
-    { name: "ハンピレオン",    art: "geo",   pools: ["h4", "h5"] },
-  ]},
-  { c: "c5", entries: [
-    { name: "カクドリ",        art: "angle",    pools: ["z1"] },
-    { name: "ミラーシフト",    art: "geo",      pools: ["z2"] },
-    { name: "オウギマドウ",    art: "fraction", pools: ["z3", "z4"] },
-  ]},
-  { c: "c6", entries: [
-    { name: "リッタイガー",    art: "volume", pools: ["k1"] },
-    { name: "タイセキング",    art: "geo",    pools: ["k2"] },
-    { name: "キュウメンオー",  art: "dice",   pools: ["k3", "k4"] },
-  ]},
-  { c: "c7", entries: [
-    { name: "サイコロイド",    art: "dice",  pools: ["d1"] },
-    { name: "ヒストグール",    art: "prime", pools: ["d2"] },
-    { name: "カクリツーム",    art: "wave",  pools: ["d3"] },
-  ]},
+// ── 章ごとの使用アート（テーマに合わせて循環割当）＆名前の素 ─────────
+// 小単元(ユニット)1つにつき1体を自動生成するので、章ごとのアートと
+// 名前パーツの組み合わせで見た目と名前に変化をつける。
+const CHAPTER_ARTS = {
+  c1: ["calc", "prime", "speed"],
+  c2: ["fraction", "balance", "calc"],
+  c3: ["balance", "fraction", "prime"],
+  c4: ["wave", "speed", "geo"],
+  c5: ["angle", "geo", "fraction"],
+  c6: ["volume", "geo", "dice"],
+  c7: ["dice", "prime", "wave"],
+};
+// アートに合わせた名前の頭（その生き物っぽい響き）
+const ART_NAME = {
+  calc: "スウチ", balance: "テンビン", geo: "ズケイ", wave: "ナミ", dice: "サイコ",
+  prime: "ソスウ", fraction: "ブンスウ", angle: "カクド", volume: "リッタイ", speed: "スピード",
+};
+// 名前のしっぽ（小単元ごとに循環して個体差を出す）
+const NAME_SUFFIX = ["ビット", "リン", "ガミ", "イーター", "ドラゴ", "レオン", "マル", "ローム", "ゴン", "ピー", "ネーガ", "クラゲ"];
+
+// 敵の「役割（タイプ）」。基準のHP・攻撃力にかける倍率で、強さの個性を出す。
+//  → HP・攻撃力が一定の増え方にならず、硬い敵・もろいが痛い敵などの凸凹が生まれる。
+//   tag    : 選択画面に出す説明
+//   hpMul  : HPの倍率   atkMul : 通常攻撃力の倍率
+// 1パンを避けるため HP の振れ幅は控えめ（0.85〜1.25）。個性は攻撃力で出す。
+const ROLES = {
+  normal:  { tag: "バランス",       hpMul: 1.0,  atkMul: 1.0 },
+  tank:    { tag: "硬い・攻撃ひかえめ", hpMul: 1.25, atkMul: 0.65 },
+  cannon:  { tag: "もろいが痛い",     hpMul: 0.85, atkMul: 1.5 },
+  bruiser: { tag: "ちから自慢",       hpMul: 1.12, atkMul: 1.25 },
+  nuker:   { tag: "必殺技が強い",     hpMul: 1.0,  atkMul: 0.8 }, // 通常は弱いが超必殺が脅威
+};
+
+// 各モンスターの「行動パターン(ai)＋役割(role)＋技の強さ上書き」。idx順。
+// 序盤はやさしく、進むほど多彩で手強くなる。HP/攻撃は role 倍率で凸凹する。
+const PROFILES = [
+  { ai: "plain",   role: "normal"  },               // 0
+  { ai: "plain",   role: "tank"    },               // 1 硬いが攻撃は弱い
+  { ai: "fire",    role: "normal"  },               // 2
+  { ai: "healer",  role: "tank"    },               // 3 回復＋硬い＝粘る
+  { ai: "mage",    role: "cannon"  },               // 4 もろいが魔法が痛い
+  { ai: "charger", role: "bruiser" },               // 5
+  { ai: "fire",    role: "cannon"  },               // 6 もろいが炎が痛い
+  { ai: "healer",  role: "tank"    },               // 7
+  { ai: "mage",    role: "normal"  },               // 8
+  { ai: "charger", role: "bruiser" },               // 9
+  { ai: "super",   role: "nuker", superMult: 6 },   // 10 必殺技が強い
+  { ai: "plain",   role: "tank"    },               // 11
+  { ai: "fire",    role: "cannon"  },               // 12
+  { ai: "healer",  role: "bruiser" },               // 13
+  { ai: "mage",    role: "cannon"  },               // 14
+  { ai: "charger", role: "bruiser" },               // 15
+  { ai: "super",   role: "nuker", superMult: 7 },   // 16 もっと強い必殺技
+  { ai: "fire",    role: "cannon"  },               // 17
+  { ai: "mage",    role: "cannon"  },               // 18
+  { ai: "charger", role: "tank"    },               // 19 硬くて、ためる
+  { ai: "super",   role: "nuker", superMult: 8 },   // 20 超強い必殺技
 ];
 
-// ── 21体を自動生成（章順・強さは段階的に上昇・Lv3刻みが推奨レベル） ──
-// HP  : 推奨レベルのプレイヤー攻撃力 × 必要回数（5〜10回で撃破）
-// atk : 推奨レベルなら「6発でやられる」攻撃力（enemyAtkForLevelで逆算）
+// ── 小単元モンスターを自動生成（章順・全ユニットぶん） ──
+//   kind:"unit"     … 小単元1つ＝1体。pools はその小単元のみ。
+//   解放条件は engine/unlock.js（タイムアタックの3難易度を★1以上で全クリア）。
+//   推奨レベル minLv は表示と制限時間の目安（解放はレベルでなく学習達成で行う）。
 export const MONSTERS = [];
-let idx = 0;
-for (const chap of CHAPTER_MONSTERS) {
-  for (const e of chap.entries) {
-    const art = ART[e.art];
-    const minLv = 1 + idx * 3;                   // 1,4,7,…,61（推奨レベル）
-    const playerAtk = 8 + minLv * 7;             // 推奨レベルでのプレイヤー攻撃力
-    const hits = 5 + Math.floor(idx / 4);        // 倒すのに必要な回数：序盤5回〜終盤10回
+let gi = 0; // グローバル小単元インデックス（強さ・名前の通し番号）
+for (const chap of CHAPTERS) {
+  const arts = CHAPTER_ARTS[chap.id] || ["calc"];
+  chap.units.forEach((u, ui) => {
+    const artKey = arts[ui % arts.length];
+    const art = ART[artKey];
+    const prof = PROFILES[gi % PROFILES.length] || { ai: "plain", role: "normal" };
+    const role = ROLES[prof.role] || ROLES.normal;
+    const minLv = 1 + gi * 2;                  // 1,3,5,…（推奨レベルの目安）
+    const playerAtk = playerAtkForLevel(minLv); // 推奨レベルでのプレイヤー攻撃力（二次関数的）
+    const hits = 5 + gi / (TOTAL_UNITS - 1);   // 序盤5発 → 終盤6発（推奨レベルで倒すのに必要な回数）
     MONSTERS.push({
-      id: `m${idx + 1}_${chap.c}_${e.pools[0]}`,
-      name: e.name,
-      unit: e.name,
-      hp: playerAtk * hits,              // 「攻撃力×必要回数」で算出（5〜10回で撃破）
-      atk: enemyAtkForLevel(minLv),      // 推奨レベルなら6発でやられる
-      reward: 25 + idx * 13,             // 25 〜 285
+      id: `m_${chap.id}_${u.id}`,
+      kind: "unit",
+      chapterId: chap.id,
+      unitId: u.id,
+      name: ART_NAME[artKey] + NAME_SUFFIX[gi % NAME_SUFFIX.length],
+      unit: u.name,                            // 戦闘画面に出すテーマ名（小単元名）
+      hp: Math.round(playerAtk * hits * role.hpMul),
+      atk: Math.max(6, Math.round(enemyAtkForLevel(minLv) * role.atkMul)),
+      reward: 20 + gi * 10,
       minLv,
+      ai: prof.ai,
+      role: prof.role,
+      roleTag: role.tag,
+      superMult: prof.superMult,
       color: art.color,
-      pools: e.pools.map((u) => ({ c: chap.c, u })),
-      art: e.art,
+      pools: [{ c: chap.id, u: u.id }],
+      art: artKey,
       svgDefs: art.svgDefs,
       svg: art.svg,
       idleExtra: art.idleExtra,
       deathColors: art.deathColors,
     });
-    idx++;
-  }
+    gi++;
+  });
 }
 
-// ── ラスボス（Lv99・全単元の発展問題） ─────────────
-const ALL_UNITS = CHAPTER_MONSTERS.flatMap((chap) => {
-  // 章のすべての単元を集める（重複は気にしない）
-  const set = new Set(chap.entries.flatMap((e) => e.pools));
-  return [...set].map((u) => ({ c: chap.c, u }));
+// ── 章ボス（その章の全小単元モンスターを倒すと解放・発展のみ出題） ──
+const bossArt = ART.boss;
+CHAPTERS.forEach((chap, ci) => {
+  const unitMons = MONSTERS.filter((m) => m.kind === "unit" && m.chapterId === chap.id);
+  const maxLv = unitMons.length ? Math.max(...unitMons.map((m) => m.minLv)) : 1 + ci * 6;
+  const minLv = maxLv + 2;
+  const playerAtk = playerAtkForLevel(minLv);
+  const bossHits = 15 + ci * 1.6;            // c1=15発 → c7≈24.6発（推奨レベルで倒すのに必要な回数）
+  MONSTERS.push({
+    id: `boss_${chap.id}`,
+    kind: "chapterBoss",
+    chapterId: chap.id,
+    name: `${chap.name}の主`,
+    unit: `${chap.name}・全体`,
+    hp: Math.round(playerAtk * bossHits),
+    atk: Math.max(8, Math.round(enemyAtkForLevel(minLv) * 1.1)),
+    reward: 200 + ci * 60,
+    minLv,
+    ai: "super",
+    role: "boss",
+    roleTag: "章ボス・超必殺",
+    superMult: 4,
+    color: chap.color,
+    pools: chap.units.map((u) => ({ c: chap.id, u: u.id })),
+    bossAdvancedOnly: true,
+    art: "boss",
+    svgDefs: bossArt.svgDefs,
+    svg: bossArt.svg,
+    idleExtra: bossArt.idleExtra,
+    deathColors: bossArt.deathColors,
+  });
 });
 
+// ── 最終ボス・数学の魔王（全章ボスを倒すと解放・全単元の発展） ──
+const ALL_UNITS = CHAPTERS.flatMap((c) => c.units.map((u) => ({ c: c.id, u: u.id })));
+const MAOU_LV = 80; // 推奨レベル
 MONSTERS.push({
   id: "boss_maou",
+  kind: "finalBoss",
   name: "数学の魔王",
   unit: "全単元の発展",
-  hp: 701 * 12, // Lv99の攻撃力701 × 約12回。ラスボスらしい歯ごたえ
-  atk: Math.round((36 + 99 * 14) / 5), // Lv99でも5発でやられる強さ（ラスボスは厳しめ）
-  reward: 3000,
-  minLv: 99,
+  hp: Math.round(playerAtkForLevel(MAOU_LV) * 30), // 推奨レベルで約30発（スキルを使ってじっくり）
+  atk: Math.round(playerHpForLevel(MAOU_LV) / 5),  // 推奨レベルでも5発で倒れる（ラスボスは厳しめ）
+  reward: 5000,
+  minLv: MAOU_LV,
+  ai: "super",
+  role: "boss",
+  roleTag: "最終ボス・超必殺",
+  superMult: 4,
   color: ART.boss.color,
   pools: ALL_UNITS,
-  bossAdvancedOnly: true, // 発展のみ出題
+  bossAdvancedOnly: true,
   art: "boss",
   svgDefs: ART.boss.svgDefs,
   svg: ART.boss.svg,

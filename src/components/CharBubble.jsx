@@ -1,8 +1,10 @@
-// CharBubble.jsx — マスコットキャラの吹き出し
-export default function CharBubble({ text }) {
+// CharBubble.jsx — マスコットキャラの吹き出し（自分のキャラを表示）
+import Avatar from "./Avatar.jsx";
+
+export default function CharBubble({ text, avatar = null, onAvatar = null }) {
   return (
     <div className="bubble-row">
-      <div className="bubble-ico">🐧</div>
+      <Avatar avatar={avatar} size={42} onClick={onAvatar} ring={onAvatar ? "rgba(255,255,255,.5)" : null} />
       <div className="bubble-txt"><span>{text}</span></div>
     </div>
   );

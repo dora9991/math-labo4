@@ -82,6 +82,40 @@ export function initialPlayerState(studentId) {
     stars: {},         // { "u1-easy": 3, ... }
     playLog: {},       // { "u1-easy": { cleared: true, lastDate: "2026/5/30" }, ... } くり返しXP用
     skillStats: {},    // { "S-NEG-012": { m: 0.62, n: 8, last: "2026/6/2" }, ... } アダプティブ習熟度
+    sp: 0,             // バトルのスキルポイント（正解で貯まり、スキル発動で消費。バトルをまたいで維持）
+    currentHp: null,   // バトル間で持ち越す現在HP（null=満タン。0以下にはせず、ショップの治療で全回復）
+    coins: 0,          // 所持コイン（タイムアタックで稼ぎ、ショップでアイテム購入に使う）
+    item: null,        // 所持アイテム（id 文字列。1つだけ持てる。バトルで使うと消費）
+    challengeCleared: {}, // { "ch1a": true, ... } チャレンジでクリア済みの難問（段位の元）
+    ownedSkills: ["time2x", "ultimate"], // 所持バトルスキルid（初期は基本2種。ショップで買い切り追加）
+    equip: { 1: "time2x", 2: "ultimate" }, // スロット1/2に装備中のスキルid
+    seenMonsters: {},  // { "m_c1_u1": true, ... } 解放を既に見たモンスター（「新しい敵」通知の制御）
+    avatar: null,      // 自分のキャラ { type:"template", id } または { type:"image", src:dataURL }。null=既定（🐧）
+    name: "",          // プレイヤー名（任意）
+    unitMastery: {},   // { unitId: { pt:0〜100, streak:連続正解数, ok:bool } } 小単元の習得確認（4連続正解でOK）
     updatedAt: now(),
   };
+}
+
+/**
+ * 旧セーブデータに新フィールドが無くても落ちないよう、既定値で補完する。
+ * load() のたびに通すので、ここを増やせば後方互換が保てる。
+ */
+export function normalizePlayerState(p) {
+  if (!p || typeof p !== "object") return p;
+  const base = initialPlayerState(p.studentId);
+  const out = { ...base, ...p };
+  // ネストするオブジェクト系は欠けていれば既定値で補う
+  out.stars = p.stars || {};
+  out.playLog = p.playLog || {};
+  out.skillStats = p.skillStats || {};
+  out.challengeCleared = p.challengeCleared || {};
+  out.seenMonsters = p.seenMonsters || {};
+  out.unitMastery = p.unitMastery || {};
+  out.ownedSkills = Array.isArray(p.ownedSkills) && p.ownedSkills.length ? p.ownedSkills : [...base.ownedSkills];
+  out.equip = { ...base.equip, ...(p.equip || {}) };
+  // 装備中スキルが未所持なら基本スキルへフォールバック
+  if (!out.ownedSkills.includes(out.equip[1])) out.equip[1] = base.equip[1];
+  if (!out.ownedSkills.includes(out.equip[2])) out.equip[2] = base.equip[2];
+  return out;
 }

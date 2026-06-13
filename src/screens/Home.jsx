@@ -6,36 +6,65 @@ import Header from "../components/Header.jsx";
 import CharBubble, { voice } from "../components/CharBubble.jsx";
 import { MathBackdrop } from "../components/Decorations.jsx";
 import Dashboard from "../components/Dashboard.jsx";
+import { findItem } from "../engine/items.js";
 
-export default function Home({ player, records, mistakeCount, onTimeAttack, onSlow, onBattle, onStepUp, onNotebook }) {
+const itemName = (id) => findItem(id)?.name ?? "";
+
+export default function Home({ player, records, mistakeCount, onTimeAttack, onChallenge, onBattle, onStepUp, onNotebook, onShop, onSkill, onDetail, onHowTo, onCharacter }) {
   const [msg] = useState(() => voice("open"));
+  const greeting = player.name ? `${player.name}、${msg}` : msg;
   return (
     <div className="app">
       <MathBackdrop />
       <Header player={player} />
       <div className="content" style={{ position: "relative", zIndex: 1 }}>
-        <CharBubble text={msg} />
+        <CharBubble text={greeting} avatar={player.avatar} onAvatar={onCharacter} />
 
+        {/* 遊び方・キャラへの導線 */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 11 }}>
+          <button className="title-link" style={{ flex: 1 }} onClick={onHowTo}>📖 遊び方</button>
+          <button className="title-link" style={{ flex: 1 }} onClick={onCharacter}>🎨 キャラ設定</button>
+        </div>
+
+        {/* 3段グリッド：①ステップアップ/タイムアタック ②バトル/チャレンジ ③ショップ/スキル */}
         <div className="mode-grid">
+          {/* 1段目 */}
+          <button className="mode-card mut" onClick={onStepUp}>
+            <span style={{ fontSize: 36 }}>🌱</span>
+            <span style={{ fontSize: 15, fontWeight: 900 }}>ステップアップ</span>
+            <span style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>あなたに合わせて適応<br />力をつける毎日の練習</span>
+          </button>
           <button className="mode-card mta" onClick={onTimeAttack}>
             <span style={{ fontSize: 36 }}>⏱️</span>
             <span style={{ fontSize: 15, fontWeight: 900 }}>タイムアタック</span>
             <span style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>40秒で何問解ける？<br />スピード勝負！</span>
           </button>
-          <button className="mode-card msl" onClick={onSlow}>
-            <span style={{ fontSize: 36 }}>🌱</span>
-            <span style={{ fontSize: 15, fontWeight: 900 }}>じっくりモード</span>
-            <span style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>時間なし・ヒントあり<br />丁寧に学ぼう！</span>
-          </button>
+
+          {/* 2段目 */}
           <button className="mode-card mba" onClick={onBattle}>
             <span style={{ fontSize: 36 }}>⚔️</span>
             <span style={{ fontSize: 15, fontWeight: 900 }}>バトルモード</span>
             <span style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>モンスターと対戦！</span>
           </button>
-          <button className="mode-card mut" onClick={onStepUp}>
-            <span style={{ fontSize: 36 }}>🌱</span>
-            <span style={{ fontSize: 15, fontWeight: 900 }}>ステップアップ</span>
-            <span style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>弱点をあなたに合わせて<br />少しずつ克服！</span>
+          <button className="mode-card mch" onClick={onChallenge}>
+            <span style={{ fontSize: 36 }}>🗻</span>
+            <span style={{ fontSize: 15, fontWeight: 900 }}>チャレンジ</span>
+            <span style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>難問に挑む・手書き<br />段位を上げよう！</span>
+          </button>
+
+          {/* 3段目 */}
+          <button className="mode-card msh" onClick={onShop}>
+            <span style={{ fontSize: 36 }}>🛒</span>
+            <span style={{ fontSize: 15, fontWeight: 900 }}>ショップ</span>
+            <span style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>
+              アイテム・スキルを買おう<br />💰{player.coins ?? 0}
+              {player.item && <> ／ 🎒{itemName(player.item)}</>}
+            </span>
+          </button>
+          <button className="mode-card msk" onClick={onSkill}>
+            <span style={{ fontSize: 36 }}>✨</span>
+            <span style={{ fontSize: 15, fontWeight: 900 }}>スキル</span>
+            <span style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>バトルで使うスキルを<br />セットしよう</span>
           </button>
         </div>
 
@@ -45,7 +74,7 @@ export default function Home({ player, records, mistakeCount, onTimeAttack, onSl
         </button>
 
         {/* 学習ダッシュボード */}
-        <Dashboard player={player} records={records || []} />
+        <Dashboard player={player} records={records || []} onDetail={onDetail} />
       </div>
     </div>
   );

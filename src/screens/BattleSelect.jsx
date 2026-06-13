@@ -1,12 +1,21 @@
 // ============================================================
 // BattleSelect.jsx — バトルする相手を選ぶ画面
-//  最初から全モンスターに挑める。minLv は「推奨レベル」として表示するだけ。
+//  小単元ごとのモンスター → 章ボス → 最終ボス。
+//  解放はタイムアタックの達成と撃破で進む（engine/unlock.js）。
+//  未解放はロック表示。新しく解放された敵には「✨ NEW」＆入室時にバナー。
 // ============================================================
+import { useState, useEffect } from "react";
 import Header from "../components/Header.jsx";
-import MonsterSprite from "../components/MonsterSprite.jsx";
 import { MONSTERS } from "../data/monsters.js";
+import { CHAPTERS } from "../data/index.js";
 import { getPlayerBattleStats } from "../engine/battle.js";
 import { levelFromXp, levelTitle } from "../engine/scoring.js";
+import { isUnlocked, newlyUnlockedIds, unlockHint } from "../engine/unlock.js";
+
+const AI_TAG = {
+  plain: "", healer: "回復してくる", mage: "魔法を使う",
+  charger: "力をためる", super: "超必殺をためる", fire: "炎を吐く",
+};
 
 // 背景の星
 function Stars() {
@@ -22,10 +31,91 @@ function Stars() {
   return <div className="battle-stars">{stars}</div>;
 }
 
-export default function BattleSelect({ player, clearedIds, onSelect, onBack }) {
+export default function BattleSelect({ player, clearedIds, onSelect, onBack, onSeen }) {
   const cleared = clearedIds || new Set();
   const lv = levelFromXp(player.xp);
   const stats = getPlayerBattleStats(lv);
+
+  // 入室した瞬間の「新しく解放された敵」を覚えておく（バナー＆NEWバッジ用）
+  const [newly] = useState(() => new Set(newlyUnlockedIds(player, cleared)));
+  // 見たことにする（次回からはNEWを出さない）
+  useEffect(() => {
+    if (newly.size && onSeen) onSeen([...newly]);
+  }, []); // eslint-disable-line
+
+  const finalBoss = MONSTERS.find((m) => m.kind === "finalBoss");
+
+  function MonsterCard({ m }) {
+    const unlocked = isUnlocked(player, cleared, m);
+    const isCleared = cleared.has(m.id);
+    const isNew = newly.has(m.id);
+    const tough = lv < m.minLv;
+    const veryTough = lv < m.minLv - 6;
+
+    if (!unlocked) {
+      // ロック表示：何をすれば解放されるかを伝える
+      return (
+        <div className="bt-panel bt-select-card" style={{ borderColor: "rgba(255,255,255,.12)", opacity: 0.7 }}>
+          <div className="bt-select-mini" style={{ borderColor: "rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>🔒</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "rgba(255,255,255,.55)" }}>？？？</div>
+            <div style={{ fontSize: 10.5, color: "#7a9a7a", lineHeight: 1.4, marginTop: 3 }}>{unlockHint(m)}</div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <button
+        className="bt-panel bt-select-card"
+        onClick={() => onSelect(m)}
+        style={{ borderColor: m.color + "88", position: "relative", overflow: "hidden" }}
+      >
+        {isNew && (
+          <div style={{
+            position: "absolute", left: 6, top: 6, zIndex: 4,
+            fontSize: 11, fontWeight: 900, color: "#fde047",
+            background: "rgba(0,0,0,.5)", border: "1px solid #fde047", borderRadius: 8, padding: "1px 7px",
+            textShadow: "0 0 8px rgba(250,204,21,.8)",
+          }}>✨ NEW</div>
+        )}
+        {isCleared && (
+          <div style={{
+            position: "absolute", right: 8, top: "50%", transform: "translateY(-50%) rotate(-15deg)",
+            fontFamily: "'M PLUS Rounded 1c','DotGothic16',sans-serif",
+            fontSize: 28, fontWeight: 900, color: "#fde047",
+            border: "4px solid #fde047", borderRadius: 10, padding: "2px 10px",
+            textShadow: "0 0 10px rgba(250,204,21,.8)",
+            boxShadow: "0 0 14px rgba(250,204,21,.5), inset 0 0 12px rgba(250,204,21,.3)",
+            opacity: 0.92, pointerEvents: "none", zIndex: 3,
+          }}>CLEAR!</div>
+        )}
+        <div className="bt-select-mini" style={{ borderColor: m.color }}>
+          <svg viewBox="0 0 140 140" style={{ width: 64, height: 64, overflow: "visible" }} dangerouslySetInnerHTML={{ __html: m.svgDefs + m.svg }} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 15, fontWeight: 900, color: m.color }}>
+            {m.name}
+            {veryTough && <span style={{ fontSize: 10, color: "#ff6b6b", marginLeft: 6 }}>☠ かなり手強い</span>}
+            {tough && !veryTough && <span style={{ fontSize: 10, color: "#fbbf24", marginLeft: 6 }}>⚠ 手強い</span>}
+          </div>
+          <div style={{ fontSize: 11, color: "#88aa88" }}>テーマ：{m.unit} ・ 推奨Lv.{m.minLv}</div>
+          <div className="bt-select-stats">
+            <span className="bt-select-stat">HP {m.hp}</span>
+            <span className="bt-select-stat">攻撃 {m.atk}</span>
+            <span className="bt-select-stat" style={{ background: "rgba(251,191,36,.2)", color: "#fbbf24" }}>撃破 +{m.reward}XP</span>
+          </div>
+          {(m.roleTag || AI_TAG[m.ai]) && (
+            <div className="bt-select-stats" style={{ marginTop: 3 }}>
+              {m.roleTag && <span className="bt-select-stat" style={{ background: "rgba(129,140,248,.18)", color: "#c7d2fe" }}>{m.roleTag}</span>}
+              {AI_TAG[m.ai] && <span className="bt-select-stat" style={{ background: "rgba(244,114,182,.18)", color: "#fbcfe8" }}>{AI_TAG[m.ai]}</span>}
+            </div>
+          )}
+        </div>
+      </button>
+    );
+  }
+
   return (
     <div className="battle-app">
       <Stars />
@@ -37,54 +127,45 @@ export default function BattleSelect({ player, clearedIds, onSelect, onBack }) {
           <div style={{ fontSize: 12, color: "#88aa88", marginTop: 2 }}>
             あなた：Lv.{lv} {levelTitle(lv)} ／ HP {stats.maxHp} ・ 攻撃 {stats.atk} ・ 制限 {stats.timer}秒
           </div>
-          <div style={{ fontSize: 11, color: "#5a8a5a", marginTop: 2 }}>全21体＋ラスボス！どの敵にも挑戦できる（推奨レベルは目安）</div>
+          <div style={{ fontSize: 11, color: "#5a8a5a", marginTop: 2 }}>
+            タイムアタックで小単元を全クリアすると、その敵が出現！全部たおすと章ボスへ！
+          </div>
         </div>
 
-        {MONSTERS.map((m) => {
-          // 自分のレベルと推奨レベルの差で「手強さ」を表示
-          const tough = lv < m.minLv;             // 推奨より下＝手強い
-          const veryTough = lv < m.minLv - 6;     // かなり下＝かなり手強い
-          const isCleared = cleared.has(m.id);
+        {/* 新しく解放された敵のお知らせ */}
+        {newly.size > 0 && (
+          <div className="bt-panel" style={{ borderColor: "#fde047", background: "rgba(250,204,21,.12)", textAlign: "center" }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#fde047" }}>✨ 新しい敵キャラが増えた！</div>
+            <div style={{ fontSize: 11, color: "#cceebb", marginTop: 2 }}>{newly.size}体の新しい相手に挑戦できるよ！</div>
+          </div>
+        )}
+
+        {/* 章ごとに：小単元モンスター → 章ボス */}
+        {CHAPTERS.map((ch) => {
+          const units = MONSTERS.filter((m) => m.kind === "unit" && m.chapterId === ch.id);
+          const boss = MONSTERS.find((m) => m.kind === "chapterBoss" && m.chapterId === ch.id);
           return (
-            <button
-              key={m.id}
-              className="bt-panel bt-select-card"
-              onClick={() => onSelect(m)}
-              style={{ borderColor: m.color + "88", position: "relative", overflow: "hidden" }}
-            >
-              {/* 撃破済み：右側に大きな斜めスタンプ */}
-              {isCleared && (
-                <div style={{
-                  position: "absolute", right: 8, top: "50%",
-                  transform: "translateY(-50%) rotate(-15deg)",
-                  fontFamily: "'M PLUS Rounded 1c','DotGothic16',sans-serif",
-                  fontSize: 30, fontWeight: 900, letterSpacing: 1,
-                  color: "#fde047",
-                  border: "4px solid #fde047", borderRadius: 10, padding: "2px 12px",
-                  textShadow: "0 0 10px rgba(250,204,21,.8)",
-                  boxShadow: "0 0 14px rgba(250,204,21,.5), inset 0 0 12px rgba(250,204,21,.3)",
-                  opacity: 0.92, pointerEvents: "none", zIndex: 3,
-                }}>CLEAR!</div>
-              )}
-              <div className="bt-select-mini" style={{ borderColor: m.color }}>
-                <svg viewBox="0 0 140 140" style={{ width: 64, height: 64, overflow: "visible" }} dangerouslySetInnerHTML={{ __html: m.svgDefs + m.svg }} />
+            <div key={ch.id}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "12px 2px 6px", borderBottom: `1px solid ${ch.color}55`, paddingBottom: 4 }}>
+                <span style={{ fontSize: 18 }}>{ch.emoji}</span>
+                <span style={{ fontSize: 14, fontWeight: 900, color: ch.color }}>{ch.name}</span>
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 15, fontWeight: 900, color: m.color }}>
-                  {m.name}
-                  {veryTough && <span style={{ fontSize: 10, color: "#ff6b6b", marginLeft: 6 }}>☠ かなり手強い</span>}
-                  {tough && !veryTough && <span style={{ fontSize: 10, color: "#fbbf24", marginLeft: 6 }}>⚠ 手強い</span>}
-                </div>
-                <div style={{ fontSize: 11, color: "#88aa88" }}>テーマ：{m.unit} ・ 推奨Lv.{m.minLv}</div>
-                <div className="bt-select-stats">
-                  <span className="bt-select-stat">HP {m.hp}</span>
-                  <span className="bt-select-stat">攻撃 {m.atk}</span>
-                  <span className="bt-select-stat" style={{ background: "rgba(251,191,36,.2)", color: "#fbbf24" }}>撃破 +{m.reward}XP</span>
-                </div>
-              </div>
-            </button>
+              {units.map((m) => <MonsterCard key={m.id} m={m} />)}
+              {boss && <MonsterCard key={boss.id} m={boss} />}
+            </div>
           );
         })}
+
+        {/* 最終ボス */}
+        {finalBoss && (
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "16px 2px 6px", borderBottom: "1px solid #e879f955", paddingBottom: 4 }}>
+              <span style={{ fontSize: 18 }}>👑</span>
+              <span style={{ fontSize: 14, fontWeight: 900, color: "#e879f9" }}>最終決戦</span>
+            </div>
+            <MonsterCard m={finalBoss} />
+          </div>
+        )}
       </div>
     </div>
   );
