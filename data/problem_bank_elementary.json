@@ -1,0 +1,4846 @@
+[
+  {
+    "id": "E3-001",
+    "display_grade": "小3",
+    "grade": "小3",
+    "unit": "かけ算",
+    "subunit": "九九",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E3_001"
+    ],
+    "prerequisite_skills": [],
+    "elem_prerequisite_skills": [],
+    "q": "3×7 を計算しなさい。",
+    "answer": "21",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_KUKU",
+        "description": "九九の暗唱ミス（特に7・8・9の段）"
+      }
+    ],
+    "tags": [
+      "かけ算",
+      "九九",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E3-002",
+    "display_grade": "小3",
+    "grade": "小3",
+    "unit": "かけ算",
+    "subunit": "九九",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E3_001"
+    ],
+    "prerequisite_skills": [],
+    "elem_prerequisite_skills": [],
+    "q": "8×6 を計算しなさい。",
+    "answer": "48",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_KUKU",
+        "description": "九九の暗唱ミス（特に7・8・9の段）"
+      }
+    ],
+    "tags": [
+      "かけ算",
+      "九九",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E3-003",
+    "display_grade": "小3",
+    "grade": "小3",
+    "unit": "かけ算",
+    "subunit": "九九",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E3_001"
+    ],
+    "prerequisite_skills": [],
+    "elem_prerequisite_skills": [],
+    "q": "9×7 を計算しなさい。",
+    "answer": "63",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_KUKU",
+        "description": "九九の暗唱ミス（特に7・8・9の段）"
+      }
+    ],
+    "tags": [
+      "かけ算",
+      "九九",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E3-004",
+    "display_grade": "小3",
+    "grade": "小3",
+    "unit": "かけ算",
+    "subunit": "九九",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E3_001"
+    ],
+    "prerequisite_skills": [],
+    "elem_prerequisite_skills": [],
+    "q": "6×4 を計算しなさい。",
+    "answer": "24",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_KUKU",
+        "description": "九九の暗唱ミス（特に7・8・9の段）"
+      }
+    ],
+    "tags": [
+      "かけ算",
+      "九九",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E3-005",
+    "display_grade": "小3",
+    "grade": "小3",
+    "unit": "かけ算",
+    "subunit": "九九",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E3_001"
+    ],
+    "prerequisite_skills": [],
+    "elem_prerequisite_skills": [],
+    "q": "7×8 を計算しなさい。",
+    "answer": "56",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_KUKU",
+        "description": "九九の暗唱ミス（特に7・8・9の段）"
+      }
+    ],
+    "tags": [
+      "かけ算",
+      "九九",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E3-006",
+    "display_grade": "小3",
+    "grade": "小3",
+    "unit": "かけ算",
+    "subunit": "九九",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E3_001"
+    ],
+    "prerequisite_skills": [],
+    "elem_prerequisite_skills": [],
+    "q": "9×4 を計算しなさい。",
+    "answer": "36",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_KUKU",
+        "description": "九九の暗唱ミス（特に7・8・9の段）"
+      }
+    ],
+    "tags": [
+      "かけ算",
+      "九九",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E3-007",
+    "display_grade": "小3",
+    "grade": "小3",
+    "unit": "かけ算",
+    "subunit": "九九",
+    "format": "文章題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E3_001"
+    ],
+    "prerequisite_skills": [],
+    "elem_prerequisite_skills": [],
+    "q": "1袋に6個のあめが入っています。7袋分では何個ですか。",
+    "answer": "42個",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_KUKU",
+        "description": "九九の暗唱ミス（特に7・8・9の段）"
+      }
+    ],
+    "tags": [
+      "かけ算",
+      "九九",
+      "★1",
+      "基礎",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E3-008",
+    "display_grade": "小3",
+    "grade": "小3",
+    "unit": "かけ算",
+    "subunit": "九九",
+    "format": "文章題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E3_001"
+    ],
+    "prerequisite_skills": [],
+    "elem_prerequisite_skills": [],
+    "q": "1列に8人が並んでいます。9列では何人ですか。",
+    "answer": "72人",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_KUKU",
+        "description": "九九の暗唱ミス（特に7・8・9の段）"
+      }
+    ],
+    "tags": [
+      "かけ算",
+      "九九",
+      "★1",
+      "基礎",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E3-009",
+    "display_grade": "小3",
+    "grade": "小3",
+    "unit": "かけ算",
+    "subunit": "九九",
+    "format": "穴埋め",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E3_001"
+    ],
+    "prerequisite_skills": [],
+    "elem_prerequisite_skills": [],
+    "q": "□×7 = 56 のとき、□にあてはまる数を求めなさい。",
+    "answer": "8",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_KUKU",
+        "description": "九九の暗唱ミス（特に7・8・9の段）"
+      }
+    ],
+    "tags": [
+      "かけ算",
+      "九九",
+      "★2",
+      "標準",
+      "穴埋め"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E3-010",
+    "display_grade": "小3",
+    "grade": "小3",
+    "unit": "かけ算",
+    "subunit": "九九",
+    "format": "穴埋め",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E3_001"
+    ],
+    "prerequisite_skills": [],
+    "elem_prerequisite_skills": [],
+    "q": "9×□ = 54 のとき、□にあてはまる数を求めなさい。",
+    "answer": "6",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_KUKU",
+        "description": "九九の暗唱ミス（特に7・8・9の段）"
+      }
+    ],
+    "tags": [
+      "かけ算",
+      "九九",
+      "★2",
+      "標準",
+      "穴埋め"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-001",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "整数の計算",
+    "subunit": "四則計算（筆算）",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E4_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "347 + 285 を計算しなさい。",
+    "answer": "632",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_CARRY",
+        "description": "繰り上がり・繰り下がりのミス"
+      }
+    ],
+    "tags": [
+      "整数の計算",
+      "四則計算（筆算）",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-002",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "整数の計算",
+    "subunit": "四則計算（筆算）",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E4_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "503 - 178 を計算しなさい。",
+    "answer": "325",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_CARRY",
+        "description": "繰り上がり・繰り下がりのミス"
+      }
+    ],
+    "tags": [
+      "整数の計算",
+      "四則計算（筆算）",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-003",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "整数の計算",
+    "subunit": "四則計算（筆算）",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E4_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "46 × 37 を計算しなさい。",
+    "answer": "1702",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_CARRY",
+        "description": "繰り上がり・繰り下がりのミス"
+      }
+    ],
+    "tags": [
+      "整数の計算",
+      "四則計算（筆算）",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-004",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "整数の計算",
+    "subunit": "四則計算（筆算）",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E4_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "756 ÷ 9 を計算しなさい。",
+    "answer": "84",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DIV",
+        "description": "余りの扱いミス（余りが除数以上になる）"
+      }
+    ],
+    "tags": [
+      "整数の計算",
+      "四則計算（筆算）",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-005",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "整数の計算",
+    "subunit": "四則計算（筆算）",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "294 ÷ 14 を計算しなさい。",
+    "answer": "21",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DIV",
+        "description": "余りの扱いミス（余りが除数以上になる）"
+      }
+    ],
+    "tags": [
+      "整数の計算",
+      "四則計算（筆算）",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-006",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "整数の計算",
+    "subunit": "四則計算（筆算）",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "63 × 48 を計算しなさい。",
+    "answer": "3024",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_CARRY",
+        "description": "繰り上がり・繰り下がりのミス"
+      }
+    ],
+    "tags": [
+      "整数の計算",
+      "四則計算（筆算）",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-007",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "整数の計算",
+    "subunit": "四則計算（筆算）",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "1000 - 374 を計算しなさい。",
+    "answer": "626",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_CARRY",
+        "description": "繰り上がり・繰り下がりのミス"
+      }
+    ],
+    "tags": [
+      "整数の計算",
+      "四則計算（筆算）",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-008",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "整数の計算",
+    "subunit": "四則計算（筆算）",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "リンゴを1箱25個ずつ、32箱作ります。リンゴは全部で何個必要ですか。",
+    "answer": "800個",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_CARRY",
+        "description": "繰り上がり・繰り下がりのミス"
+      }
+    ],
+    "tags": [
+      "整数の計算",
+      "四則計算（筆算）",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-009",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "整数の計算",
+    "subunit": "四則計算（筆算）",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "480枚の色紙を15人で等しく分けると、1人何枚になりますか。",
+    "answer": "32枚",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DIV",
+        "description": "余りの扱いミス（余りが除数以上になる）"
+      }
+    ],
+    "tags": [
+      "整数の計算",
+      "四則計算（筆算）",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-010",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "整数の計算",
+    "subunit": "四則計算（筆算）",
+    "format": "計算問題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E4_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "1234 × 56 を計算しなさい。",
+    "answer": "69104",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_CARRY",
+        "description": "繰り上がり・繰り下がりのミス"
+      }
+    ],
+    "tags": [
+      "整数の計算",
+      "四則計算（筆算）",
+      "★3",
+      "応用",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-011",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "かけ算・わり算",
+    "subunit": "かけ算の意味・等分除・包含除",
+    "format": "文章題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E4_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "24個のみかんを6人で等しく分けると1人何個になりますか。（等分除）",
+    "answer": "4個",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_MEANING",
+        "description": "等分除と包含除の混同"
+      }
+    ],
+    "tags": [
+      "かけ算・わり算",
+      "かけ算の意味・等分除・包含除",
+      "★1",
+      "基礎",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-012",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "かけ算・わり算",
+    "subunit": "かけ算の意味・等分除・包含除",
+    "format": "文章題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E4_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "24個のみかんを1袋6個ずつ袋に入れると何袋できますか。（包含除）",
+    "answer": "4袋",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_MEANING",
+        "description": "等分除と包含除の混同"
+      }
+    ],
+    "tags": [
+      "かけ算・わり算",
+      "かけ算の意味・等分除・包含除",
+      "★1",
+      "基礎",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-013",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "かけ算・わり算",
+    "subunit": "かけ算の意味・等分除・包含除",
+    "format": "文章題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E4_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "1本30円のえんぴつを5本買います。代金は何円ですか。",
+    "answer": "150円",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_MEANING",
+        "description": "等分除と包含除の混同"
+      }
+    ],
+    "tags": [
+      "かけ算・わり算",
+      "かけ算の意味・等分除・包含除",
+      "★1",
+      "基礎",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-014",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "かけ算・わり算",
+    "subunit": "かけ算の意味・等分除・包含除",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "72枚の画用紙を8人で等しく分けます。1人何枚もらえますか。",
+    "answer": "9枚",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_MEANING",
+        "description": "等分除と包含除の混同"
+      }
+    ],
+    "tags": [
+      "かけ算・わり算",
+      "かけ算の意味・等分除・包含除",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-015",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "かけ算・わり算",
+    "subunit": "かけ算の意味・等分除・包含除",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "56cmのリボンを7cmずつ切ると、何本できますか。",
+    "answer": "8本",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_MEANING",
+        "description": "等分除と包含除の混同"
+      }
+    ],
+    "tags": [
+      "かけ算・わり算",
+      "かけ算の意味・等分除・包含除",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-016",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "かけ算・わり算",
+    "subunit": "かけ算の意味・等分除・包含除",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "1さつ120円のノートを6さつ買います。代金は何円ですか。",
+    "answer": "720円",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_MEANING",
+        "description": "等分除と包含除の混同"
+      }
+    ],
+    "tags": [
+      "かけ算・わり算",
+      "かけ算の意味・等分除・包含除",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-017",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "かけ算・わり算",
+    "subunit": "かけ算の意味・等分除・包含除",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "花を1花びんに3本ずつ入れます。花が27本あるとき、花びんは何個必要ですか。",
+    "answer": "9個",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_MEANING",
+        "description": "等分除と包含除の混同"
+      }
+    ],
+    "tags": [
+      "かけ算・わり算",
+      "かけ算の意味・等分除・包含除",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-018",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "かけ算・わり算",
+    "subunit": "かけ算の意味・等分除・包含除",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E4_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "1袋に8個入りのクッキーが5袋と、ばら売りで3個あります。クッキーは全部で何個ですか。",
+    "answer": "43個",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_MEANING",
+        "description": "等分除と包含除の混同"
+      }
+    ],
+    "tags": [
+      "かけ算・わり算",
+      "かけ算の意味・等分除・包含除",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-019",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "計算のきまり",
+    "subunit": "計算の順序・かっこ",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E4_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "3 + 4 × 2 を計算しなさい。",
+    "answer": "11",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_ORDER",
+        "description": "計算順序ミス（かっこや乗除の優先順位）"
+      }
+    ],
+    "tags": [
+      "計算のきまり",
+      "計算の順序・かっこ",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-020",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "計算のきまり",
+    "subunit": "計算の順序・かっこ",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E4_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "(3 + 4) × 2 を計算しなさい。",
+    "answer": "14",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_ORDER",
+        "description": "計算順序ミス（かっこや乗除の優先順位）"
+      }
+    ],
+    "tags": [
+      "計算のきまり",
+      "計算の順序・かっこ",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-021",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "計算のきまり",
+    "subunit": "計算の順序・かっこ",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E4_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "20 - 6 ÷ 2 を計算しなさい。",
+    "answer": "17",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_ORDER",
+        "description": "計算順序ミス（かっこや乗除の優先順位）"
+      }
+    ],
+    "tags": [
+      "計算のきまり",
+      "計算の順序・かっこ",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-022",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "計算のきまり",
+    "subunit": "計算の順序・かっこ",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "5 × (8 - 3) + 4 を計算しなさい。",
+    "answer": "29",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_ORDER",
+        "description": "計算順序ミス（かっこや乗除の優先順位）"
+      }
+    ],
+    "tags": [
+      "計算のきまり",
+      "計算の順序・かっこ",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-023",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "計算のきまり",
+    "subunit": "計算の順序・かっこ",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "48 ÷ (2 + 4) × 3 を計算しなさい。",
+    "answer": "24",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_ORDER",
+        "description": "計算順序ミス（かっこや乗除の優先順位）"
+      }
+    ],
+    "tags": [
+      "計算のきまり",
+      "計算の順序・かっこ",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-024",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "計算のきまり",
+    "subunit": "計算の順序・かっこ",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "100 - (7 + 3) × 8 を計算しなさい。",
+    "answer": "20",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_ORDER",
+        "description": "計算順序ミス（かっこや乗除の優先順位）"
+      }
+    ],
+    "tags": [
+      "計算のきまり",
+      "計算の順序・かっこ",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-025",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "計算のきまり",
+    "subunit": "計算の順序・かっこ",
+    "format": "計算問題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E4_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "(36 - 12) ÷ 4 + 9 × 2 を計算しなさい。",
+    "answer": "24",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_ORDER",
+        "description": "計算順序ミス（かっこや乗除の優先順位）"
+      }
+    ],
+    "tags": [
+      "計算のきまり",
+      "計算の順序・かっこ",
+      "★3",
+      "応用",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E4-026",
+    "display_grade": "小4",
+    "grade": "小4",
+    "unit": "計算のきまり",
+    "subunit": "計算の順序・かっこ",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E4_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "えんぴつ1本40円とノート1さつ80円を、合わせて3セット買います。代金は何円ですか。式を1つにして計算しなさい。",
+    "answer": "360円",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_ORDER",
+        "description": "計算順序ミス（かっこや乗除の優先順位）"
+      }
+    ],
+    "tags": [
+      "計算のきまり",
+      "計算の順序・かっこ",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-001",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "小数",
+    "subunit": "小数の四則計算",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "3.4 + 2.7 を計算しなさい。",
+    "answer": "6.1",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DECIMAL",
+        "description": "小数点の位置ずれ"
+      }
+    ],
+    "tags": [
+      "小数",
+      "小数の四則計算",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-002",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "小数",
+    "subunit": "小数の四則計算",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "5.2 - 1.8 を計算しなさい。",
+    "answer": "3.4",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DECIMAL",
+        "description": "小数点の位置ずれ"
+      }
+    ],
+    "tags": [
+      "小数",
+      "小数の四則計算",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-003",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "小数",
+    "subunit": "小数の四則計算",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "2.5 × 4 を計算しなさい。",
+    "answer": "10",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DECIMAL",
+        "description": "小数点の位置ずれ"
+      }
+    ],
+    "tags": [
+      "小数",
+      "小数の四則計算",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-004",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "小数",
+    "subunit": "小数の四則計算",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "7.2 ÷ 8 を計算しなさい。",
+    "answer": "0.9",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DECIMAL",
+        "description": "小数点の位置ずれ"
+      }
+    ],
+    "tags": [
+      "小数",
+      "小数の四則計算",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-005",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "小数",
+    "subunit": "小数の四則計算",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "0.36 × 0.5 を計算しなさい。",
+    "answer": "0.18",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DECIMAL",
+        "description": "小数点の位置ずれ"
+      }
+    ],
+    "tags": [
+      "小数",
+      "小数の四則計算",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-006",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "小数",
+    "subunit": "小数の四則計算",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "4.2 ÷ 0.6 を計算しなさい。",
+    "answer": "7",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DECIMAL",
+        "description": "小数点の位置ずれ"
+      }
+    ],
+    "tags": [
+      "小数",
+      "小数の四則計算",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-007",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "小数",
+    "subunit": "小数の四則計算",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "1.25 × 0.8 を計算しなさい。",
+    "answer": "1",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DECIMAL",
+        "description": "小数点の位置ずれ"
+      }
+    ],
+    "tags": [
+      "小数",
+      "小数の四則計算",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-008",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "小数",
+    "subunit": "小数の四則計算",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "1mが0.8kgのパイプがあります。2.5m分の重さは何kgですか。",
+    "answer": "2kg",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DECIMAL",
+        "description": "小数点の位置ずれ"
+      }
+    ],
+    "tags": [
+      "小数",
+      "小数の四則計算",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-009",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "小数",
+    "subunit": "小数の四則計算",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "4.2Lのジュースを0.7Lずつ分けると何人に分けられますか。",
+    "answer": "6人",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DECIMAL",
+        "description": "小数点の位置ずれ"
+      }
+    ],
+    "tags": [
+      "小数",
+      "小数の四則計算",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-010",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "小数",
+    "subunit": "小数の四則計算",
+    "format": "計算問題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E5_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "2.4 × 1.5 - 0.6 ÷ 0.4 を計算しなさい。",
+    "answer": "2.1",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_DECIMAL",
+        "description": "小数点の位置ずれ"
+      }
+    ],
+    "tags": [
+      "小数",
+      "小数の四則計算",
+      "★3",
+      "応用",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-011",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の意味・大小比較・通分",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "q": "2/3 と 3/4 を通分しなさい。",
+    "answer": "8/12 と 9/12",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の意味・大小比較・通分",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-012",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の意味・大小比較・通分",
+    "format": "大小比較",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "q": "2/3 と 3/4 はどちらが大きいですか。",
+    "answer": "3/4",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の意味・大小比較・通分",
+      "★1",
+      "基礎",
+      "大小比較"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-013",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の意味・大小比較・通分",
+    "format": "大小比較",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "q": "5/6 と 7/9 はどちらが大きいですか。",
+    "answer": "5/6",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の意味・大小比較・通分",
+      "★1",
+      "基礎",
+      "大小比較"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-014",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の意味・大小比較・通分",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "q": "3/4, 2/3, 5/6 を小さい順に並べなさい。",
+    "answer": "2/3, 3/4, 5/6",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の意味・大小比較・通分",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-015",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の意味・大小比較・通分",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "q": "ピザを3/8枚食べました。残りは何枚ですか。分数で答えなさい。",
+    "answer": "5/8枚",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の意味・大小比較・通分",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-016",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の意味・大小比較・通分",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "q": "1/2 を分母が12の分数に直しなさい。",
+    "answer": "6/12",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の意味・大小比較・通分",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-017",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の意味・大小比較・通分",
+    "format": "大小比較",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E5_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002"
+    ],
+    "q": "3/7, 5/11, 2/5 を小さい順に並べなさい。",
+    "answer": "2/5, 3/7, 5/11",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の意味・大小比較・通分",
+      "★3",
+      "応用",
+      "大小比較"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-018",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の加法・減法（通分）",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "1/3 + 1/4 を計算しなさい。",
+    "answer": "7/12",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の加法・減法（通分）",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-019",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の加法・減法（通分）",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "3/4 - 1/6 を計算しなさい。",
+    "answer": "7/12",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の加法・減法（通分）",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-020",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の加法・減法（通分）",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "1/2 + 2/5 を計算しなさい。",
+    "answer": "9/10",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の加法・減法（通分）",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-021",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の加法・減法（通分）",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "2/3 + 3/4 - 1/2 を計算しなさい。",
+    "answer": "11/12",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の加法・減法（通分）",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-022",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の加法・減法（通分）",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "1 - 3/8 - 1/4 を計算しなさい。",
+    "answer": "3/8",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の加法・減法（通分）",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-023",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の加法・減法（通分）",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "ジュースが 3/4 L あります。1/3 L 飲むと残りは何 L ですか。",
+    "answer": "5/12 L",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の加法・減法（通分）",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-024",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の加法・減法（通分）",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "赤いテープ 2/3 m と青いテープ 3/5 m を合わせると何 m になりますか。",
+    "answer": "19/15 m（1と4/15 m）",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の加法・減法（通分）",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-025",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の加法・減法（通分）",
+    "format": "計算問題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E5_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "5/6 - 1/4 + 1/3 を計算しなさい。",
+    "answer": "11/12",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の加法・減法（通分）",
+      "★3",
+      "応用",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-026",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "分数",
+    "subunit": "分数の加法・減法（通分）",
+    "format": "計算問題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E5_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "2と1/3 - 1と5/6 を計算しなさい。",
+    "answer": "1/2",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の加法・減法（通分）",
+      "★3",
+      "応用",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-027",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "割合",
+    "subunit": "割合・百分率・歩合",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "q": "30は50の何割ですか。",
+    "answer": "6割",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO",
+        "description": "割合・百分率・歩合の変換ミス"
+      }
+    ],
+    "tags": [
+      "割合",
+      "割合・百分率・歩合",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-028",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "割合",
+    "subunit": "割合・百分率・歩合",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "q": "40は200の何%ですか。",
+    "answer": "20%",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO",
+        "description": "割合・百分率・歩合の変換ミス"
+      }
+    ],
+    "tags": [
+      "割合",
+      "割合・百分率・歩合",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-029",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "割合",
+    "subunit": "割合・百分率・歩合",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "q": "80の25%はいくつですか。",
+    "answer": "20",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO",
+        "description": "割合・百分率・歩合の変換ミス"
+      }
+    ],
+    "tags": [
+      "割合",
+      "割合・百分率・歩合",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-030",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "割合",
+    "subunit": "割合・百分率・歩合",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "q": "定価600円の品物を3割引きで売るとき、売り値は何円ですか。",
+    "answer": "420円",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO",
+        "description": "割合・百分率・歩合の変換ミス"
+      }
+    ],
+    "tags": [
+      "割合",
+      "割合・百分率・歩合",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-031",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "割合",
+    "subunit": "割合・百分率・歩合",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "q": "120人の生徒のうち60%が女子です。女子は何人ですか。",
+    "answer": "72人",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO",
+        "description": "割合・百分率・歩合の変換ミス"
+      }
+    ],
+    "tags": [
+      "割合",
+      "割合・百分率・歩合",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-032",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "割合",
+    "subunit": "割合・百分率・歩合",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "q": "もとの値段が500円の品物を80円値引きしました。何%引きになりましたか。",
+    "answer": "16%引き",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO",
+        "description": "割合・百分率・歩合の変換ミス"
+      }
+    ],
+    "tags": [
+      "割合",
+      "割合・百分率・歩合",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-033",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "割合",
+    "subunit": "割合・百分率・歩合",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "q": "割合が0.4で比べる量が60のとき、もとにする量はいくつですか。",
+    "answer": "150",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO",
+        "description": "割合・百分率・歩合の変換ミス"
+      }
+    ],
+    "tags": [
+      "割合",
+      "割合・百分率・歩合",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-034",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "割合",
+    "subunit": "割合・百分率・歩合",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E5_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "q": "ある学校の今年の全校生徒数は昨年より5%増えて420人になりました。昨年の全校生徒数は何人でしたか。",
+    "answer": "400人",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO",
+        "description": "割合・百分率・歩合の変換ミス"
+      }
+    ],
+    "tags": [
+      "割合",
+      "割合・百分率・歩合",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-035",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "割合",
+    "subunit": "割合・百分率・歩合",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E5_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002"
+    ],
+    "q": "食塩水200gに食塩15gが溶けています。この食塩水の濃度は何%ですか。",
+    "answer": "7.5%",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO",
+        "description": "割合・百分率・歩合の変換ミス"
+      }
+    ],
+    "tags": [
+      "割合",
+      "割合・百分率・歩合",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-036",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "整数の性質",
+    "subunit": "公倍数・公約数・最小公倍数・最大公約数",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "4と6の最小公倍数を求めなさい。",
+    "answer": "12",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LCM",
+        "description": "最小公倍数と最大公約数を混同"
+      }
+    ],
+    "tags": [
+      "整数の性質",
+      "公倍数・公約数・最小公倍数・最大公約数",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-037",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "整数の性質",
+    "subunit": "公倍数・公約数・最小公倍数・最大公約数",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "12と18の最大公約数を求めなさい。",
+    "answer": "6",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LCM",
+        "description": "最小公倍数と最大公約数を混同"
+      }
+    ],
+    "tags": [
+      "整数の性質",
+      "公倍数・公約数・最小公倍数・最大公約数",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-038",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "整数の性質",
+    "subunit": "公倍数・公約数・最小公倍数・最大公約数",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E5_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "3と5の公倍数を小さい方から3つ答えなさい。",
+    "answer": "15, 30, 45",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LCM",
+        "description": "最小公倍数と最大公約数を混同"
+      }
+    ],
+    "tags": [
+      "整数の性質",
+      "公倍数・公約数・最小公倍数・最大公約数",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-039",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "整数の性質",
+    "subunit": "公倍数・公約数・最小公倍数・最大公約数",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "4, 6, 9の最小公倍数を求めなさい。",
+    "answer": "36",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LCM",
+        "description": "最小公倍数と最大公約数を混同"
+      }
+    ],
+    "tags": [
+      "整数の性質",
+      "公倍数・公約数・最小公倍数・最大公約数",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-040",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "整数の性質",
+    "subunit": "公倍数・公約数・最小公倍数・最大公約数",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "24と36の最大公約数を求めなさい。",
+    "answer": "12",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LCM",
+        "description": "最小公倍数と最大公約数を混同"
+      }
+    ],
+    "tags": [
+      "整数の性質",
+      "公倍数・公約数・最小公倍数・最大公約数",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-041",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "整数の性質",
+    "subunit": "公倍数・公約数・最小公倍数・最大公約数",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "赤い花が6本ずつ、白い花が8本ずつ束になっています。どちらも同じ本数になる最小の本数は何本ですか。",
+    "answer": "24本",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LCM",
+        "description": "最小公倍数と最大公約数を混同"
+      }
+    ],
+    "tags": [
+      "整数の性質",
+      "公倍数・公約数・最小公倍数・最大公約数",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-042",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "整数の性質",
+    "subunit": "公倍数・公約数・最小公倍数・最大公約数",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E5_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "縦24cm、横36cmの長方形の紙を同じ大きさの正方形に無駄なく切ります。1辺を最も長くするとき、何cmの正方形になりますか。",
+    "answer": "12cm",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LCM",
+        "description": "最小公倍数と最大公約数を混同"
+      }
+    ],
+    "tags": [
+      "整数の性質",
+      "公倍数・公約数・最小公倍数・最大公約数",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E5-043",
+    "display_grade": "小5",
+    "grade": "小5",
+    "unit": "整数の性質",
+    "subunit": "公倍数・公約数・最小公倍数・最大公約数",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E5_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001"
+    ],
+    "q": "2つの整数があります。最小公倍数は60、最大公約数は4です。一方の数が12のとき、もう一方の数を求めなさい。",
+    "answer": "20",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LCM",
+        "description": "最小公倍数と最大公約数を混同"
+      }
+    ],
+    "tags": [
+      "整数の性質",
+      "公倍数・公約数・最小公倍数・最大公約数",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-001",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "分数",
+    "subunit": "分数の乗法・除法",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "q": "2/3 × 3/4 を計算しなさい。",
+    "answer": "1/2",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の乗法・除法",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-002",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "分数",
+    "subunit": "分数の乗法・除法",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "q": "3/5 ÷ 2/3 を計算しなさい。",
+    "answer": "9/10",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の乗法・除法",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-003",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "分数",
+    "subunit": "分数の乗法・除法",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "q": "4/7 × 7/4 を計算しなさい。",
+    "answer": "1",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の乗法・除法",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-004",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "分数",
+    "subunit": "分数の乗法・除法",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "q": "3/4 × 8/9 ÷ 2/3 を計算しなさい。",
+    "answer": "1",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の乗法・除法",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-005",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "分数",
+    "subunit": "分数の乗法・除法",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "q": "5/6 ÷ 5/12 × 2/3 を計算しなさい。",
+    "answer": "4/3（1と1/3）",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の乗法・除法",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-006",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "分数",
+    "subunit": "分数の乗法・除法",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "q": "3/4 m の重さが 1/2 kg のパイプがあります。1m の重さは何 kg ですか。",
+    "answer": "2/3 kg",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の乗法・除法",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-007",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "分数",
+    "subunit": "分数の乗法・除法",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "q": "2/5 L のジュースが 1/3 本分です。1本分は何 L ですか。",
+    "answer": "6/5 L（1と1/5 L）",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の乗法・除法",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-008",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "分数",
+    "subunit": "分数の乗法・除法",
+    "format": "計算問題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "q": "1と2/3 ÷ 2と1/2 × 3/4 を計算しなさい。",
+    "answer": "1/2",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の乗法・除法",
+      "★3",
+      "応用",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-009",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "分数",
+    "subunit": "分数の乗法・除法",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_001"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002",
+      "sk_E5_003"
+    ],
+    "q": "面積が 3/4 m² で、横が 5/6 m の長方形の縦の長さを求めなさい。",
+    "answer": "9/10 m",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_FRAC",
+        "description": "通分ミス・分子だけ計算してしまう"
+      }
+    ],
+    "tags": [
+      "分数",
+      "分数の乗法・除法",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-010",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "比",
+    "subunit": "比の値・比を簡単にする・比例配分",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "6:9 を最も簡単な整数の比にしなさい。",
+    "answer": "2:3",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO2",
+        "description": "比を簡単にするとき最大公約数でなく2で割る"
+      }
+    ],
+    "tags": [
+      "比",
+      "比の値・比を簡単にする・比例配分",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-011",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "比",
+    "subunit": "比の値・比を簡単にする・比例配分",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "2:3 の比の値を求めなさい。",
+    "answer": "2/3",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO2",
+        "description": "比を簡単にするとき最大公約数でなく2で割る"
+      }
+    ],
+    "tags": [
+      "比",
+      "比の値・比を簡単にする・比例配分",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-012",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "比",
+    "subunit": "比の値・比を簡単にする・比例配分",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "0.4:0.6 を最も簡単な整数の比にしなさい。",
+    "answer": "2:3",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO2",
+        "description": "比を簡単にするとき最大公約数でなく2で割る"
+      }
+    ],
+    "tags": [
+      "比",
+      "比の値・比を簡単にする・比例配分",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-013",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "比",
+    "subunit": "比の値・比を簡単にする・比例配分",
+    "format": "計算問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "1/2 : 1/3 を最も簡単な整数の比にしなさい。",
+    "answer": "3:2",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO2",
+        "description": "比を簡単にするとき最大公約数でなく2で割る"
+      }
+    ],
+    "tags": [
+      "比",
+      "比の値・比を簡単にする・比例配分",
+      "★2",
+      "標準",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-014",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "比",
+    "subunit": "比の値・比を簡単にする・比例配分",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "60枚の画用紙を 2:3 に分けます。それぞれ何枚ですか。",
+    "answer": "24枚と36枚",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO2",
+        "description": "比を簡単にするとき最大公約数でなく2で割る"
+      }
+    ],
+    "tags": [
+      "比",
+      "比の値・比を簡単にする・比例配分",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-015",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "比",
+    "subunit": "比の値・比を簡単にする・比例配分",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "AとBの所持金の比は 5:4 です。Aの所持金が 1500 円のとき、Bの所持金は何円ですか。",
+    "answer": "1200円",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO2",
+        "description": "比を簡単にするとき最大公約数でなく2で割る"
+      }
+    ],
+    "tags": [
+      "比",
+      "比の値・比を簡単にする・比例配分",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-016",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "比",
+    "subunit": "比の値・比を簡単にする・比例配分",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "みかんとりんごを合わせて56個買いました。みかんとりんごの個数の比が 3:4 のとき、りんごは何個ですか。",
+    "answer": "32個",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO2",
+        "description": "比を簡単にするとき最大公約数でなく2で割る"
+      }
+    ],
+    "tags": [
+      "比",
+      "比の値・比を簡単にする・比例配分",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-017",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "比",
+    "subunit": "比の値・比を簡単にする・比例配分",
+    "format": "計算問題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_002"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_002",
+      "sk_E5_002"
+    ],
+    "q": "x : 9 = 4 : 6 のとき、x を求めなさい。",
+    "answer": "6",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_RATIO2",
+        "description": "比を簡単にするとき最大公約数でなく2で割る"
+      }
+    ],
+    "tags": [
+      "比",
+      "比の値・比を簡単にする・比例配分",
+      "★3",
+      "応用",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-018",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "速さ",
+    "subunit": "速さ・時間・距離の関係",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "速さ60km/h で2時間走ると何 km 進みますか。",
+    "answer": "120 km",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_SPEED",
+        "description": "速さ・時間・距離の公式の使い間違い"
+      }
+    ],
+    "tags": [
+      "速さ",
+      "速さ・時間・距離の関係",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-019",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "速さ",
+    "subunit": "速さ・時間・距離の関係",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "120 km を4時間で走ったときの速さを求めなさい。",
+    "answer": "時速30 km",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_SPEED",
+        "description": "速さ・時間・距離の公式の使い間違い"
+      }
+    ],
+    "tags": [
+      "速さ",
+      "速さ・時間・距離の関係",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-020",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "速さ",
+    "subunit": "速さ・時間・距離の関係",
+    "format": "計算問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "分速80m で歩くと、400 m 進むのに何分かかりますか。",
+    "answer": "5分",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_SPEED",
+        "description": "速さ・時間・距離の公式の使い間違い"
+      }
+    ],
+    "tags": [
+      "速さ",
+      "速さ・時間・距離の関係",
+      "★1",
+      "基礎",
+      "計算問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-021",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "速さ",
+    "subunit": "速さ・時間・距離の関係",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "Aさんは家から1200mの学校まで分速60mで歩きます。何分かかりますか。",
+    "answer": "20分",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_SPEED",
+        "description": "速さ・時間・距離の公式の使い間違い"
+      }
+    ],
+    "tags": [
+      "速さ",
+      "速さ・時間・距離の関係",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-022",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "速さ",
+    "subunit": "速さ・時間・距離の関係",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "時速54 km は秒速何 m ですか。",
+    "answer": "秒速15 m",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_SPEED",
+        "description": "速さ・時間・距離の公式の使い間違い"
+      }
+    ],
+    "tags": [
+      "速さ",
+      "速さ・時間・距離の関係",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-023",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "速さ",
+    "subunit": "速さ・時間・距離の関係",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "AとBが3000m離れた地点から向かい合って歩き始めます。Aの速さは分速60m、Bは分速40mです。何分後に出会いますか。",
+    "answer": "30分後",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_SPEED",
+        "description": "速さ・時間・距離の公式の使い間違い"
+      }
+    ],
+    "tags": [
+      "速さ",
+      "速さ・時間・距離の関係",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-024",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "速さ",
+    "subunit": "速さ・時間・距離の関係",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "BさんがAさんの5分後に同じ道を出発しました。AさんとBさんの速さはそれぞれ分速50mと分速75mです。BさんはAさんに何分後に追いつきますか。",
+    "answer": "10分後",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_SPEED",
+        "description": "速さ・時間・距離の公式の使い間違い"
+      }
+    ],
+    "tags": [
+      "速さ",
+      "速さ・時間・距離の関係",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-025",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "速さ",
+    "subunit": "速さ・時間・距離の関係",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "時速72 km の列車が長さ300mのトンネルを抜けるのに20秒かかりました。この列車の長さを求めなさい。",
+    "answer": "100 m",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_SPEED",
+        "description": "速さ・時間・距離の公式の使い間違い"
+      }
+    ],
+    "tags": [
+      "速さ",
+      "速さ・時間・距離の関係",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-026",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "速さ",
+    "subunit": "速さ・時間・距離の関係",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_003"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "上りの速さが分速40m、下りの速さが分速60mの山道を往復します。往復の平均の速さを求めなさい。",
+    "answer": "分速48 m",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_SPEED",
+        "description": "速さ・時間・距離の公式の使い間違い"
+      }
+    ],
+    "tags": [
+      "速さ",
+      "速さ・時間・距離の関係",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-027",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "文字と式（算数）",
+    "subunit": "□・文字を使った式",
+    "format": "穴埋め",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "□ + 5 = 12 のとき、□ = ?",
+    "answer": "7",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LETTER",
+        "description": "□を使った式の立て方ミス（逆の関係になる）"
+      }
+    ],
+    "tags": [
+      "文字と式（算数）",
+      "□・文字を使った式",
+      "★1",
+      "基礎",
+      "穴埋め"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-028",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "文字と式（算数）",
+    "subunit": "□・文字を使った式",
+    "format": "穴埋め",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "□ × 3 = 24 のとき、□ = ?",
+    "answer": "8",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LETTER",
+        "description": "□を使った式の立て方ミス（逆の関係になる）"
+      }
+    ],
+    "tags": [
+      "文字と式（算数）",
+      "□・文字を使った式",
+      "★1",
+      "基礎",
+      "穴埋め"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-029",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "文字と式（算数）",
+    "subunit": "□・文字を使った式",
+    "format": "穴埋め",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "18 ÷ □ = 6 のとき、□ = ?",
+    "answer": "3",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LETTER",
+        "description": "□を使った式の立て方ミス（逆の関係になる）"
+      }
+    ],
+    "tags": [
+      "文字と式（算数）",
+      "□・文字を使った式",
+      "★1",
+      "基礎",
+      "穴埋め"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-030",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "文字と式（算数）",
+    "subunit": "□・文字を使った式",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "1本 x 円のえんぴつを5本買って、100円出したときのおつりを x を使って表しなさい。",
+    "answer": "100 - 5x 円",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LETTER",
+        "description": "□を使った式の立て方ミス（逆の関係になる）"
+      }
+    ],
+    "tags": [
+      "文字と式（算数）",
+      "□・文字を使った式",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-031",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "文字と式（算数）",
+    "subunit": "□・文字を使った式",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "1辺が a cm の正方形の周りの長さを a を使って表しなさい。",
+    "answer": "4a cm",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LETTER",
+        "description": "□を使った式の立て方ミス（逆の関係になる）"
+      }
+    ],
+    "tags": [
+      "文字と式（算数）",
+      "□・文字を使った式",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-032",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "文字と式（算数）",
+    "subunit": "□・文字を使った式",
+    "format": "文章題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "x の式 3x + 7 で、x = 4 のときの値を求めなさい。",
+    "answer": "19",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LETTER",
+        "description": "□を使った式の立て方ミス（逆の関係になる）"
+      }
+    ],
+    "tags": [
+      "文字と式（算数）",
+      "□・文字を使った式",
+      "★2",
+      "標準",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-033",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "文字と式（算数）",
+    "subunit": "□・文字を使った式",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "1個 a 円のお菓子を6個と、1個 b 円のジュースを3本買ったときの代金を a, b を使って表しなさい。",
+    "answer": "6a + 3b 円",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LETTER",
+        "description": "□を使った式の立て方ミス（逆の関係になる）"
+      }
+    ],
+    "tags": [
+      "文字と式（算数）",
+      "□・文字を使った式",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-034",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "文字と式（算数）",
+    "subunit": "□・文字を使った式",
+    "format": "文章題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_004"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001",
+      "sk_E4_002",
+      "sk_E4_003",
+      "sk_E5_001",
+      "sk_E5_002",
+      "sk_E5_004"
+    ],
+    "q": "x 円の商品を2割引きで売るときの価格を x を使って表しなさい。",
+    "answer": "0.8x 円",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_LETTER",
+        "description": "□を使った式の立て方ミス（逆の関係になる）"
+      }
+    ],
+    "tags": [
+      "文字と式（算数）",
+      "□・文字を使った式",
+      "★3",
+      "応用",
+      "文章題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-035",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "数の概念",
+    "subunit": "数直線・整数・小数・分数の位置",
+    "format": "一行問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "数直線上で 0 と 1 のちょうど真ん中の数はいくつですか。",
+    "answer": "0.5（1/2）",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_NUMLINE",
+        "description": "数直線上の位置（小数・分数）の読み取りミス"
+      }
+    ],
+    "tags": [
+      "数の概念",
+      "数直線・整数・小数・分数の位置",
+      "★1",
+      "基礎",
+      "一行問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-036",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "数の概念",
+    "subunit": "数直線・整数・小数・分数の位置",
+    "format": "一行問題",
+    "difficulty": 1,
+    "exam_level": "基礎",
+    "skill_ids": [
+      "sk_E6_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "数直線上で 1.5 は 1 より 0 に近いですか、2 に近いですか。",
+    "answer": "2に近い（等距離）",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_NUMLINE",
+        "description": "数直線上の位置（小数・分数）の読み取りミス"
+      }
+    ],
+    "tags": [
+      "数の概念",
+      "数直線・整数・小数・分数の位置",
+      "★1",
+      "基礎",
+      "一行問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-037",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "数の概念",
+    "subunit": "数直線・整数・小数・分数の位置",
+    "format": "一行問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "数直線上で 1/3 と 1/2 の間にある分数を1つ答えなさい（分母が6）。",
+    "answer": "5/12（または 2/5 など）",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_NUMLINE",
+        "description": "数直線上の位置（小数・分数）の読み取りミス"
+      }
+    ],
+    "tags": [
+      "数の概念",
+      "数直線・整数・小数・分数の位置",
+      "★2",
+      "標準",
+      "一行問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-038",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "数の概念",
+    "subunit": "数直線・整数・小数・分数の位置",
+    "format": "一行問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "0.1, 1/8, 0.15 を数直線上で小さい順に並べなさい。",
+    "answer": "1/8(0.125), 0.1 → 正しくは 0.1, 1/8, 0.15",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_NUMLINE",
+        "description": "数直線上の位置（小数・分数）の読み取りミス"
+      }
+    ],
+    "tags": [
+      "数の概念",
+      "数直線・整数・小数・分数の位置",
+      "★2",
+      "標準",
+      "一行問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-039",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "数の概念",
+    "subunit": "数直線・整数・小数・分数の位置",
+    "format": "一行問題",
+    "difficulty": 2,
+    "exam_level": "標準",
+    "skill_ids": [
+      "sk_E6_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "1.4 を分数で表しなさい（分母を5にする）。",
+    "answer": "7/5",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_NUMLINE",
+        "description": "数直線上の位置（小数・分数）の読み取りミス"
+      }
+    ],
+    "tags": [
+      "数の概念",
+      "数直線・整数・小数・分数の位置",
+      "★2",
+      "標準",
+      "一行問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-040",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "数の概念",
+    "subunit": "数直線・整数・小数・分数の位置",
+    "format": "一行問題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "数直線上で -1 と -3 の間にある整数を全て答えなさい。",
+    "answer": "-2",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_NUMLINE",
+        "description": "数直線上の位置（小数・分数）の読み取りミス"
+      }
+    ],
+    "tags": [
+      "数の概念",
+      "数直線・整数・小数・分数の位置",
+      "★3",
+      "応用",
+      "一行問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  },
+  {
+    "id": "E6-041",
+    "display_grade": "小6",
+    "grade": "小6",
+    "unit": "数の概念",
+    "subunit": "数直線・整数・小数・分数の位置",
+    "format": "一行問題",
+    "difficulty": 3,
+    "exam_level": "応用",
+    "skill_ids": [
+      "sk_E6_005"
+    ],
+    "prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "elem_prerequisite_skills": [
+      "sk_E3_001",
+      "sk_E4_001"
+    ],
+    "q": "2/7, 5/14, 3/7 を小さい順に並べなさい。",
+    "answer": "2/7, 5/14, 3/7",
+    "source": "オリジナル",
+    "error_types": [
+      {
+        "code": "ERR_NUMLINE",
+        "description": "数直線上の位置（小数・分数）の読み取りミス"
+      }
+    ],
+    "tags": [
+      "数の概念",
+      "数直線・整数・小数・分数の位置",
+      "★3",
+      "応用",
+      "一行問題"
+    ],
+    "autoGradable": true,
+    "created_at": "2026-06-20"
+  }
+]
