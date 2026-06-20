@@ -1,0 +1,327 @@
+[
+  {
+    "id": "sk_E3_001",
+    "name": "九九（乗法九九の暗唱）",
+    "grade": "小3",
+    "subject": "算数",
+    "unit": "かけ算",
+    "prerequisite_skill_ids": [],
+    "is_bottleneck": true,
+    "description": "1〜9の段の乗法九九を正確に答えられる"
+  },
+  {
+    "id": "sk_E4_001",
+    "name": "整数の四則計算（筆算）",
+    "grade": "小4",
+    "subject": "算数",
+    "unit": "計算のきまり",
+    "prerequisite_skill_ids": ["sk_E3_001"],
+    "is_bottleneck": true,
+    "description": "たし算・ひき算・かけ算・わり算の筆算が正確にできる"
+  },
+  {
+    "id": "sk_E4_002",
+    "name": "かけ算の意味（等分除・包含除）",
+    "grade": "小4",
+    "subject": "算数",
+    "unit": "かけ算とわり算",
+    "prerequisite_skill_ids": ["sk_E3_001"],
+    "is_bottleneck": true,
+    "description": "かけ算が「等しい数のまとまり」であること、わり算の2つの意味を理解している"
+  },
+  {
+    "id": "sk_E4_003",
+    "name": "計算の順序（四則混合・かっこ）",
+    "grade": "小4",
+    "subject": "算数",
+    "unit": "計算のきまり",
+    "prerequisite_skill_ids": ["sk_E4_001"],
+    "is_bottleneck": false,
+    "description": "かっこ→乗除→加減の順に計算できる"
+  },
+  {
+    "id": "sk_E5_001",
+    "name": "小数の四則計算",
+    "grade": "小5",
+    "subject": "算数",
+    "unit": "小数",
+    "prerequisite_skill_ids": ["sk_E4_001"],
+    "is_bottleneck": false,
+    "description": "小数のたし算・ひき算・かけ算・わり算が正確にできる"
+  },
+  {
+    "id": "sk_E5_002",
+    "name": "分数の意味と大小比較",
+    "grade": "小5",
+    "subject": "算数",
+    "unit": "分数",
+    "prerequisite_skill_ids": ["sk_E4_002"],
+    "is_bottleneck": true,
+    "description": "分数の意味（部分・割合）を理解し、通分して大小を比較できる"
+  },
+  {
+    "id": "sk_E5_003",
+    "name": "分数の加減（通分）",
+    "grade": "小5",
+    "subject": "算数",
+    "unit": "分数",
+    "prerequisite_skill_ids": ["sk_E5_002"],
+    "is_bottleneck": true,
+    "description": "異分母の分数のたし算・ひき算が通分を使ってできる"
+  },
+  {
+    "id": "sk_E5_004",
+    "name": "割合（百分率・歩合）",
+    "grade": "小5",
+    "subject": "算数",
+    "unit": "割合",
+    "prerequisite_skill_ids": ["sk_E5_001", "sk_E5_002"],
+    "is_bottleneck": true,
+    "description": "割合・百分率・歩合の相互変換ができる"
+  },
+  {
+    "id": "sk_E5_005",
+    "name": "公倍数・公約数",
+    "grade": "小5",
+    "subject": "算数",
+    "unit": "整数の性質",
+    "prerequisite_skill_ids": ["sk_E3_001"],
+    "is_bottleneck": false,
+    "description": "最小公倍数・最大公約数を求められる"
+  },
+  {
+    "id": "sk_E6_001",
+    "name": "分数の乗除",
+    "grade": "小6",
+    "subject": "算数",
+    "unit": "分数",
+    "prerequisite_skill_ids": ["sk_E5_003"],
+    "is_bottleneck": false,
+    "description": "分数×分数・分数÷分数が計算できる"
+  },
+  {
+    "id": "sk_E6_002",
+    "name": "比の計算",
+    "grade": "小6",
+    "subject": "算数",
+    "unit": "比と比の値",
+    "prerequisite_skill_ids": ["sk_E5_002"],
+    "is_bottleneck": false,
+    "description": "比を簡単にする、比から一方の量を求めることができる"
+  },
+  {
+    "id": "sk_E6_003",
+    "name": "速さ（距離・時間・速度）",
+    "grade": "小6",
+    "subject": "算数",
+    "unit": "速さ",
+    "prerequisite_skill_ids": ["sk_E5_001", "sk_E5_004"],
+    "is_bottleneck": true,
+    "description": "速さ=距離÷時間の公式を使って3量のうちいずれかを求められる"
+  },
+  {
+    "id": "sk_E6_004",
+    "name": "文字を使った式（□を使った式の発展）",
+    "grade": "小6",
+    "subject": "算数",
+    "unit": "文字と式",
+    "prerequisite_skill_ids": ["sk_E4_003", "sk_E5_004"],
+    "is_bottleneck": true,
+    "description": "□や文字を使って数量の関係を式に表せる"
+  },
+  {
+    "id": "sk_E6_005",
+    "name": "数直線上の数の位置",
+    "grade": "小6",
+    "subject": "算数",
+    "unit": "数の概念",
+    "prerequisite_skill_ids": ["sk_E4_001"],
+    "is_bottleneck": false,
+    "description": "数直線上に整数・小数・分数を正確に位置付けられる"
+  },
+  {
+    "id": "sk_M1_001",
+    "name": "正負の数の概念・数直線",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "正の数・負の数",
+    "app_skill": "S-NEG-001",
+    "prerequisite_skill_ids": ["sk_E6_005"],
+    "is_bottleneck": false,
+    "description": "負の数の概念を理解し、数直線上に正負の数を位置付けられる"
+  },
+  {
+    "id": "sk_M1_002",
+    "name": "正負の数の大小比較・絶対値",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "正の数・負の数",
+    "app_skill": "S-NEG-002",
+    "prerequisite_skill_ids": ["sk_M1_001"],
+    "is_bottleneck": false,
+    "description": "絶対値の意味を理解し、正負の数の大小を正しく比較できる"
+  },
+  {
+    "id": "sk_M1_003",
+    "name": "正負の数の加法・減法",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "正の数・負の数",
+    "app_skill": "S-NEG-004",
+    "prerequisite_skill_ids": ["sk_M1_001", "sk_E4_001"],
+    "is_bottleneck": true,
+    "description": "正負の数のたし算・ひき算（符号の扱い）が正確にできる"
+  },
+  {
+    "id": "sk_M1_004",
+    "name": "正負の数の乗法・除法",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "正の数・負の数",
+    "app_skill": "S-NEG-011",
+    "prerequisite_skill_ids": ["sk_M1_001", "sk_E4_002"],
+    "is_bottleneck": false,
+    "description": "正負の数のかけ算・わり算（符号の決め方）が正確にできる"
+  },
+  {
+    "id": "sk_M1_005",
+    "name": "四則混合・累乗",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "正の数・負の数",
+    "app_skill": "S-NEG-020",
+    "prerequisite_skill_ids": ["sk_M1_003", "sk_M1_004", "sk_E4_003"],
+    "is_bottleneck": false,
+    "description": "正負の数の四則混合計算・累乗が正確にできる"
+  },
+  {
+    "id": "sk_M1_006",
+    "name": "文字と式の基礎（積・商の表し方）",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "文字の式",
+    "prerequisite_skill_ids": ["sk_E6_004", "sk_M1_004"],
+    "is_bottleneck": true,
+    "description": "乗法・除法の記号を省略した文字式の書き方・読み方ができる"
+  },
+  {
+    "id": "sk_M1_007",
+    "name": "文字式の計算（一次式の加減・数×式）",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "文字の式",
+    "prerequisite_skill_ids": ["sk_M1_006", "sk_M1_003"],
+    "is_bottleneck": false,
+    "description": "一次式の加法・減法と数と式の乗除ができる"
+  },
+  {
+    "id": "sk_M1_008",
+    "name": "文字式への代入",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "文字の式",
+    "prerequisite_skill_ids": ["sk_M1_007", "sk_M1_005"],
+    "is_bottleneck": false,
+    "description": "文字に数値を代入して式の値を計算できる"
+  },
+  {
+    "id": "sk_M1_009",
+    "name": "一次方程式の解き方",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "方程式",
+    "prerequisite_skill_ids": ["sk_M1_007", "sk_E6_004"],
+    "is_bottleneck": true,
+    "description": "等式の性質を使い、移項して一次方程式を解ける"
+  },
+  {
+    "id": "sk_M1_010",
+    "name": "一次方程式の文章題（式を立てる）",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "方程式",
+    "prerequisite_skill_ids": ["sk_M1_009", "sk_E6_003"],
+    "is_bottleneck": true,
+    "description": "文章から方程式を立て、解き、答えを検証できる"
+  },
+  {
+    "id": "sk_M1_011",
+    "name": "比例・関数の概念",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "比例と反比例",
+    "prerequisite_skill_ids": ["sk_E6_002", "sk_M1_006"],
+    "is_bottleneck": false,
+    "description": "y=ax の関係を理解し、比例定数を求められる"
+  },
+  {
+    "id": "sk_M1_012",
+    "name": "比例・反比例のグラフ",
+    "grade": "中1",
+    "subject": "数学",
+    "unit": "比例と反比例",
+    "prerequisite_skill_ids": ["sk_M1_011", "sk_M1_008"],
+    "is_bottleneck": false,
+    "description": "比例・反比例のグラフを正しく描き、読み取れる"
+  },
+  {
+    "id": "sk_M2_001",
+    "name": "連立方程式の解き方（加減法）",
+    "grade": "中2",
+    "subject": "数学",
+    "unit": "連立方程式",
+    "prerequisite_skill_ids": ["sk_M1_009", "sk_M1_007"],
+    "is_bottleneck": false,
+    "description": "加減法を使って連立方程式を解ける"
+  },
+  {
+    "id": "sk_M2_002",
+    "name": "連立方程式の解き方（代入法）",
+    "grade": "中2",
+    "subject": "数学",
+    "unit": "連立方程式",
+    "prerequisite_skill_ids": ["sk_M1_009", "sk_M1_008"],
+    "is_bottleneck": false,
+    "description": "代入法を使って連立方程式を解ける"
+  },
+  {
+    "id": "sk_M2_003",
+    "name": "一次関数の式と変化の割合",
+    "grade": "中2",
+    "subject": "数学",
+    "unit": "一次関数",
+    "prerequisite_skill_ids": ["sk_M1_011", "sk_M1_009"],
+    "is_bottleneck": false,
+    "description": "y=ax+bを理解し、変化の割合・切片を求められる"
+  },
+  {
+    "id": "sk_M2_004",
+    "name": "多項式の展開・因数分解",
+    "grade": "中2",
+    "subject": "数学",
+    "unit": "式の計算",
+    "prerequisite_skill_ids": ["sk_M1_007", "sk_M1_004"],
+    "is_bottleneck": true,
+    "description": "単項式×多項式、多項式の乗法、因数分解の基礎ができる"
+  },
+  {
+    "id": "sk_M3_001",
+    "name": "二次方程式の解き方（因数分解・解の公式）",
+    "grade": "中3",
+    "subject": "数学",
+    "unit": "二次方程式",
+    "prerequisite_skill_ids": ["sk_M2_004", "sk_M1_009"],
+    "is_bottleneck": false,
+    "description": "因数分解・平方完成・解の公式で二次方程式を解ける"
+  },
+  {
+    "id": "sk_M3_002",
+    "name": "二乗に比例する関数（y=ax²）",
+    "grade": "中3",
+    "subject": "数学",
+    "unit": "関数y=ax²",
+    "prerequisite_skill_ids": ["sk_M2_003", "sk_M3_001"],
+    "is_bottleneck": false,
+    "description": "y=ax²のグラフを描き、変域・変化の割合を求められる"
+  }
+]
