@@ -11,7 +11,8 @@
 // 画面側は「genProblem / buildTemplate を呼ぶだけ」で済むようにしている。
 // ============================================================
 import { rng, pick } from "./rng.js";
-import { dbTemplatesFor } from "../data/dbProblems.js";
+import { dbTemplatesFor, dbTemplatesForStage } from "../data/dbProblems.js";
+import { stageToLevel } from "./difficulty.js";
 
 // DB実問題を出す割合（手続き生成より優先。手続きは変化球として残す）
 const DB_PREFER = 0.65;
@@ -53,6 +54,35 @@ export function genProblem(unit, level, lastId = null) {
   const usable = pool.filter((t) => t.id !== lastId);
   const chosen = pick(usable.length ? usable : pool);
   return makeFromTemplate(chosen, unit, level);
+}
+
+/**
+ * 5段階ステージ(Lv1〜5)で1問を生成する（タイムアタックの「5連続正解で難易度UP」用）。
+ * ステージ → コンテンツ難易度(easy/standard/advanced) を選び、DBは diff5 が
+ * そのステージに合う実問題を優先。手続き生成は変化球として残す。
+ * @param {object} unit  - 単元オブジェクト
+ * @param {number} stage - 1〜5
+ * @param {string|null} lastId - 直前のID（連続回避）
+ */
+export function genProblemByStage(unit, stage, lastId = null) {
+  // 希望ステージの難易度から出題。問題が無ければ易しい方向へフォールバックして
+  // 「高ステージで出題が止まる」のを防ぐ。
+  const want = stageToLevel(stage);
+  const tryLevels = [];
+  for (const lv of [want, "standard", "easy"]) if (!tryLevels.includes(lv)) tryLevels.push(lv);
+
+  for (const level of tryLevels) {
+    const proc = unit?.problems?.[level] || [];
+    const db = level === want ? dbTemplatesForStage(unit?.id, stage) : dbTemplatesFor(unit?.id, level);
+    if (proc.length === 0 && db.length === 0) continue;
+
+    const prefer = Math.min(DB_PREFER, db.length * 0.18);
+    const useDb = db.length > 0 && (proc.length === 0 || Math.random() < prefer);
+    const pool = useDb ? db : proc;
+    const usable = pool.filter((t) => t.id !== lastId);
+    return makeFromTemplate(pick(usable.length ? usable : pool), unit, level);
+  }
+  return genProblem(unit, "easy", lastId); // 最後の保険
 }
 
 /**

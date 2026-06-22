@@ -9,6 +9,7 @@
 //     DB問題があれば優先的に出す（手続き生成は変化球として残す）。
 // ============================================================
 import { PROBLEM_BANK } from "./problemBank.js";
+import { diff5Of, stageToLevel } from "../engine/difficulty.js";
 
 // DBの「章/小単元」→ ゲームの小単元ID（c1〜c4のみ）
 const SUBUNIT_TO_UNIT = {
@@ -71,6 +72,7 @@ for (const p of PROBLEM_BANK) {
     id: `db_${p.id}`,
     fromDb: true,
     skill: p.appSkill || null,
+    diff5: diff5Of(p.level, p.timeSec), // 5段階の難易度（level と想定解答時間から派生）
     // build は手続きテンプレと同じ形（rngは無視して固定問題を返す）
     build: () => ({ q: p.q, ans, h1: hintOf(p), h2: "答えの符号にも気をつけよう" }),
   };
@@ -80,6 +82,16 @@ for (const p of PROBLEM_BANK) {
 /** 小単元×難易度のDB実問題テンプレを返す（無ければ空配列） */
 export function dbTemplatesFor(unitId, level) {
   return (INDEX[unitId] && INDEX[unitId][level]) || [];
+}
+
+/**
+ * 5段階ステージ(Lv1〜5)に合うDB実問題テンプレを返す。
+ * まず diff5 がぴったり一致する問題を、無ければそのコンテンツ難易度の全問を返す。
+ */
+export function dbTemplatesForStage(unitId, stage) {
+  const pool = dbTemplatesFor(unitId, stageToLevel(stage));
+  const exact = pool.filter((t) => t.diff5 === stage);
+  return exact.length ? exact : pool;
 }
 
 /** 取り込んだDB問題の総数（デバッグ・確認用） */

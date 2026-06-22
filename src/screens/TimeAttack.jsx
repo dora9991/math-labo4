@@ -5,10 +5,12 @@
 import { useState, useEffect, useRef } from "react";
 import Header from "../components/Header.jsx";
 import Stars from "../components/Stars.jsx";
+import DrawPad from "../components/DrawPad.jsx";
 import { BigWord } from "../components/Decorations.jsx";
 import * as bgm from "../audio/bgm.js";
 import * as sfx from "../audio/sfx.js";
-import { genProblem, makeChoices } from "../engine/generator.js";
+import { genProblemByStage, makeChoices } from "../engine/generator.js";
+import { levelToStage, MAX_STAGE, STREAK_TO_LEVELUP, STAGE_LABEL } from "../engine/difficulty.js";
 import { calcStars, timeAttackXp, timeAttackCoins, timeAttackStreakBonus, isCorrect, STAR_TARGET, XP_PENALTY_PER_WRONG, xpRepeatMultiplier } from "../engine/scoring.js";
 import { getStars } from "../engine/progress.js";
 
@@ -16,9 +18,15 @@ const QUIZ_TIME = 40;
 const todayStr = () => new Date().toLocaleDateString("ja-JP");
 
 export default function TimeAttack({ player, chapter, unit, level, onComplete, onBackToMap, onHome }) {
+  const startStage = levelToStage(level);
+  const stageRef = useRef(startStage); // 出題中の難易度Lv（setTimeout内からも読むのでref）
   const [phase, setPhase] = useState("intro"); // intro | playing | finish | end
   const [timeLeft, setTimeLeft] = useState(QUIZ_TIME);
-  const [q, setQ] = useState(() => genProblem(unit, level));
+  const [stage, setStage] = useState(startStage); // 表示用の難易度Lv（1〜5）
+  const [levelUp, setLevelUp] = useState(false);   // 難易度アップの一瞬の表示
+  const [showPad, setShowPad] = useState(false);   // 手書き計算スペースの開閉
+  const [padKey, setPadKey] = useState(0);         // 問題が変わるたびに消す用
+  const [q, setQ] = useState(() => genProblemByStage(unit, startStage));
   const [choices, setChoices] = useState(() => []);
   const [correct, setCorrect] = useState(0);
   const [wrong, setWrong] = useState(0);
@@ -78,6 +86,12 @@ export default function TimeAttack({ player, chapter, unit, level, onComplete, o
       setCorrect((c) => c + 1);
       sfx.correct();
       setShowRing(true); setTimeout(() => setShowRing(false), 700); // 光る◯
+      // 5連続正解ごとに難易度を1段アップ（Lv5まで）
+      if (ns > 0 && ns % STREAK_TO_LEVELUP === 0 && stageRef.current < MAX_STAGE) {
+        stageRef.current += 1;
+        setStage(stageRef.current);
+        setLevelUp(true); setTimeout(() => setLevelUp(false), 1100);
+      }
     } else {
       setWrong((w) => w + 1);
       sfx.wrong();
@@ -86,8 +100,8 @@ export default function TimeAttack({ player, chapter, unit, level, onComplete, o
     setResults((p) => [...p, { q: q.q, ans: q.ans, userAns: parseFloat(val), ok }]);
     setTimeout(() => {
       setLocked(false); setSelected(null);
-      const nq = genProblem(unit, level, q.id);
-      if (nq) { setQ(nq); setChoices(makeChoices(nq.ans)); }
+      const nq = genProblemByStage(unit, stageRef.current, q.id);
+      if (nq) { setQ(nq); setChoices(makeChoices(nq.ans)); setPadKey((k) => k + 1); }
     }, ok ? 350 : 650);
   }
 
@@ -162,6 +176,14 @@ export default function TimeAttack({ player, chapter, unit, level, onComplete, o
       {phase === "finish" && <BigWord text="終了！" color="#fbbf24" onDone={() => setPhase("end")} />}
       {/* 正解：画面全体のやわらかい閃光（◯は選択肢の中央に出す） */}
       {showRing && <div className="correct-flash show" style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 55 }} />}
+      {/* 難易度アップの一瞬の表示 */}
+      {levelUp && (
+        <div style={{ position: "fixed", top: "38%", left: 0, right: 0, textAlign: "center", zIndex: 60, pointerEvents: "none" }}>
+          <span style={{ fontSize: 26, fontWeight: 900, color: "#fbbf24", textShadow: "0 2px 14px rgba(251,191,36,.7)" }}>
+            ⬆ 難易度アップ！Lv{stage}
+          </span>
+        </div>
+      )}
       <Header player={player} back="やめる" onBack={onBackToMap} />
       <div className="content">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
@@ -177,7 +199,23 @@ export default function TimeAttack({ player, chapter, unit, level, onComplete, o
             </div>
           </div>
         </div>
-        {streak >= 3 && <div style={{ textAlign: "center", color: "#fbbf24", fontWeight: 700, fontSize: 13, marginBottom: 8 }}>🔥 {streak}連続！</div>}
+        {/* 難易度Lv（5段階）と連続正解 */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 8 }}>
+          <span style={{ fontSize: 12, fontWeight: 800, color: "#a5b4fc" }}>
+            難易度 Lv{stage}/{MAX_STAGE}・{STAGE_LABEL[stage]}
+          </span>
+          {streak >= 3 && <span style={{ color: "#fbbf24", fontWeight: 700, fontSize: 13 }}>🔥 {streak}連続！</span>}
+        </div>
+        {/* 次のLvまでのゲージ（5問で1段アップ） */}
+        <div style={{ display: "flex", gap: 3, justifyContent: "center", marginBottom: 10 }}>
+          {Array.from({ length: STREAK_TO_LEVELUP }).map((_, i) => (
+            <span key={i} style={{
+              width: 22, height: 5, borderRadius: 3,
+              background: i < streak % STREAK_TO_LEVELUP || (streak > 0 && streak % STREAK_TO_LEVELUP === 0)
+                ? "linear-gradient(90deg,#818cf8,#6366f1)" : "rgba(255,255,255,.12)",
+            }} />
+          ))}
+        </div>
         <div className="qcard">
           <span className="q-pill">{unit.name}</span>
           <div className="q-text">{q.q}</div>
@@ -199,6 +237,21 @@ export default function TimeAttack({ player, chapter, unit, level, onComplete, o
             </div>
           </div>
         </div>
+
+        {/* 手書きの計算スペース（開閉式・問題が変わると消える） */}
+        <button
+          onClick={() => setShowPad((v) => !v)}
+          data-sfx="none"
+          style={{
+            width: "100%", marginTop: 12, padding: "10px", borderRadius: 12,
+            border: "1px solid rgba(255,255,255,.18)", cursor: "pointer",
+            fontSize: 14, fontWeight: 800, color: "#fff",
+            background: showPad ? "rgba(255,255,255,.14)" : "rgba(255,255,255,.06)",
+          }}
+        >
+          ✏️ 計算スペース{showPad ? "を閉じる" : "を開く"}
+        </button>
+        {showPad && <DrawPad key={padKey} height={260} />}
       </div>
     </div>
   );
