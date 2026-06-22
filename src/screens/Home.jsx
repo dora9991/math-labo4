@@ -12,13 +12,32 @@ const itemName = (id) => findItem(id)?.name ?? "";
 
 export default function Home({ player, records, mistakeCount, onTimeAttack, onChallenge, onBattle, onStepUp, onNotebook, onShop, onSkill, onDetail, onHowTo, onCharacter }) {
   const [msg] = useState(() => voice("open"));
-  const greeting = player.name ? `${player.name}、${msg}` : msg;
+  // 夜（21時〜翌5時）はモンスターも寝る時間。無理に進めさせず、おやすみをそっと促す。
+  const hour = new Date().getHours();
+  const night = hour >= 21 || hour < 5;
+  const greeting = night
+    ? (player.name ? `${player.name}、おそくまでおつかれさま。` : "おそくまでおつかれさま。")
+    : (player.name ? `${player.name}、${msg}` : msg);
   return (
     <div className="app">
       <MathBackdrop />
       <Header player={player} />
       <div className="content" style={{ position: "relative", zIndex: 1 }}>
         <CharBubble text={greeting} avatar={player.avatar} onAvatar={onCharacter} />
+
+        {/* おやすみ：夜はモンスターも寝はじめる。やめても責めない、休む許可を出す */}
+        {night && (
+          <div className="glass" style={{
+            padding: "12px 14px", marginBottom: 11, display: "flex", gap: 10,
+            alignItems: "center", border: "1px solid rgba(129,140,248,.3)",
+          }}>
+            <span style={{ fontSize: 28 }}>😴</span>
+            <div style={{ fontSize: 12.5, lineHeight: 1.6, color: "rgba(255,255,255,.82)" }}>
+              もう{hour}時。モンスターたちも寝はじめてるよ。<br />
+              今日はよくがんばったね。むりせず、おやすみしよ。
+            </div>
+          </div>
+        )}
 
         {/* 遊び方・キャラへの導線 */}
         <div style={{ display: "flex", gap: 8, marginBottom: 11 }}>

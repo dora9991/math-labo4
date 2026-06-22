@@ -50,6 +50,20 @@ export default function StepUp({ player, chapter, onAttempt, onHome, targetSkill
   const [showRing, setShowRing] = useState(false); // 正解の光る◯＋閃光（タイムアタックと同じ）
   const [shakeAns, setShakeAns] = useState(false); // 不正解の横揺れ（タイムアタックと同じ）
 
+  // 相棒の声かけ（共感）のON/OFF。生徒視点で「励ましがウザい時もある」ため切れるように。
+  const [comfortMuted, setComfortMuted] = useState(() => {
+    try { return localStorage.getItem("mathlabo_comfort_muted") === "1"; } catch { return false; }
+  });
+  function toggleComfort() {
+    setComfortMuted((v) => {
+      const nv = !v;
+      try { localStorage.setItem("mathlabo_comfort_muted", nv ? "1" : "0"); } catch {}
+      return nv;
+    });
+  }
+  // 「そっと励まして」ボタン：苦しい時に自分から呼べる（声かけOFFでも手動なら出す）
+  function callComfort() { setMsg(voice("comfort")); }
+
   // ── 10問ごとの区切り（セット）──
   const [phase, setPhase] = useState("play");    // "play" | "result"
   const [done, setDone] = useState(0);           // このセットで解いた数（メーター用）
@@ -134,8 +148,13 @@ export default function StepUp({ player, chapter, onAttempt, onHome, targetSkill
     setSeen((s) => s + 1);
     if (ok) setGot((g) => g + 1);
     if (mNew > mOld + 0.001) setImproved((p) => ({ ...p, [skill]: true }));
-    setMsg(ok ? voice("correct") : voice("wrong"));
-    setFb({ ok, ans: problem.ans, h1: problem.h1, skill, mOld, mNew });
+    // 同じ調子で続けて間違えたら、点でなく共感を返す（「みんな引っかかる」）。
+    // runRef はこの時点で更新済み（負の値＝連続不正解の数）。
+    const wrongStreak = ok ? 0 : Math.max(0, -runRef.current);
+    if (ok) setMsg(voice("correct"));
+    else if (!comfortMuted && wrongStreak >= 2) setMsg(voice("common"));
+    else setMsg(voice("wrong"));
+    setFb({ ok, ans: problem.ans, h1: problem.h1, skill, mOld, mNew, streak: wrongStreak });
 
     // このセットの集計を進める（メーター＆結果画面用）
     const r = roundRef.current;
@@ -162,6 +181,23 @@ export default function StepUp({ player, chapter, onAttempt, onHome, targetSkill
     if (ok) {
       advanceTimer.current = setTimeout(() => (roundDone ? finishRound() : next()), AUTO_NEXT_MS);
     }
+  }
+
+  // 「わからない…」を押したとき：責めずに、そっと答えを見せる。
+  // 失敗扱いにしない（習熟度は下げない・間違いノートにも残さない）が、
+  // 難易度だけ静かに下げて、次はやさしい問題から再開する。
+  function reveal() {
+    if (!cur || locked) return;
+    clearTimeout(advanceTimer.current);
+    setLocked(true);
+    const { entry, problem } = cur;
+    runRef.current = runRef.current > 0 ? -2 : runRef.current - 2; // 次の出題をやさしく
+    setMsg(comfortMuted ? voice("wrong") : voice("comfort"));
+    setSeen((s) => s + 1);
+    const r = roundRef.current;
+    r.n += 1;              // セットは進める（「わからない」で止まらない）
+    setDone(r.n);
+    setFb({ taught: true, ans: problem.ans, h1: problem.h1, skill: entry.skill });
   }
 
   // セット結果をまとめて結果画面へ
@@ -301,6 +337,20 @@ export default function StepUp({ player, chapter, onAttempt, onHome, targetSkill
 
         <CharBubble text={msg} avatar={player.avatar} />
 
+        {/* 相棒の声かけ：自分から呼べる／うるさければOFFにできる */}
+        <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "flex-end", margin: "6px 0 0" }}>
+          <button onClick={callComfort} data-sfx="none" style={{
+            fontSize: 11, fontWeight: 700, padding: "5px 11px", borderRadius: 999,
+            border: "1px solid rgba(255,255,255,.18)", background: "rgba(255,255,255,.06)",
+            color: "rgba(255,255,255,.8)", cursor: "pointer",
+          }}>🐾 そっと励まして</button>
+          <button onClick={toggleComfort} data-sfx="none" title="連続不正解のときの声かけを切り替え" style={{
+            fontSize: 11, fontWeight: 700, padding: "5px 11px", borderRadius: 999,
+            border: "1px solid rgba(255,255,255,.14)", background: "transparent",
+            color: "rgba(255,255,255,.5)", cursor: "pointer",
+          }}>声かけ {comfortMuted ? "OFF" : "ON"}</button>
+        </div>
+
         {/* いま練習中のスキルと習熟度バー（穏やかな可視化） */}
         <div style={{ margin: "10px 0 6px", display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.55)", minWidth: 0 }}>
@@ -347,21 +397,51 @@ export default function StepUp({ player, chapter, onAttempt, onHome, targetSkill
             </div>
           </div>
 
+          {/* わからない…：責めずに答えを見せ、難易度を静かに下げる */}
+          {!fb && (
+            <button onClick={reveal} data-sfx="none" style={{
+              width: "100%", marginTop: 12, padding: "10px", borderRadius: 10,
+              border: "1px dashed rgba(255,255,255,.25)", cursor: "pointer",
+              fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)", background: "transparent",
+            }}>
+              🤍 わからない…そっと教えて
+            </button>
+          )}
+
           {/* フィードバック */}
           {fb && (
             <>
-              {!fb.ok && (
-                <div style={{ fontSize: 16, fontWeight: 900, margin: "14px 0 6px", color: "#f87171" }}>
-                  △ おしい
-                </div>
-              )}
-              {!fb.ok && (
-                <div style={{ fontSize: 14, marginBottom: 6 }}>
-                  正解：<strong style={{ color: "#4ade80" }}>{fb.ans}</strong>
-                </div>
-              )}
-              {!fb.ok && fb.h1 && (
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)", marginBottom: 10 }}>💡 {fb.h1}</div>
+              {fb.taught ? (
+                <>
+                  <div style={{ fontSize: 15, fontWeight: 900, margin: "14px 0 6px", color: "#60a5fa" }}>
+                    🫧 わからなくて、大丈夫
+                  </div>
+                  <div style={{ fontSize: 14, marginBottom: 6 }}>
+                    答えは <strong style={{ color: "#4ade80" }}>{fb.ans}</strong>。いっしょに見てみよう
+                  </div>
+                  {fb.h1 && <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)", marginBottom: 10 }}>💡 {fb.h1}</div>}
+                </>
+              ) : (
+                <>
+                  {!fb.ok && (
+                    <div style={{ fontSize: 16, fontWeight: 900, margin: "14px 0 6px", color: fb.streak >= 2 ? "#60a5fa" : "#f87171" }}>
+                      {fb.streak >= 2 ? "🫧 ここ、みんな引っかかるところ" : "△ おしい"}
+                    </div>
+                  )}
+                  {!fb.ok && (
+                    <div style={{ fontSize: 14, marginBottom: 6 }}>
+                      正解：<strong style={{ color: "#4ade80" }}>{fb.ans}</strong>
+                    </div>
+                  )}
+                  {!fb.ok && fb.streak >= 2 && (
+                    <div style={{ fontSize: 12, color: "rgba(96,165,250,.9)", marginBottom: 6 }}>
+                      あなただけじゃないよ。少しやさしい問題に変えるね
+                    </div>
+                  )}
+                  {!fb.ok && fb.h1 && (
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)", marginBottom: 10 }}>💡 {fb.h1}</div>
+                  )}
+                </>
               )}
               {fb.ok ? (
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginTop: 4 }}>
