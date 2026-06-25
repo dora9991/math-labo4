@@ -78,9 +78,9 @@
   .sectiontag.know{background:#dbeafe;color:#1e40af}
   .sectiontag.think{background:#f3e8ff;color:#6b21a8}
   .daimon{margin:14px 0 16px;page-break-inside:avoid}
-  .daimon .dhead{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:14.5px;margin-bottom:8px;
+  .daimon .dhead{display:flex;align-items:baseline;gap:8px;font-weight:400;font-size:13.5px;margin-bottom:6px;
        border-left:5px solid var(--accent);padding-left:8px}
-  .daimon .dhead .dno{font-size:15px}
+  .daimon .dhead .dno{font-size:14px;font-weight:700}
   .daimon .dhead .dunit{font-size:11px;color:var(--sub);font-weight:600}
   .daimon .dhead .dpts{margin-left:auto;font-size:12px;color:var(--sub);font-weight:600}
   .daimon.knowd .dhead{border-color:var(--know)}
@@ -112,12 +112,12 @@
   .akgrid .akans{color:var(--ok);margin-right:10px}
 
   /* ===== Phase1: レイアウト（ヘッダー型・観点集計表・段組） ===== */
-  .examhead.split{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-  .examhead.split .ttl{text-align:left;font-size:19px}
-  .examhead.split .hright{border:1px solid #111;border-radius:4px;padding:6px 10px;font-size:12.5px;white-space:nowrap;align-self:flex-start}
+  .examhead.split{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .examhead.split .ttl{text-align:left;font-size:18px}
+  .examhead.split .hright{margin-left:auto;border:1px solid #111;border-radius:4px;padding:5px 9px;font-size:12.5px;white-space:nowrap}
   .hsub{font-size:12px;color:#555}
-  .kanten-summary{display:flex;margin:8px 0 14px;width:max-content;max-width:100%}
-  .kanten-summary .kcell{border:1px solid #111;border-right:0;min-width:94px}
+  .kanten-summary{display:flex;margin:0 0 12px;width:100%}
+  .kanten-summary .kcell{flex:1;border:1px solid #111;border-right:0;min-width:0}
   .kanten-summary .kcell:last-child{border-right:1px solid #111}
   .kanten-summary .klab{font-size:10.5px;text-align:center;border-bottom:1px solid #111;padding:3px 8px;background:#f3f4f6}
   .kanten-summary .kval{font-size:13px;text-align:center;padding:8px;min-height:24px}
@@ -148,6 +148,10 @@
 <div class="wrap">
   <!-- 左：設定 -->
   <div class="noprint">
+    <div class="card" style="padding:12px">
+      <button id="mkfig" class="btn" style="margin:0;background:#059669">▱ 図形の作成</button>
+      <p class="hint" style="margin-top:6px">押したあと、用紙で図を入れたい場所をドラッグ。用紙を<b>右クリック</b>からも作成できます。</p>
+    </div>
     <div class="card" style="background:#f5f3ff;border-color:#ddd6fe">
       <a href="applied.html" style="display:block;text-align:center;font-weight:800;color:#6d28d9;text-decoration:none;font-size:13px">
         🏆 応用チャレンジ（数オリ・全国学テ・自作の良問）のプリントを作る →
@@ -522,11 +526,25 @@ function applyPageStyle(cfg){
   paper.style.maxWidth='100%';
   paper.style.margin='0 auto';
 }
+/* 「解きなさい」系の大問（方程式）は、各問の冗長な末尾（…を解きなさい。/ x=？）を消して
+   大問見出しに集約する。 */
+function isSolveDaimon(d){
+  if(d.unit!=='方程式' || !d.items.length) return false;
+  const n=d.items.filter(p=>/を解きなさい。?\s*$/.test(p.q)||/[xyz]\s*[=＝]\s*[?？]\s*$/.test(p.q)).length;
+  return n>=Math.ceil(d.items.length*0.6);
+}
+function stripSolveTail(q){
+  return String(q)
+    .replace(/\s*を解きなさい。?\s*$/,'')
+    .replace(/[\s　]*[xyz]\s*[=＝]\s*[?？]\s*$/,'')
+    .trim();
+}
 function headerHtml(cfg,{title,minutes,points}){
   const sub=`制限時間 ${minutes}分 ／ ${points}点満点`;
   if(cfg.headerType==='split'){
     return `<div class="examhead split">
-      <div class="hleft"><div class="ttl">${esc(title)}</div><div class="hsub">${sub}</div></div>
+      <div class="ttl">${esc(title)}</div>
+      <div class="hsub">${sub}</div>
       <div class="hright">${esc(cfg.nameText)}</div>
     </div>`;
   }
@@ -605,9 +623,9 @@ function render(){
   applyPageStyle(cfg);
   let html=headerHtml(cfg,{title,minutes,points});
   const sumTbl=cfg.sumShow?summaryHtml(cfg,{knowPts,thinkPts,totPts}):'';
-  if(cfg.sumShow && cfg.sumPos==='top') html+=sumTbl;
   const colStyle=cfg.pageCols>1?`column-count:${cfg.pageCols};column-gap:22px;column-rule:1px solid #111;`:'';
   html+=`<div class="problems" style="${colStyle}">`;
+  if(cfg.sumShow && cfg.sumPos==='top') html+=sumTbl;   // 集計表を2列の中（先頭）に収める
 
   let lastCog=null;
   daimon.forEach(d=>{
@@ -623,10 +641,12 @@ function render(){
     const pack=$('pack2up').checked && cfg.pageCols<=2;   // 段組3列など狭いときは2up無効
     const itemCols=pack?2:1;
     const mult=spaceMult();
+    const solve=isSolveDaimon(d);
+    const dInstr=solve?'次の方程式を解きなさい。':d.instr;
     html+=`<div class="daimon ${isKnow?'knowd':'thinkd'}">
       <div class="dhead">
         <span class="dno">${d.no}</span>
-        <span>${esc(d.instr)}</span>
+        <span>${esc(dInstr)}</span>
         <span class="dunit">${d.mixed?'':'［'+esc(d.unit)+'］'}</span>
         <span class="dpts">${ptsLabel(d)}</span>
       </div>
@@ -637,10 +657,11 @@ function render(){
       const h=units*mult;
       const wide=!pack || isWide(p,units);
       const utag=d.mixed?`<span class="dunit" style="margin-right:4px">［${esc(p.unit)}］</span>`:'';
+      const qShow=solve?stripSolveTail(p.q):p.q;   // 「解きなさい」系は冗長な末尾を除去
       // グリッド大問は問題側に空白を作らず、下の解答欄にまとめる
       const spaceHtml=(!useGrid && h>0)?`<div class="calc-space" style="min-height:${h.toFixed(1)}em"></div>`:'';
       html+=`<div class="qit ${wide?'wide':''}" data-d="${d.no}" data-i="${i}">
-        <div class="qrow"><span class="qn" draggable="true" title="番号をドラッグして問題を入れ替え">${mathify(num)}</span><span class="qbody">${utag}${mathify(p.q)}<span class="qpt">[${p.pts}点]</span></span></div>
+        <div class="qrow"><span class="qn" draggable="true" title="番号をドラッグして問題を入れ替え">${mathify(num)}</span><span class="qbody">${utag}${mathify(qShow)}<span class="qpt">[${p.pts}点]</span></span></div>
         ${spaceHtml}
         <span class="spc-ctl noprint">空白<b data-act="dec">−</b><b data-act="inc">＋</b></span>
         <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
@@ -830,10 +851,20 @@ applyPageStyle();
   const paper=document.getElementById("paper");
   if(getComputedStyle(paper).position==="static") paper.style.position="relative";
 
+  // 選択範囲があれば、その中に収まるよう配置
+  let region=null; try{ region=JSON.parse(localStorage.getItem("figmaker_region")||"null"); }catch(_){}
+  let fw=pending.w, fh=pending.h, fl=40, ft=40;
+  if(region){
+    const sc=Math.min(region.w/pending.w, region.h/pending.h);
+    fw=Math.max(20,pending.w*sc); fh=Math.max(20,pending.h*sc);
+    fl=region.left+(region.w-fw)/2; ft=region.top+(region.h-fh)/2;
+    localStorage.removeItem("figmaker_region");
+  }
+
   // フローティング図形
   const box=document.createElement("div");
   box.className="fig-float noprint-edit";
-  box.style.cssText="position:absolute;left:40px;top:40px;width:"+pending.w+"px;height:"+pending.h+"px;"
+  box.style.cssText="position:absolute;left:"+fl+"px;top:"+ft+"px;width:"+fw+"px;height:"+fh+"px;"
     +"z-index:20;touch-action:none;cursor:move;border:1px dashed #cbd5e1;";
   box.innerHTML=pending.svg;
   const inner=box.querySelector("svg");
@@ -847,13 +878,25 @@ applyPageStyle();
     +"background:#059669;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:nwse-resize;";
   box.appendChild(handle);
 
+  // 削除ボタン（×）
+  const del=document.createElement("div");
+  del.className="noprint-edit"; del.textContent="×"; del.title="図形を削除";
+  del.style.cssText="position:absolute;right:-10px;top:-10px;width:21px;height:21px;border-radius:50%;"
+    +"background:#dc2626;color:#fff;font-weight:700;font-size:15px;line-height:18px;text-align:center;"
+    +"border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;z-index:22;";
+  function removeFig(){ box.remove(); try{localStorage.removeItem("figmaker_pending");}catch(_){} }
+  del.addEventListener("pointerdown",ev=>ev.stopPropagation());
+  del.addEventListener("click",ev=>{ ev.stopPropagation(); removeFig(); });
+  box.appendChild(del);
+  box._removeFig=removeFig;
+
   paper.appendChild(box);
 
   const baseW=pending.w, baseH=pending.h, ratio=baseH/baseW;
   let mode=null, sx, sy, ox, oy, ow;
 
   box.addEventListener("pointerdown",e=>{
-    if(e.target===handle) return;
+    if(e.target===handle||e.target===del) return;
     mode="move"; sx=e.clientX; sy=e.clientY; ox=box.offsetLeft; oy=box.offsetTop;
     box.setPointerCapture(e.pointerId); e.preventDefault();
   });
@@ -878,6 +921,85 @@ applyPageStyle();
   const st=document.createElement("style");
   st.textContent="@media print{.fig-float{border:0!important} .noprint-edit{display:none!important}}";
   document.head.appendChild(st);
+})();
+</script>
+
+<!-- ===== 「図形の作成」：範囲をドラッグ指定して図形メーカーへ＋右クリックメニュー ===== -->
+<script>
+(function(){
+  const paper=document.getElementById("paper");
+  if(!paper) return;
+  const mkfig=document.getElementById("mkfig");
+  if(mkfig) mkfig.addEventListener("click",startRegion);
+
+  function startRegion(){
+    if(getComputedStyle(paper).position==="static") paper.style.position="relative";
+    const ov=document.createElement("div");
+    ov.style.cssText="position:absolute;inset:0;z-index:40;cursor:crosshair;background:rgba(59,110,246,.05);touch-action:none";
+    const band=document.createElement("div");
+    band.style.cssText="position:absolute;border:2px dashed #3b6ef6;background:rgba(59,110,246,.12);display:none";
+    ov.appendChild(band); paper.appendChild(ov);
+    const tip=document.createElement("div");
+    tip.textContent="図を入れたい場所をドラッグして範囲を指定";
+    tip.style.cssText="position:absolute;top:8px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;font-size:12px;padding:5px 12px;border-radius:8px;z-index:41";
+    ov.appendChild(tip);
+    let sx,sy,active=false;
+    const pr=()=>paper.getBoundingClientRect();
+    ov.addEventListener("pointerdown",e=>{
+      active=true; const r=pr(); sx=e.clientX-r.left; sy=e.clientY-r.top;
+      band.style.display="block"; band.style.left=sx+"px"; band.style.top=sy+"px"; band.style.width="0"; band.style.height="0";
+      ov.setPointerCapture(e.pointerId); e.preventDefault();
+    });
+    ov.addEventListener("pointermove",e=>{
+      if(!active) return; const r=pr(); const x=e.clientX-r.left,y=e.clientY-r.top;
+      band.style.left=Math.min(sx,x)+"px"; band.style.top=Math.min(sy,y)+"px";
+      band.style.width=Math.abs(x-sx)+"px"; band.style.height=Math.abs(y-sy)+"px";
+    });
+    ov.addEventListener("pointerup",e=>{
+      if(!active) return; active=false;
+      const r=pr(); const x=e.clientX-r.left,y=e.clientY-r.top;
+      const l=Math.min(sx,x),t=Math.min(sy,y),w=Math.abs(x-sx),h=Math.abs(y-sy);
+      ov.remove();
+      if(w<20||h<20) return;             // 小さすぎる範囲はキャンセル
+      const bl=paper.clientLeft||0, bt=paper.clientTop||0;
+      const region={left:l-bl, top:t-bt, w, h};
+      try{ localStorage.setItem("figmaker_region",JSON.stringify(region)); }catch(_){}
+      location.href="./figure-maker.html";
+    });
+  }
+
+  /* 右クリックメニュー：用紙の空白＝図形を作成／図形の上＝編集・削除 */
+  let menu=null;
+  function closeMenu(){ if(menu){menu.remove();menu=null;} }
+  document.addEventListener("pointerdown",e=>{ if(menu && !menu.contains(e.target)) closeMenu(); }, true);
+  window.addEventListener("scroll",closeMenu,true);
+  function showMenu(x,y,items){
+    closeMenu();
+    menu=document.createElement("div"); menu.className="noprint";
+    menu.style.cssText="position:fixed;left:"+x+"px;top:"+y+"px;z-index:200;background:#fff;border:1px solid #e5e7eb;"
+      +"border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:5px;min-width:150px;font-size:14px";
+    items.forEach(it=>{
+      const b=document.createElement("div"); b.textContent=it.label;
+      b.style.cssText="padding:9px 12px;border-radius:7px;cursor:pointer;font-weight:600;color:"+(it.danger?"#b91c1c":"#111");
+      b.addEventListener("mouseenter",()=>b.style.background=it.danger?"#fef2f2":"#f3f4f6");
+      b.addEventListener("mouseleave",()=>b.style.background="");
+      b.addEventListener("click",()=>{ closeMenu(); it.fn(); });
+      menu.appendChild(b);
+    });
+    document.body.appendChild(menu);
+  }
+  paper.addEventListener("contextmenu",e=>{
+    const box=e.target.closest(".fig-float");
+    e.preventDefault();
+    if(box){
+      showMenu(e.clientX,e.clientY,[
+        {label:"✎ 図形を編集",fn:()=>{ location.href="./figure-maker.html?edit=1"; }},
+        {label:"🗑 図形を削除",danger:true,fn:()=>{ if(box._removeFig)box._removeFig(); else box.remove(); }}
+      ]);
+    }else{
+      showMenu(e.clientX,e.clientY,[{label:"▱ 図形を作成",fn:startRegion}]);
+    }
+  });
 })();
 </script>
 </body>
