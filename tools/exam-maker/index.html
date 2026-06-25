@@ -263,29 +263,55 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 /* $...$ で囲まれた部分だけ KaTeX で数式組版し、残りは通常どおりエスケープ。
    ・$ が無い問題は従来どおり（既存データを書き換えなくてよい）
    ・$ の数が奇数（閉じ忘れ）や KaTeX 未読込のときは素のテキストにフォールバック */
-/* 平文の中の「a/b」分数を自動で KaTeX の縦組み分数にする（データに $...$ が無くてもOK）。
-   符号(- − －)付きにも対応。数字/数字のみ対象なので "km/h" 等は変換しない。 */
-function autoFrac(text){
+/* 数式ランを LaTeX へ変換（×÷・指数²³・√・分数a/b・不等号などを KaTeX 記法に） */
+function runToTex(run){
+  return run
+    .replace(/−/g,'-')                       // 全角マイナス→-
+    .replace(/\.\.\.|…/g,' \\cdots ')
+    .replace(/×/g,' \\times ')
+    .replace(/÷/g,' \\div ')
+    .replace(/[·・]/g,' \\cdot ')
+    .replace(/≦|≤/g,' \\leq ')
+    .replace(/≧|≥/g,' \\geq ')
+    .replace(/π/g,' \\pi ')
+    .replace(/√\s*(\d+)/g,' \\sqrt{$1}')
+    .replace(/√/g,' \\sqrt{\\,}')
+    .replace(/⁴/g,'^{4}').replace(/³/g,'^{3}').replace(/²/g,'^{2}')
+    .replace(/(\d+)\s*\/\s*(\d+)/g,'\\dfrac{$1}{$2}');
+}
+/* このランを「式」として組版すべきか：演算子/関係/指数/√/分数を含む、または単独の変数1文字 */
+function qualifyMath(t){
+  return /[+−*×÷·・/=<>≦≧≤≥^²³⁴√]/.test(t) || /^[A-Za-z]$/.test(t);
+}
+/* 平文の中の「式のかたまり」だけを KaTeX で組版する。日本語の文・単位(cm等)・数字の羅列はそのまま。 */
+function autoTypeset(text){
   if(typeof katex==='undefined') return esc(text);
-  const re=/([\-−－]?)(\d+)\s*\/\s*(\d+)/g;
+  const re=/[0-9A-Za-z+−*×÷·・=<>≦≧≤≥().,^²³⁴√π \/\-]+/g;
   let out='',last=0,m;
   while((m=re.exec(text))){
     out+=esc(text.slice(last,m.index));
-    const sign=m[1]?'-':'';
-    try{ out+=katex.renderToString(`${sign}\\dfrac{${m[2]}}{${m[3]}}`,{throwOnError:false}); }
-    catch(e){ out+=esc(m[0]); }
-    last=m.index+m[0].length;
+    const raw=m[0];
+    const lead=(raw.match(/^\s*/)||[''])[0], trail=(raw.match(/\s*$/)||[''])[0];
+    const core=raw.trim();
+    if(core && qualifyMath(core)){
+      let rendered;
+      try{ rendered=katex.renderToString(runToTex(core),{throwOnError:false}); }
+      catch(e){ rendered=esc(core); }
+      out+=esc(lead)+rendered+esc(trail);
+    }else{
+      out+=esc(raw);
+    }
+    last=m.index+raw.length;
   }
   return out+esc(text.slice(last));
 }
 function mathify(s){
   s=String(s);
   if(typeof katex==='undefined') return esc(s);
-  if(s.indexOf('$')===-1) return autoFrac(s);
-  if((s.split('$').length-1)%2!==0) return autoFrac(s);   // $ が奇数＝閉じ忘れ → 分数だけ自動変換
+  if(s.indexOf('$')===-1 || (s.split('$').length-1)%2!==0) return autoTypeset(s);
   return s.split('$').map((part,idx)=>{
-    if(idx%2===0) return autoFrac(part);                  // 偶数番＝通常テキスト（分数は自動変換）
-    try{ return katex.renderToString(part,{throwOnError:false}); }
+    if(idx%2===0) return autoTypeset(part);               // 偶数番＝通常テキスト（式は自動組版）
+    try{ return katex.renderToString(part,{throwOnError:false}); }   // 奇数番＝$…$内のLaTeX
     catch(e){ return esc('$'+part+'$'); }
   }).join('');
 }
