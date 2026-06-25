@@ -85,12 +85,17 @@
   .daimon .dhead .dpts{margin-left:auto;font-size:12px;color:var(--sub);font-weight:600}
   .daimon.knowd .dhead{border-color:var(--know)}
   .daimon.thinkd .dhead{border-color:var(--think)}
-  .items{display:grid;grid-template-columns:1fr 1fr;gap:6px 26px}
+  .items{display:grid;grid-template-columns:1fr 1fr;gap:6px 26px;align-items:start}
   .items.single{grid-template-columns:1fr}
-  .qit{display:flex;gap:7px;align-items:flex-start;font-size:13.5px;padding:3px 0;position:relative}
-  .qit .qn{font-weight:700;min-width:30px}
-  .qit .qbody{flex:1}
+  .qit{position:relative;font-size:13.5px;padding:3px 0}
+  .qit.wide{grid-column:1/-1}
+  .qit .qn{font-weight:700;display:inline-block;width:28px;vertical-align:top}
+  .qit .qbody{display:inline-block;width:calc(100% - 34px);vertical-align:top}
   .qit .qpt{font-size:10.5px;color:var(--sub);margin-left:4px}
+  .calc-space{margin:3px 0 7px 34px;border-bottom:1px solid #aaa}
+  .spc-ctl{position:absolute;right:32px;bottom:0;font-size:10px;color:var(--accent);opacity:0;background:#fff;padding:0 2px}
+  .qit:hover .spc-ctl{opacity:1}
+  .spc-ctl b{cursor:pointer;border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-left:4px;background:#fff}
   .qit .ans-space{display:inline-block;border-bottom:1px solid #999;min-width:130px;height:1.25em;vertical-align:bottom;margin-left:4px}
   .swap{position:absolute;right:-6px;top:2px;font-size:10px;color:var(--accent);cursor:pointer;
        opacity:0;border:1px solid var(--line);border-radius:5px;padding:0 4px;background:#fff}
@@ -196,7 +201,10 @@
             <option value="t-k-s-sum">思判・知技・(主体)・合計</option>
           </select></div>
       </div>
-      <p class="hint">並び順のさらに細かい入れ替えは後で追加できます。</p>
+      <label style="margin-top:14px">計算スペース（自動・問題ごと）</label>
+      <select id="calcSpace"><option value="none">なし</option><option value="small">小</option><option value="std" selected>標準</option><option value="large">大</option></select>
+      <label><input type="checkbox" id="pack2up" checked style="width:auto"> 簡単な問題は1列に2つ並べる（難問は1つ）</label>
+      <p class="hint">並び順の細かい入れ替えは後で追加できます。各問題は作成後、マウスを乗せると出る「空白 −／＋」で個別に調整できます。</p>
     </div>
 
     <div class="card">
@@ -471,6 +479,31 @@ function summaryHtml(cfg,{knowPts,thinkPts,totPts}){
   return `<div class="kanten-summary">${cells}</div>`;
 }
 
+/* ---------- 計算スペース＆2列パッキング（Phase2） ---------- */
+const SPACE_EM={none:0,small:1.1,std:1.6,large:2.2};   // 1行あたりの高さ(em)
+function spaceMult(){const v=SPACE_EM[$('calcSpace').value]; return v==null?1.6:v;}
+/* 問題が必要とする計算スペースの「行数」。手動上書き(p.spaceLines)を最優先。 */
+function spaceUnitsFor(p){
+  if(p.spaceLines!=null) return p.spaceLines;
+  const f=p.format||'', lvl=p.level||2;
+  if(f==='作図') return 8;
+  if(f==='証明') return 6;
+  if(f==='文章題') return 5;
+  if(p.cognitive==='思考・判断・表現') return Math.max(3,lvl+1);
+  if(f==='計算'||f==='一行問題') return lvl>=3?3:(lvl>=2?2:1);
+  return 2;
+}
+/* 全幅(1列)で出すべき「難しい/長い」問題か。簡単なものは半幅で2つ並ぶ。 */
+function isWide(p,units){
+  const f=p.format||'';
+  if(['文章題','作図','選択','証明'].includes(f)) return true;
+  if(p.cognitive==='思考・判断・表現') return true;
+  if((p.level||0)>=3) return true;
+  if(units>=4) return true;
+  if((p.q||'').length>=40) return true;
+  return false;
+}
+
 /* ---------- 描画 ---------- */
 function render(){
   if(!exam){return;}
@@ -512,7 +545,9 @@ function render(){
       lastCog=d.cog;
     }
     const isKnow=d.cog==='知識・技能';
-    const single=cfg.pageCols>1 || d.items.some(p=>['文章題','作図','選択'].includes(p.format)) || d.cog==='思考・判断・表現';
+    const pack=$('pack2up').checked && cfg.pageCols<=2;   // 段組3列など狭いときは2up無効
+    const itemCols=pack?2:1;
+    const mult=spaceMult();
     html+=`<div class="daimon ${isKnow?'knowd':'thinkd'}">
       <div class="dhead">
         <span class="dno">${d.no}</span>
@@ -520,14 +555,19 @@ function render(){
         <span class="dunit">${d.mixed?'':'［'+esc(d.unit)+'］'}</span>
         <span class="dpts">${ptsLabel(d)}</span>
       </div>
-      <div class="items ${single?'single':''}">`;
+      <div class="items" style="grid-template-columns:repeat(${itemCols},1fr)">`;
     d.items.forEach((p,i)=>{
       const num=`(${i+1})`;
-      const showSpace=!single;
+      const units=spaceUnitsFor(p);
+      const h=units*mult;
+      const wide=!pack || isWide(p,units);
       const utag=d.mixed?`<span class="dunit" style="margin-right:4px">［${esc(p.unit)}］</span>`:'';
-      html+=`<div class="qit" data-d="${d.no}" data-i="${i}">
+      const spaceHtml=h>0?`<div class="calc-space" style="height:${h.toFixed(1)}em"></div>`:'';
+      html+=`<div class="qit ${wide?'wide':''}" data-d="${d.no}" data-i="${i}">
         <span class="qn">${num}</span>
-        <span class="qbody">${utag}${mathify(p.q)}${showSpace?'<span class="ans-space"></span>':''}<span class="qpt">[${p.pts}点]</span></span>
+        <span class="qbody">${utag}${mathify(p.q)}<span class="qpt">[${p.pts}点]</span></span>
+        ${spaceHtml}
+        <span class="spc-ctl noprint">空白<b data-act="dec">−</b><b data-act="inc">＋</b></span>
         <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
       </div>`;
     });
@@ -584,6 +624,14 @@ function answerKeyHtml(daimon){
 
 /* ---------- 1問差し替え ---------- */
 function bindSwap(){
+  $('paper').querySelectorAll('.spc-ctl b').forEach(b=>b.onclick=()=>{
+    const qit=b.closest('.qit'); const dno=+qit.dataset.d, idx=+qit.dataset.i;
+    const d=exam.daimon.find(x=>x.no===dno); if(!d) return;
+    const p=d.items[idx];
+    const cur=(p.spaceLines!=null)?p.spaceLines:spaceUnitsFor(p);
+    p.spaceLines=Math.max(0,Math.min(14,cur+(b.dataset.act==='inc'?1:-1)));
+    render();
+  });
   $('paper').querySelectorAll('.swap').forEach(b=>b.onclick=()=>{
     const qit=b.closest('.qit');
     const dno=+qit.dataset.d, idx=+qit.dataset.i;
@@ -645,7 +693,7 @@ $('printBtn').onclick=()=>{
 };
 
 /* レイアウト設定の変更で即プレビュー反映 */
-['paperSize','orientation','pageCols','headerType','nameText','sumShow','sumShutai','sumPos','sumOrder'].forEach(id=>{
+['paperSize','orientation','pageCols','headerType','nameText','sumShow','sumShutai','sumPos','sumOrder','calcSpace','pack2up'].forEach(id=>{
   const el=$(id); if(!el) return;
   const ev=(el.tagName==='SELECT'||el.type==='checkbox')?'change':'input';
   el.addEventListener(ev,()=>{applyPageStyle();if(exam)render();});
