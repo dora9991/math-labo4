@@ -101,6 +101,9 @@
   .swap{position:absolute;right:-6px;top:2px;font-size:10px;color:var(--accent);cursor:pointer;
        opacity:0;border:1px solid var(--line);border-radius:5px;padding:0 4px;background:#fff}
   .qit:hover .swap{opacity:1}
+  .qit .qn[draggable]{cursor:grab}
+  .qit .qn[draggable]:active{cursor:grabbing}
+  .qit.dragover{outline:2px dashed var(--accent);outline-offset:2px;background:#eef4ff}
   .answerkey{margin-top:26px;border-top:2px dashed #999;padding-top:14px;page-break-before:always}
   .answerkey h3{margin:0 0 10px;font-size:15px}
   .akgrid{columns:2;font-size:12.5px;color:#111}
@@ -251,6 +254,7 @@
 const BANK = (window.PROBLEM_BANK||[]).map(p=>({...p}));
 const UNIT_ORDER=['正の数・負の数','文字の式','方程式','比例と反比例','平面図形','空間図形','データの活用'];
 let exam=null;
+let dragSrc=null;   // ドラッグ並べ替えの掴んでいる問題 {d,i}
 
 /* ---------- ユーティリティ ---------- */
 function $(id){return document.getElementById(id);}
@@ -268,7 +272,7 @@ function autoFrac(text){
   while((m=re.exec(text))){
     out+=esc(text.slice(last,m.index));
     const sign=m[1]?'-':'';
-    try{ out+=katex.renderToString(`${sign}\\frac{${m[2]}}{${m[3]}}`,{throwOnError:false}); }
+    try{ out+=katex.renderToString(`${sign}\\dfrac{${m[2]}}{${m[3]}}`,{throwOnError:false}); }
     catch(e){ out+=esc(m[0]); }
     last=m.index+m[0].length;
   }
@@ -601,7 +605,7 @@ function render(){
       // グリッド大問は問題側に空白を作らず、下の解答欄にまとめる
       const spaceHtml=(!useGrid && h>0)?`<div class="calc-space" style="min-height:${h.toFixed(1)}em"></div>`:'';
       html+=`<div class="qit ${wide?'wide':''}" data-d="${d.no}" data-i="${i}">
-        <div class="qrow"><span class="qn">${num}</span><span class="qbody">${utag}${mathify(p.q)}<span class="qpt">[${p.pts}点]</span></span></div>
+        <div class="qrow"><span class="qn" draggable="true" title="番号をドラッグして問題を入れ替え">${num}</span><span class="qbody">${utag}${mathify(p.q)}<span class="qpt">[${p.pts}点]</span></span></div>
         ${spaceHtml}
         <span class="spc-ctl noprint">空白<b data-act="dec">−</b><b data-act="inc">＋</b></span>
         <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
@@ -666,7 +670,40 @@ function answerKeyHtml(daimon){
 }
 
 /* ---------- 1問差し替え ---------- */
+/* 2問の位置を入れ替える（配点は位置に残す）。同じ大問内なら並べ替え、別大問なら交換。 */
+function swapItems(src,dst){
+  const ds=exam.daimon.find(x=>x.no===src.d), dd=exam.daimon.find(x=>x.no===dst.d);
+  if(!ds||!dd) return;
+  const a=ds.items[src.i], b=dd.items[dst.i];
+  if(!a||!b) return;
+  const pa=a.pts, pb=b.pts;
+  ds.items[src.i]=b; dd.items[dst.i]=a;
+  b.pts=pa; a.pts=pb;                                  // 配点はスロット（位置）に残す
+  exam.daimon.forEach(x=>x.total=x.items.reduce((s,y)=>s+y.pts,0));
+}
+function bindDnD(){
+  $('paper').querySelectorAll('.qn[draggable]').forEach(qn=>{
+    qn.ondragstart=e=>{
+      const q=qn.closest('.qit'); dragSrc={d:+q.dataset.d,i:+q.dataset.i};
+      e.dataTransfer.effectAllowed='move';
+      try{ e.dataTransfer.setData('text/plain','move'); e.dataTransfer.setDragImage(q,12,12); }catch(_){}
+    };
+    qn.ondragend=()=>{ dragSrc=null; $('paper').querySelectorAll('.qit.dragover').forEach(x=>x.classList.remove('dragover')); };
+  });
+  $('paper').querySelectorAll('.qit').forEach(q=>{
+    q.ondragover=e=>{ if(dragSrc){ e.preventDefault(); q.classList.add('dragover'); } };
+    q.ondragleave=()=>q.classList.remove('dragover');
+    q.ondrop=e=>{
+      e.preventDefault(); q.classList.remove('dragover');
+      if(!dragSrc) return;
+      const dst={d:+q.dataset.d,i:+q.dataset.i};
+      if(!(dragSrc.d===dst.d && dragSrc.i===dst.i)){ swapItems(dragSrc,dst); render(); toast('入れ替えました'); }
+      dragSrc=null;
+    };
+  });
+}
 function bindSwap(){
+  bindDnD();
   $('paper').querySelectorAll('.spc-ctl b').forEach(b=>b.onclick=()=>{
     const qit=b.closest('.qit'); const dno=+qit.dataset.d, idx=+qit.dataset.i;
     const d=exam.daimon.find(x=>x.no===dno); if(!d) return;
