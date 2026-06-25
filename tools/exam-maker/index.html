@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>定期テスト作成ツール（中1 数学・100点/50分）</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <style>
   :root{
     --bg:#f4f6fb; --card:#fff; --ink:#1f2937; --sub:#6b7280; --line:#e5e7eb;
@@ -187,6 +189,19 @@ let exam=null;
 function $(id){return document.getElementById(id);}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+/* $...$ で囲まれた部分だけ KaTeX で数式組版し、残りは通常どおりエスケープ。
+   ・$ が無い問題は従来どおり（既存データを書き換えなくてよい）
+   ・$ の数が奇数（閉じ忘れ）や KaTeX 未読込のときは素のテキストにフォールバック */
+function mathify(s){
+  s=String(s);
+  if(s.indexOf('$')===-1 || typeof katex==='undefined') return esc(s);
+  if((s.split('$').length-1)%2!==0) return esc(s);   // $ が奇数＝閉じ忘れ → そのまま表示
+  return s.split('$').map((part,idx)=>{
+    if(idx%2===0) return esc(part);                   // 偶数番＝通常テキスト
+    try{ return katex.renderToString(part,{throwOnError:false}); }
+    catch(e){ return esc('$'+part+'$'); }
+  }).join('');
+}
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1900);}
 
 /* ---------- 範囲UI ---------- */
@@ -416,7 +431,7 @@ function render(){
       const utag=d.mixed?`<span class="dunit" style="margin-right:4px">［${esc(p.unit)}］</span>`:'';
       html+=`<div class="qit" data-d="${d.no}" data-i="${i}">
         <span class="qn">${num}</span>
-        <span class="qbody">${utag}${esc(p.q)}${showSpace?'<span class="ans-space"></span>':''}<span class="qpt">[${p.pts}点]</span></span>
+        <span class="qbody">${utag}${mathify(p.q)}${showSpace?'<span class="ans-space"></span>':''}<span class="qpt">[${p.pts}点]</span></span>
         <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
       </div>`;
     });
@@ -460,7 +475,7 @@ function ptsLabel(d){
 function answerKeyBody(daimon){
   let s='';
   daimon.forEach(d=>{
-    const list=d.items.map((p,i)=>`<span class="akans">(${i+1}) ${esc(p.answer)}</span>`).join(' ');
+    const list=d.items.map((p,i)=>`<span class="akans">(${i+1}) ${mathify(p.answer)}</span>`).join(' ');
     s+=`<div class="akd"><b>大問${d.no}</b>（${esc(d.unit)}）<br>${list}</div>`;
   });
   return `<h3>【解答】</h3><div class="akgrid">${s}</div>`;
