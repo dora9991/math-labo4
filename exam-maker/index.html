@@ -102,6 +102,19 @@
   .akgrid .akd b{color:var(--accent-d)}
   .akgrid .akans{color:var(--ok);margin-right:10px}
 
+  /* ===== Phase1: レイアウト（ヘッダー型・観点集計表・段組） ===== */
+  .examhead.split{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  .examhead.split .ttl{text-align:left;font-size:19px}
+  .examhead.split .hright{border:1px solid #111;border-radius:4px;padding:6px 10px;font-size:12.5px;white-space:nowrap;align-self:flex-start}
+  .hsub{font-size:12px;color:#555}
+  .kanten-summary{display:flex;margin:8px 0 14px;width:max-content;max-width:100%}
+  .kanten-summary .kcell{border:1px solid #111;border-right:0;min-width:94px}
+  .kanten-summary .kcell:last-child{border-right:1px solid #111}
+  .kanten-summary .klab{font-size:10.5px;text-align:center;border-bottom:1px solid #111;padding:3px 8px;background:#f3f4f6}
+  .kanten-summary .kval{font-size:13px;text-align:center;padding:8px;min-height:24px}
+  .kanten-summary .kcell.total .klab{font-weight:800}
+  .problems .daimon{break-inside:avoid}
+
   @media print{
     body{background:#fff}
     .noprint{display:none !important}
@@ -155,6 +168,35 @@
       </div>
       <p class="hint">合計が100%でなくても比率として扱います。0%にした難易度は出題されません。</p>
       <label><input type="checkbox" id="normPts" checked style="width:auto"> 配点を満点ぴったりに自動調整</label>
+    </div>
+
+    <div class="card">
+      <h2>④ レイアウト</h2>
+      <div class="row">
+        <div><label>用紙</label>
+          <select id="paperSize"><option>A4</option><option>B4</option><option>A3</option></select></div>
+        <div><label>向き</label>
+          <select id="orientation"><option value="portrait">縦</option><option value="landscape">横</option></select></div>
+      </div>
+      <label>段組</label>
+      <select id="pageCols"><option value="1">1列</option><option value="2" selected>2列</option><option value="3">3列</option></select>
+      <label>ヘッダー型</label>
+      <select id="headerType"><option value="split" selected>左右（テスト名｜氏名）</option><option value="center">中央（タイトル＋得点欄）</option></select>
+      <label>氏名欄の文言</label>
+      <input type="text" id="nameText" value="中学１年（　）組（　）番　氏名（　　　　　　　）">
+      <label style="margin-top:14px"><input type="checkbox" id="sumShow" checked style="width:auto"> 観点別の集計表を入れる</label>
+      <label><input type="checkbox" id="sumShutai" style="width:auto"> 「主体的に学習に取り組む態度」の列も入れる</label>
+      <div class="row">
+        <div><label>集計表の位置</label>
+          <select id="sumPos"><option value="top" selected>先頭</option><option value="bottom">末尾</option></select></div>
+        <div><label>並び順</label>
+          <select id="sumOrder">
+            <option value="k-t-s-sum">知技・思判・(主体)・合計</option>
+            <option value="sum-k-t-s">合計・知技・思判・(主体)</option>
+            <option value="t-k-s-sum">思判・知技・(主体)・合計</option>
+          </select></div>
+      </div>
+      <p class="hint">並び順のさらに細かい入れ替えは後で追加できます。</p>
     </div>
 
     <div class="card">
@@ -372,6 +414,63 @@ function normalize(daimon,cog,target){
   items.forEach((it,i)=>it.pts=floors[i]);
 }
 
+/* ---------- レイアウト設定（Phase1） ---------- */
+const PAPER={A4:[210,297],B4:[257,364],A3:[297,420]};   // [短辺,長辺] mm（B4はJIS）
+const KANTEN={know:'知識・技能',think:'思考・判断・表現',shutai:'主体的に学習に\n取り組む態度',total:'合計'};
+function readLayout(){
+  return {
+    paperSize:$('paperSize').value,
+    orientation:$('orientation').value,
+    pageCols:+$('pageCols').value||1,
+    headerType:$('headerType').value,
+    nameText:$('nameText').value,
+    sumShow:$('sumShow').checked,
+    sumShutai:$('sumShutai').checked,
+    sumPos:$('sumPos').value,
+    sumOrder:$('sumOrder').value,
+  };
+}
+function applyPageStyle(cfg){
+  cfg=cfg||readLayout();
+  const [s,l]=PAPER[cfg.paperSize]||PAPER.A4;
+  const w=cfg.orientation==='landscape'?l:s, h=cfg.orientation==='landscape'?s:l;
+  let st=document.getElementById('pageStyle');
+  if(!st){st=document.createElement('style');st.id='pageStyle';document.head.appendChild(st);}
+  st.textContent=`@media print{@page{size:${w}mm ${h}mm;margin:14mm 12mm}}`;
+  const paper=$('paper');
+  paper.style.width=w+'mm';
+  paper.style.maxWidth='100%';
+  paper.style.margin='0 auto';
+}
+function headerHtml(cfg,{title,minutes,points}){
+  const sub=`制限時間 ${minutes}分 ／ ${points}点満点`;
+  if(cfg.headerType==='split'){
+    return `<div class="examhead split">
+      <div class="hleft"><div class="ttl">${esc(title)}</div><div class="hsub">${sub}</div></div>
+      <div class="hright">${esc(cfg.nameText)}</div>
+    </div>`;
+  }
+  return `<div class="examhead">
+    <div class="ttl">${esc(title)}</div>
+    <div class="meta">
+      <div><span class="namebox">${esc(cfg.nameText)}</span><div class="hsub" style="margin-top:6px">${sub}</div></div>
+      <div class="scorebox"><div class="lab">得点</div><div class="num">／ ${points}</div></div>
+    </div>
+  </div>`;
+}
+function summaryHtml(cfg,{knowPts,thinkPts,totPts}){
+  const val={know:knowPts+'点',think:thinkPts+'点',shutai:'',total:totPts+'点'};
+  const ordMap={
+    'k-t-s-sum':['know','think','shutai','total'],
+    'sum-k-t-s':['total','know','think','shutai'],
+    't-k-s-sum':['think','know','shutai','total'],
+  };
+  let keys=(ordMap[cfg.sumOrder]||ordMap['k-t-s-sum']).slice();
+  if(!cfg.sumShutai) keys=keys.filter(k=>k!=='shutai');
+  const cells=keys.map(k=>`<div class="kcell ${k}"><div class="klab">${esc(KANTEN[k]).replace(/\n/g,'<br>')}</div><div class="kval">${val[k]}</div></div>`).join('');
+  return `<div class="kanten-summary">${cells}</div>`;
+}
+
 /* ---------- 描画 ---------- */
 function render(){
   if(!exam){return;}
@@ -396,17 +495,14 @@ function render(){
   // 難易度の内訳（実際の構成）
   renderDiffBar(daimon, totPts);
 
-  // 用紙
-  let html=`<div class="examhead">
-    <div class="ttl">${esc(title)}</div>
-    <div class="meta">
-      <div>
-        <span class="namebox">年　組　番　氏名：　　　　　　　　　　　</span>
-        <div style="margin-top:6px;color:#555">制限時間 ${minutes}分／${points}点満点</div>
-      </div>
-      <div class="scorebox"><div class="lab">得点</div><div class="num">／ ${totPts}</div></div>
-    </div>
-  </div>`;
+  // 用紙（レイアウト設定を反映）
+  const cfg=readLayout();
+  applyPageStyle(cfg);
+  let html=headerHtml(cfg,{title,minutes,points});
+  const sumTbl=cfg.sumShow?summaryHtml(cfg,{knowPts,thinkPts,totPts}):'';
+  if(cfg.sumShow && cfg.sumPos==='top') html+=sumTbl;
+  const colStyle=cfg.pageCols>1?`column-count:${cfg.pageCols};column-gap:22px;column-rule:1px solid #111;`:'';
+  html+=`<div class="problems" style="${colStyle}">`;
 
   let lastCog=null;
   daimon.forEach(d=>{
@@ -416,7 +512,7 @@ function render(){
       lastCog=d.cog;
     }
     const isKnow=d.cog==='知識・技能';
-    const single=d.items.some(p=>['文章題','作図','選択'].includes(p.format)) || d.cog==='思考・判断・表現';
+    const single=cfg.pageCols>1 || d.items.some(p=>['文章題','作図','選択'].includes(p.format)) || d.cog==='思考・判断・表現';
     html+=`<div class="daimon ${isKnow?'knowd':'thinkd'}">
       <div class="dhead">
         <span class="dno">${d.no}</span>
@@ -437,6 +533,8 @@ function render(){
     });
     html+=`</div></div>`;
   });
+  html+=`</div>`; // .problems を閉じる
+  if(cfg.sumShow && cfg.sumPos==='bottom') html+=sumTbl;
 
   // 解答
   if($('showAns').checked){
@@ -546,9 +644,17 @@ $('printBtn').onclick=()=>{
   setTimeout(()=>{if(hid)hid.style.display='none';},500);
 };
 
+/* レイアウト設定の変更で即プレビュー反映 */
+['paperSize','orientation','pageCols','headerType','nameText','sumShow','sumShutai','sumPos','sumOrder'].forEach(id=>{
+  const el=$(id); if(!el) return;
+  const ev=(el.tagName==='SELECT'||el.type==='checkbox')?'change':'input';
+  el.addEventListener(ev,()=>{applyPageStyle();if(exam)render();});
+});
+
 /* ---------- init ---------- */
 buildUnitUI();
 syncRatio();
+applyPageStyle();
 </script>
 </body>
 </html>
