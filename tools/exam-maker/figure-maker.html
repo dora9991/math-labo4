@@ -46,6 +46,9 @@
     stroke:#fff;stroke-width:4px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:middle;user-select:none;pointer-events:none}
   text.len{stroke-width:7px}
   text.albl{fill:#b91c1c}
+  path.angarc{fill:none;stroke:#b91c1c;stroke-width:1.8}
+  circle.anghit{fill:transparent;cursor:pointer}
+  g.shape:not(.sel) circle.anghit{display:none}
   text.nm{font-size:17px;font-weight:800;fill:#1e3a8a;paint-order:stroke;
     stroke:#fff;stroke-width:4px;stroke-linejoin:round;text-anchor:middle;dominant-baseline:middle;user-select:none;pointer-events:auto;cursor:pointer}
   #editor{position:fixed;display:none;z-index:50;transform:translate(-50%,-130%)}
@@ -131,7 +134,7 @@ function buildDom(s){
   if(s.closed){body.dataset.kind="body";body.dataset.id=s.id;} else body.style.display="none";
   g.appendChild(body);
   const n=s.v.length, ec=EC(s);
-  const arc=[],edge=[],hit=[],elen=[],verts=[],nm=[],ang=[];
+  const arc=[],edge=[],hit=[],elen=[],verts=[],nm=[],ang=[],angarc=[],anghit=[];
   for(let i=0;i<ec;i++){
     arc.push(g.appendChild(el("path",{class:"dim"})));
     edge.push(g.appendChild(el("line",{class:"edge"})));
@@ -144,18 +147,56 @@ function buildDom(s){
     verts.push(g.appendChild(c));
   }
   for(let i=0;i<n;i++){
+    if(s.closed){
+      angarc.push(g.appendChild(el("path",{class:"angarc"})));
+      const ah=el("circle",{class:"anghit",r:16});ah.dataset.kind="ang";ah.dataset.id=s.id;ah.dataset.idx=i;
+      anghit.push(g.appendChild(ah));
+    }else{ angarc.push(null); anghit.push(null); }
     ang.push(g.appendChild(el("text",{class:"lbl albl"})));
     const t=el("text",{class:"nm"});t.dataset.kind="name";t.dataset.id=s.id;t.dataset.idx=i;
     nm.push(g.appendChild(t));
   }
   svg.appendChild(g);
-  s.dom={g,body,arc,edge,hit,elen,verts,nm,ang};
+  s.dom={g,body,arc,edge,hit,elen,verts,nm,ang,angarc,anghit};
   updateDom(s); markSel();
 }
 
 function centroidV(s){let x=0,y=0;s.v.forEach(pid=>{x+=P[pid].x;y+=P[pid].y;});return {x:x/s.v.length,y:y/s.v.length};}
 function show(e,on){e.style.display=on?"":"none";}
 
+// 角の円弧/直角記号/ラベルの座標を計算（内側＝重心向き）
+function angleGeom(s,i){
+  const n=s.v.length, v=P[s.v[i]], pa=P[s.v[(i-1+n)%n]], pb=P[s.v[(i+1)%n]], c=centroidV(s);
+  let d1x=pa.x-v.x,d1y=pa.y-v.y,l1=Math.hypot(d1x,d1y)||1;d1x/=l1;d1y/=l1;
+  let d2x=pb.x-v.x,d2y=pb.y-v.y,l2=Math.hypot(d2x,d2y)||1;d2x/=l2;d2y/=l2;
+  let bx=d1x+d2x,by=d1y+d2y,bl=Math.hypot(bx,by)||1;bx/=bl;by/=bl;
+  if(bx*(c.x-v.x)+by*(c.y-v.y)<0){bx=-bx;by=-by;}   // 内側（重心側）へ
+  const val=(s.ang[i]||"").trim(), isRight=parseFloat(val)===90;
+  let path="",label="",lx=0,ly=0;
+  if(val){
+    if(isRight){
+      const r=15;
+      path="M "+(v.x+d1x*r)+" "+(v.y+d1y*r)+" L "+(v.x+(d1x+d2x)*r)+" "+(v.y+(d1y+d2y)*r)+" L "+(v.x+d2x*r)+" "+(v.y+d2y*r);
+    }else{
+      const R=20,a1=Math.atan2(d1y,d1x),a2=Math.atan2(d2y,d2x);
+      let da=a2-a1;while(da<=-Math.PI)da+=2*Math.PI;while(da>Math.PI)da-=2*Math.PI;
+      const midA=a1+da/2;
+      if(Math.cos(midA)*bx+Math.sin(midA)*by<0){da=da>0?da-2*Math.PI:da+2*Math.PI;}
+      const large=Math.abs(da)>Math.PI?1:0,sweep=da>0?1:0;
+      path="M "+(v.x+Math.cos(a1)*R)+" "+(v.y+Math.sin(a1)*R)+" A "+R+" "+R+" 0 "+large+" "+sweep+" "+(v.x+Math.cos(a2)*R)+" "+(v.y+Math.sin(a2)*R);
+      label=val;lx=v.x+bx*(R+12);ly=v.y+by*(R+12);
+    }
+  }
+  return {path,label,lx,ly,bx,by,val};
+}
+function drawAngle(s,d,i,v){
+  const g=angleGeom(s,i);
+  d.anghit[i].setAttribute("cx",v.x+g.bx*20);d.anghit[i].setAttribute("cy",v.y+g.by*20);
+  if(!g.val){ show(d.angarc[i],false); d.ang[i].textContent=""; return; }
+  d.angarc[i].setAttribute("d",g.path); show(d.angarc[i],true);
+  d.ang[i].textContent=g.label;
+  if(g.label){ d.ang[i].setAttribute("x",g.lx); d.ang[i].setAttribute("y",g.ly); }
+}
 function updateDom(s){
   const n=s.v.length,d=s.dom,c=centroidV(s),ec=EC(s);
   if(s.closed) d.body.setAttribute("points",s.v.map(pid=>P[pid].x+","+P[pid].y).join(" "));
@@ -184,8 +225,8 @@ function updateDom(s){
     let ox=v.x-c.x,oy=v.y-c.y;const ol=Math.hypot(ox,oy)||1;ox/=ol;oy/=ol;
     d.nm[i].textContent = isNameOwner(s,i) ? (v.name||"") : "";   // 共有頂点は1図形だけが名前を描く
     d.nm[i].setAttribute("x",v.x+ox*22);d.nm[i].setAttribute("y",v.y+oy*22);
-    d.ang[i].textContent=s.ang[i]||"";
-    d.ang[i].setAttribute("x",v.x-ox*26);d.ang[i].setAttribute("y",v.y-oy*26);
+    if(s.closed && d.anghit[i]){ drawAngle(s,d,i,v,c,ox,oy); }
+    else { d.ang[i].textContent=s.ang[i]||""; d.ang[i].setAttribute("x",v.x-ox*26);d.ang[i].setAttribute("y",v.y-oy*26); }
   }
 }
 function updateAll(){shapes.forEach(updateDom);}
@@ -262,6 +303,7 @@ svg.addEventListener("pointerup",e=>{
   }
   if(!a.moved && a.wasSel){
     if(a.kind==="edge") openEditor(a.s,"elen",a.idx);
+    else if(a.kind==="ang") openEditor(a.s,"ang",a.idx);
     else if(a.kind==="vtx") openEditor(a.s,"name",a.idx);
     else if(a.kind==="name") openEditor(a.s,"name",a.idx);
   }
@@ -328,7 +370,11 @@ function buildExportSVG(){
       const pid=s.v[i],v=P[pid];let ox=v.x-c.x,oy=v.y-c.y;const ol=Math.hypot(ox,oy)||1;ox/=ol;oy/=ol;
       if(v.name && !drawnName[pid]){drawnName[pid]=1;
         bd+='<text x="'+(v.x+ox*22)+'" y="'+(v.y+oy*22)+'" text-anchor="middle" dominant-baseline="middle" style="paint-order:stroke" stroke="#fff" stroke-width="4" fill="#1e3a8a" font-size="17" font-weight="800" font-family="sans-serif">'+esc(v.name)+'</text>';}
-      if(s.ang[i]) bd+='<text x="'+(v.x-ox*26)+'" y="'+(v.y-oy*26)+'" text-anchor="middle" dominant-baseline="middle" style="paint-order:stroke" stroke="#fff" stroke-width="4" fill="#b91c1c" font-size="15" font-weight="700" font-family="sans-serif">'+esc(s.ang[i])+'</text>';
+      if(s.closed && s.ang[i]){
+        const g2=angleGeom(s,i);
+        if(g2.path) bd+='<path d="'+g2.path+'" fill="none" stroke="#b91c1c" stroke-width="1.8"/>';
+        if(g2.label) bd+='<text x="'+g2.lx+'" y="'+g2.ly+'" text-anchor="middle" dominant-baseline="middle" style="paint-order:stroke" stroke="#fff" stroke-width="4" fill="#b91c1c" font-size="15" font-weight="700" font-family="sans-serif">'+esc(g2.label)+'</text>';
+      } else if(s.ang[i]) bd+='<text x="'+(v.x-ox*26)+'" y="'+(v.y-oy*26)+'" text-anchor="middle" dominant-baseline="middle" style="paint-order:stroke" stroke="#fff" stroke-width="4" fill="#b91c1c" font-size="15" font-weight="700" font-family="sans-serif">'+esc(s.ang[i])+'</text>';
     }
   });
   return {svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="'+minx+' '+miny+' '+w+' '+h+'" width="'+w+'" height="'+h+'">'+bd+'</svg>',w,h};
