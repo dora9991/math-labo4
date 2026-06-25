@@ -119,6 +119,10 @@
   .kanten-summary .kval{font-size:13px;text-align:center;padding:8px;min-height:24px}
   .kanten-summary .kcell.total .klab{font-weight:800}
   .problems .daimon{break-inside:avoid}
+  /* 解答欄グリッド（Phase3） */
+  .answer-grid{display:grid;gap:0;border-top:1px solid #111;border-left:1px solid #111;margin:8px 0 4px}
+  .acell{border-right:1px solid #111;border-bottom:1px solid #111;min-height:2.4em;padding:2px 6px}
+  .acell .anum{font-size:10px;color:#666;font-weight:700}
 
   @media print{
     body{background:#fff}
@@ -204,6 +208,12 @@
       <label style="margin-top:14px">計算スペース（自動・問題ごと）</label>
       <select id="calcSpace"><option value="none">なし</option><option value="small">小</option><option value="std" selected>標準</option><option value="large">大</option></select>
       <label><input type="checkbox" id="pack2up" checked style="width:auto"> 簡単な問題は1列に2つ並べる（難問は1つ）</label>
+      <label>解答欄の形式</label>
+      <select id="answerStyle">
+        <option value="auto" selected>自動（計算・短答は枠／記述は空白）</option>
+        <option value="inline">すべて空白（計算スペース）</option>
+        <option value="grid">すべて解答欄グリッド</option>
+      </select>
       <p class="hint">並び順の細かい入れ替えは後で追加できます。各問題は作成後、マウスを乗せると出る「空白 −／＋」で個別に調整できます。</p>
     </div>
 
@@ -545,6 +555,9 @@ function render(){
       lastCog=d.cog;
     }
     const isKnow=d.cog==='知識・技能';
+    const mode=$('answerStyle').value;
+    // 解答欄グリッドにする大問か：知識・技能の計算/一行/選択だけで構成された大問は枠、それ以外は空白
+    const useGrid = mode==='grid' || (mode==='auto' && d.cog==='知識・技能' && d.items.every(p=>['計算','一行問題','選択'].includes(p.format||'')));
     const pack=$('pack2up').checked && cfg.pageCols<=2;   // 段組3列など狭いときは2up無効
     const itemCols=pack?2:1;
     const mult=spaceMult();
@@ -562,7 +575,8 @@ function render(){
       const h=units*mult;
       const wide=!pack || isWide(p,units);
       const utag=d.mixed?`<span class="dunit" style="margin-right:4px">［${esc(p.unit)}］</span>`:'';
-      const spaceHtml=h>0?`<div class="calc-space" style="height:${h.toFixed(1)}em"></div>`:'';
+      // グリッド大問は問題側に空白を作らず、下の解答欄にまとめる
+      const spaceHtml=(!useGrid && h>0)?`<div class="calc-space" style="height:${h.toFixed(1)}em"></div>`:'';
       html+=`<div class="qit ${wide?'wide':''}" data-d="${d.no}" data-i="${i}">
         <span class="qn">${num}</span>
         <span class="qbody">${utag}${mathify(p.q)}<span class="qpt">[${p.pts}点]</span></span>
@@ -571,7 +585,14 @@ function render(){
         <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
       </div>`;
     });
-    html+=`</div></div>`;
+    html+=`</div>`; // close .items
+    if(useGrid){
+      const n=d.items.length;
+      const gcols=cfg.pageCols>=2?Math.min(3,n):Math.min(5,n);
+      const cells=d.items.map((p,i)=>`<div class="acell"><span class="anum">(${i+1})</span></div>`).join('');
+      html+=`<div class="answer-grid" style="grid-template-columns:repeat(${gcols||1},1fr)">${cells}</div>`;
+    }
+    html+=`</div>`; // close .daimon
   });
   html+=`</div>`; // .problems を閉じる
   if(cfg.sumShow && cfg.sumPos==='bottom') html+=sumTbl;
@@ -693,7 +714,7 @@ $('printBtn').onclick=()=>{
 };
 
 /* レイアウト設定の変更で即プレビュー反映 */
-['paperSize','orientation','pageCols','headerType','nameText','sumShow','sumShutai','sumPos','sumOrder','calcSpace','pack2up'].forEach(id=>{
+['paperSize','orientation','pageCols','headerType','nameText','sumShow','sumShutai','sumPos','sumOrder','calcSpace','pack2up','answerStyle'].forEach(id=>{
   const el=$(id); if(!el) return;
   const ev=(el.tagName==='SELECT'||el.type==='checkbox')?'change':'input';
   el.addEventListener(ev,()=>{applyPageStyle();if(exam)render();});
