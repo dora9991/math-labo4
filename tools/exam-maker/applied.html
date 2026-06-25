@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>応用チャレンジ プリント作成（exam-maker）</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<style>
+  :root{ --ink:#1a1a1a; --line:#cfcfcf; --accent:#6d28d9; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; color:var(--ink); background:#f3f4f6; }
+  .wrap{ display:flex; gap:16px; align-items:flex-start; padding:16px; max-width:1180px; margin:0 auto; }
+  .panel{ width:330px; flex:none; position:sticky; top:16px; }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px; }
+  h1{ font-size:18px; margin:0 0 2px; }
+  .sub{ font-size:12px; color:#666; margin-bottom:10px; }
+  label{ font-size:12px; font-weight:700; display:block; margin:8px 0 4px; color:#444; }
+  select, input[type=text]{ width:100%; padding:7px 8px; border:1px solid var(--line); border-radius:7px; font-size:13px; }
+  .row{ display:flex; gap:8px; } .row>*{ flex:1; }
+  .chk{ display:flex; align-items:center; gap:6px; font-size:13px; margin:6px 0; font-weight:700; }
+  .chk input{ width:auto; }
+  .btn{ width:100%; padding:11px; border:none; border-radius:9px; background:var(--accent); color:#fff; font-size:14px; font-weight:800; cursor:pointer; margin-top:8px; }
+  .btn.sec{ background:#fff; color:var(--accent); border:1.5px solid var(--accent); }
+  .count{ font-size:12px; color:#666; margin-top:6px; }
+  .picklist{ max-height:46vh; overflow:auto; }
+  .pick{ display:flex; gap:8px; align-items:flex-start; font-size:12px; padding:6px 4px; border-bottom:1px dashed #eee; }
+  .pick input{ margin-top:2px; }
+  .pick .meta{ color:#777; font-size:10.5px; }
+  .badge{ display:inline-block; font-size:10px; border:1px solid #bbb; border-radius:5px; padding:0 5px; color:#555; margin-right:4px; }
+
+  /* ===== 印刷される本体 ===== */
+  .sheet{ flex:1; background:#fff; border:1px solid var(--line); border-radius:10px; padding:22px 26px; min-height:60vh; }
+  .sheet h2{ font-size:18px; margin:0 0 4px; }
+  .sheet .meta{ font-size:12px; color:#444; }
+  .sheet .head{ border-bottom:2px solid #111; padding-bottom:6px; margin:0 0 14px; }
+  .q{ margin-bottom:18px; page-break-inside:avoid; }
+  .qhead{ display:flex; gap:8px; align-items:baseline; margin-bottom:3px; }
+  .qno{ font-weight:900; font-size:15px; }
+  .stmt{ white-space:pre-wrap; line-height:1.85; font-size:13.5px; }
+  .fig{ font-size:12px; color:#333; background:#f3f3f3; border-radius:6px; padding:6px 8px; margin-top:6px; }
+  .space{ color:#aaa; font-size:11px; border:1px dashed #bbb; border-radius:6px; padding:20px 8px; margin-top:8px; }
+  .answers{ page-break-before:always; }
+  .a{ margin-bottom:14px; page-break-inside:avoid; }
+  .ahead{ font-weight:900; font-size:13.5px; }
+  .ans{ font-weight:800; color:#0a7d3c; margin:2px 0; }
+  .hints{ font-size:12px; color:#444; line-height:1.7; }
+  .sol{ white-space:pre-wrap; line-height:1.8; font-size:13px; }
+  .empty{ color:#999; padding:40px 0; text-align:center; }
+
+  @media print{
+    body{ background:#fff; }
+    .wrap{ padding:0; max-width:none; display:block; }
+    .noprint{ display:none !important; }
+    .sheet{ border:none; border-radius:0; padding:0; }
+    @page{ margin:16mm; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- 操作パネル -->
+  <div class="panel noprint">
+    <div class="card">
+      <h1>🏆 応用チャレンジ プリント</h1>
+      <div class="sub">数オリ・全国学テ・自作の良問を、配布用プリント＋別冊解説に。</div>
+      <label>出典</label><select id="fSource"></select>
+      <div class="row">
+        <div><label>分野</label><select id="fField"></select></div>
+        <div><label>学年</label><select id="fLevel"></select></div>
+      </div>
+      <label>難易度（以下）</label>
+      <select id="fDiff">
+        <option value="all">すべて</option>
+        <option value="1">★1まで</option><option value="2">★2まで</option>
+        <option value="3">★3まで</option><option value="4">★4まで</option><option value="5">★5まで</option>
+      </select>
+      <label>プリントの題名</label>
+      <input type="text" id="title" value="応用チャレンジ 問題プリント">
+      <label class="chk"><input type="checkbox" id="optAns" checked> 別冊解説（答え・ヒント・解説）を付ける</label>
+      <label class="chk"><input type="checkbox" id="optName" checked> 名前・日付欄を付ける</label>
+      <label class="chk"><input type="checkbox" id="optSpace" checked> 解答欄スペースを付ける</label>
+      <button class="btn" id="printBtn">🖨 印刷 / PDF保存</button>
+      <div class="count" id="count"></div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <button class="btn sec" id="allBtn" style="margin-top:0">全部えらぶ</button>
+        <button class="btn sec" id="noneBtn" style="margin-top:0">全部はずす</button>
+      </div>
+      <div class="picklist" id="picklist"></div>
+    </div>
+  </div>
+
+  <!-- 印刷本体（プレビュー兼用） -->
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script src="applied_bank.js"></script>
+<script>
+(function(){
+  var BANK = (window.APPLIED_BANK || []).slice();
+  if(!BANK.length){ document.getElementById('sheet').innerHTML='<div class="empty">applied_bank.js が読み込めません（同じフォルダに置いてください）。</div>'; }
+  var FIELDS=["整数","代数","幾何","組合せ","確率","データ"];
+  var LEVELS=["中1","中2","中3"];
+  var SOURCES=Array.from(new Set(BANK.map(function(p){return p.source;})));
+  var selected=new Set(); // 含める問題id
+
+  function $(id){ return document.getElementById(id); }
+  function stars(n){ return "★".repeat(n)+"☆".repeat(Math.max(0,5-n)); }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ===== 数式の自動組版（地の文はそのまま、数式部分だけ KaTeX 化）=====
+  var MCACHE={};
+  var SUP={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','ⁿ':'n'};
+  var SUB={'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'};
+  // 数式を構成しうる文字（日本語・全角記号は含めない）
+  var MC="A-Za-z0-9√^()<>=+\\-−×·∙*\\/:≦≧≤≥≠±∞⇒→.⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ₀₁₂₃₄₅₆₇₈₉";
+  var RUN=new RegExp("["+MC+"]+(?:[ ,]+["+MC+"]+)*","g");
+  function toLatex(run){
+    var s=run;
+    s=s.replace(/\^([A-Za-z0-9]+)/g,'^{$1}');                       // a^123 → a^{123}
+    s=s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ]+/g,function(m){var r='';for(var i=0;i<m.length;i++)r+=SUP[m[i]];return '^{'+r+'}';});
+    s=s.replace(/[₀₁₂₃₄₅₆₇₈₉]+/g,function(m){var r='';for(var i=0;i<m.length;i++)r+=SUB[m[i]];return '_{'+r+'}';});
+    s=s.replace(/√\(([^()]*)\)/g,'\\sqrt{$1}');                     // √(…) → \sqrt{…}
+    s=s.replace(/√([A-Za-z0-9]+(?:\^\{[^}]*\})?)/g,'\\sqrt{$1}');   // √2, √k² → \sqrt{…}
+    s=s.replace(/×/g,'\\times ').replace(/[·∙]/g,'\\cdot ')
+       .replace(/≦/g,'\\leqq ').replace(/≤/g,'\\le ')
+       .replace(/≧/g,'\\geqq ').replace(/≥/g,'\\ge ')
+       .replace(/≠/g,'\\neq ').replace(/±/g,'\\pm ').replace(/∞/g,'\\infty ')
+       .replace(/⇒/g,'\\Rightarrow ').replace(/→/g,'\\to ')
+       .replace(/−/g,'-');
+    return s;
+  }
+  function mathify(raw){
+    if(raw==null) return '';
+    var key=String(raw);
+    if(MCACHE[key]!=null) return MCACHE[key];
+    if(typeof katex==='undefined') return esc(key);   // 読込前は素のテキスト（load後に再描画）
+    var out='', last=0, m; RUN.lastIndex=0;
+    while((m=RUN.exec(key))){
+      var run=m[0], start=m.index;
+      out+=esc(key.slice(last,start));
+      if(/[A-Za-z0-9√∞]/.test(run)){
+        try{ out+=katex.renderToString(toLatex(run),{throwOnError:false,displayMode:false}); }
+        catch(e){ out+=esc(run); }
+      } else { out+=esc(run); }
+      last=start+run.length;
+    }
+    out+=esc(key.slice(last));
+    MCACHE[key]=out;
+    return out;
+  }
+
+  function opt(sel, vals, allLabel){
+    sel.innerHTML='<option value="all">'+(allLabel||'すべて')+'</option>'+vals.map(function(v){return '<option value="'+esc(v)+'">'+esc(v)+'</option>';}).join('');
+  }
+  opt($('fSource'), SOURCES); opt($('fField'), FIELDS); opt($('fLevel'), LEVELS);
+
+  function filtered(){
+    var s=$('fSource').value, f=$('fField').value, l=$('fLevel').value, d=$('fDiff').value;
+    return BANK.filter(function(p){
+      return (s==='all'||p.source===s) && (f==='all'||p.field===f) && (l==='all'||p.needLevel===l)
+        && (d==='all'|| (p.difficulty||0) <= Number(d));
+    });
+  }
+
+  function renderPick(){
+    var list=filtered(), html='';
+    list.forEach(function(p){
+      var on=selected.has(p.id);
+      html+='<label class="pick"><input type="checkbox" data-id="'+esc(p.id)+'" '+(on?'checked':'')+'>'
+        +'<span><b>'+esc(p.title)+'</b><br><span class="meta">'
+        +esc(p.source)+'・'+esc(p.field)+'・'+esc(p.needLevel)+'・'+stars(p.difficulty)+'</span></span></label>';
+    });
+    $('picklist').innerHTML = html || '<div class="empty">該当なし</div>';
+    Array.prototype.forEach.call($('picklist').querySelectorAll('input'), function(cb){
+      cb.onchange=function(){ if(cb.checked) selected.add(cb.dataset.id); else selected.delete(cb.dataset.id); renderSheet(); };
+    });
+    $('count').textContent = '該当 '+list.length+' 問／選択中 '+list.filter(function(p){return selected.has(p.id);}).length+' 問';
+  }
+
+  function chosen(){ return filtered().filter(function(p){return selected.has(p.id);}); }
+
+  function renderSheet(){
+    var ps=chosen();
+    $('count').textContent = '該当 '+filtered().length+' 問／選択中 '+ps.length+' 問';
+    if(!ps.length){ $('sheet').innerHTML='<div class="empty">左で問題をえらぶと、ここにプリントが表示されます。</div>'; return; }
+    var withAns=$('optAns').checked, withName=$('optName').checked, withSpace=$('optSpace').checked;
+    var title=esc($('title').value||'応用チャレンジ 問題プリント');
+    var today=new Date().toLocaleDateString('ja-JP');
+    var h='<div class="section"><div class="head"><h2>'+title+'</h2>';
+    h+='<div class="meta">'+(withName?'名前 ____________　日付 ____________　':'')+'（'+today+' 作成・全'+ps.length+'問）</div></div>';
+    ps.forEach(function(p,i){
+      h+='<div class="q"><div class="qhead"><span class="qno">'+(i+1)+'.</span>'
+        +'<span class="badge">'+esc(p.source)+'・'+esc(p.field)+'・'+esc(p.needLevel)+'・'+stars(p.difficulty)+'</span></div>';
+      h+='<div class="stmt">'+mathify(p.statement)+'</div>';
+      if(p.figureNote) h+='<div class="fig">［図］'+mathify(p.figureNote)+'</div>';
+      if(withSpace) h+='<div class="space">（解答欄）</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+    if(withAns){
+      h+='<div class="section answers"><div class="head"><h2>'+title+'　別冊解説（指導者用）</h2><div class="meta">答え・段階ヒント・解説</div></div>';
+      ps.forEach(function(p,i){
+        h+='<div class="a"><div class="ahead">'+(i+1)+'. '+esc(p.title)+'　<span class="badge">'+esc(p.source)+(p.year?(' '+p.year):'')+'・'+esc(p.field)+'・'+esc(p.needLevel)+'</span></div>';
+        h+='<div class="ans">答え：'+mathify(p.answer)+'</div>';
+        if(p.hints&&p.hints.length){ h+='<div class="hints">'+p.hints.map(function(t,j){return 'ヒント'+(j+1)+'：'+mathify(t);}).join('<br>')+'</div>'; }
+        h+='<div class="sol">解説：'+mathify(p.solution)+'</div></div>';
+      });
+      h+='</div>';
+    }
+    $('sheet').innerHTML=h;
+  }
+
+  // 初期：全問選択
+  function selectAllFiltered(){ filtered().forEach(function(p){selected.add(p.id);}); }
+  function refresh(reset){ if(reset){ selected.clear(); selectAllFiltered(); } renderPick(); renderSheet(); }
+
+  ['fSource','fField','fLevel','fDiff'].forEach(function(id){ $(id).onchange=function(){ refresh(true); }; });
+  ['title','optAns','optName','optSpace'].forEach(function(id){ $(id).oninput=renderSheet; $(id).onchange=renderSheet; });
+  $('allBtn').onclick=function(){ selectAllFiltered(); renderPick(); renderSheet(); };
+  $('noneBtn').onclick=function(){ filtered().forEach(function(p){selected.delete(p.id);}); renderPick(); renderSheet(); };
+  $('printBtn').onclick=function(){ window.print(); };
+
+  refresh(true);
+  // KaTeX が遅れて読み込まれた場合に備え、ロード後に組み直す
+  window.addEventListener('load',function(){ if(typeof katex!=='undefined'){ MCACHE={}; renderSheet(); } });
+})();
+</script>
+</body>
+</html>

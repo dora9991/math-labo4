@@ -119,8 +119,8 @@
   .kanten-summary{display:flex;margin:0 0 12px;width:100%}
   .kanten-summary .kcell{flex:1;border:1px solid #111;border-right:0;min-width:0}
   .kanten-summary .kcell:last-child{border-right:1px solid #111}
-  .kanten-summary .klab{font-size:10.5px;text-align:center;border-bottom:1px solid #111;padding:3px 8px;background:#f3f4f6}
-  .kanten-summary .kval{font-size:13px;text-align:center;padding:8px;min-height:24px}
+  .kanten-summary .klab{font-size:10px;line-height:1.15;text-align:center;border-bottom:1px solid #111;padding:2px 4px;background:#f3f4f6}
+  .kanten-summary .kval{font-size:13px;text-align:right;padding:6px 8px 6px 4px;min-height:22px}
   .kanten-summary .kcell.total .klab{font-weight:800}
   .problems .daimon{break-inside:avoid}
   .paper .katex{font-size:0.92em}   /* KaTeXの数字を本文よりやや小さく */
@@ -141,7 +141,7 @@
 </head>
 <body>
 <header>
-  <h1>定期テスト作成ツール <span style="font-weight:400;opacity:.85;font-size:14px">中1 数学</span></h1>
+  <h1>定期テスト作成ツール <span id="gradeTitle" style="font-weight:400;opacity:.85;font-size:14px">中1 数学</span></h1>
   <p>問題データベースから、範囲・観点・配点に合わせてパターンの異なる問題を自動編成（100点/50分のめやす）</p>
 </header>
 
@@ -159,6 +159,12 @@
     </div>
     <div class="card">
       <h2>① テスト範囲</h2>
+      <label style="margin-top:0">学年</label>
+      <div class="row" id="gradeSel" style="margin-bottom:8px">
+        <button class="btn sec gradebtn" data-grade="中1" style="margin:0;padding:7px;font-size:13px">中1</button>
+        <button class="btn sec gradebtn" data-grade="中2" style="margin:0;padding:7px;font-size:13px">中2</button>
+        <button class="btn sec gradebtn" data-grade="中3" style="margin:0;padding:7px;font-size:13px">中3</button>
+      </div>
       <div class="row" style="margin-bottom:6px">
         <button class="btn sec" style="margin:0;padding:7px;font-size:12px" id="selAll">全選択</button>
         <button class="btn sec" style="margin:0;padding:7px;font-size:12px" id="selNone">全解除</button>
@@ -255,11 +261,18 @@
 
 <script src="problem_bank.js"></script>
 <script src="problem_bank_extra.js"></script>
+<script src="problem_bank_g2g3.js"></script>
 <script src="applied_bank.js"></script>
 <script src="applied_adapter.js"></script>
 <script>
 const BANK = (window.PROBLEM_BANK||[]).map(p=>({...p}));
-const UNIT_ORDER=['正の数・負の数','文字の式','方程式','比例と反比例','平面図形','空間図形','データの活用','応用問題'];
+const UNITS_BY_GRADE={
+  '中1':['正の数・負の数','文字の式','方程式','比例と反比例','平面図形','空間図形','データの活用','応用問題'],
+  '中2':['式の計算','連立方程式','一次関数','平行と合同','三角形と四角形','確率と統計','応用問題'],
+  '中3':['式の展開と因数分解','平方根','2次方程式','関数 y=ax²','相似な図形','円','三平方の定理','標本調査','応用問題'],
+};
+let GRADE='中1';
+let UNIT_ORDER=UNITS_BY_GRADE[GRADE];
 let exam=null;
 let dragSrc=null;   // ドラッグ並べ替えの掴んでいる問題 {d,i}
 
@@ -275,6 +288,7 @@ function runToTex(run){
   let s = run
     .replace(/(cm|mm|km|kg|mL|dL|kL|ha)/g,'\\text{$1}')   // 単位はローマン体で保護
     .replace(/−/g,'-')                       // 全角マイナス→-
+    .replace(/±/g,' \\pm ')                  // ±（中3の解 x=±… 等）
     .replace(/\.\.\.|…/g,' \\cdots ')
     .replace(/×/g,' \\times ')
     .replace(/÷/g,' \\div ')
@@ -299,7 +313,7 @@ function qualifyMath(t){
 /* 平文の中の「式のかたまり」だけを KaTeX で組版する。日本語の文・単位(cm等)・数字の羅列はそのまま。 */
 function autoTypeset(text){
   if(typeof katex==='undefined') return esc(text);
-  const re=/[0-9A-Za-z+−*×÷·・=<>≦≧≤≥:().,^²³⁴⁰¹⁵⁶⁷⁸⁹ⁿ√π \/\-]+/g;
+  const re=/[0-9A-Za-z+−*×÷·・=<>≦≧≤≥±:().,^²³⁴⁰¹⁵⁶⁷⁸⁹ⁿ√π \/\-]+/g;
   let out='',last=0,m;
   while((m=re.exec(text))){
     out+=esc(text.slice(last,m.index));
@@ -335,8 +349,8 @@ function buildUnitUI(){
   const box=$('units');
   box.innerHTML='';
   UNIT_ORDER.forEach(u=>{
-    const subs=[...new Set(BANK.filter(p=>p.unit===u).map(p=>p.subunit))];
-    const n=BANK.filter(p=>p.unit===u).length;
+    const subs=[...new Set(BANK.filter(p=>p.grade===GRADE && p.unit===u).map(p=>p.subunit))];
+    const n=BANK.filter(p=>p.grade===GRADE && p.unit===u).length;
     const row=document.createElement('div');row.className='unitrow';
     row.innerHTML=`
       <div class="uhead">
@@ -439,7 +453,7 @@ function buildExam(){
   const thinkRatio=(+$('thinkRatio').value||0)/100;
   const pace=+$('volume').value||1.8;
   const ratios=getRatios();
-  const pool=BANK.filter(p=>filt(p));
+  const pool=BANK.filter(p=>p.grade===GRADE && filt(p));
   if(!pool.length){toast('範囲に問題がありません。範囲を広げてください。');return null;}
   const know=pool.filter(p=>p.cognitive==='知識・技能');
   const think=pool.filter(p=>p.cognitive==='思考・判断・表現');
@@ -557,7 +571,7 @@ function headerHtml(cfg,{title,minutes,points}){
   </div>`;
 }
 function summaryHtml(cfg,{knowPts,thinkPts,totPts}){
-  const val={know:knowPts+'点',think:thinkPts+'点',shutai:'',total:totPts+'点'};
+  const val={know:'/'+knowPts,think:'/'+thinkPts,shutai:'',total:'/'+totPts};   // 右に満点（左に得点を書く）
   const ordMap={
     'k-t-s-sum':['know','think','shutai','total'],
     'sum-k-t-s':['total','know','think','shutai'],
@@ -643,11 +657,20 @@ function render(){
     const mult=spaceMult();
     const solve=isSolveDaimon(d);
     const dInstr=solve?'次の方程式を解きなさい。':d.instr;
+    // 2列パッキング: 隣と組めない問題は半分を空けず全幅で出す
+    const widths=new Array(d.items.length).fill('full');
+    if(pack){
+      const narrow=d.items.map(p=>!isWide(p,spaceUnitsFor(p)));
+      let i2=0;
+      while(i2<d.items.length){
+        if(narrow[i2] && i2+1<d.items.length && narrow[i2+1]){ widths[i2]='half'; widths[i2+1]='half'; i2+=2; }
+        else { widths[i2]='full'; i2++; }
+      }
+    }
     html+=`<div class="daimon ${isKnow?'knowd':'thinkd'}">
       <div class="dhead">
         <span class="dno">${d.no}</span>
         <span>${esc(dInstr)}</span>
-        <span class="dunit">${d.mixed?'':'［'+esc(d.unit)+'］'}</span>
         <span class="dpts">${ptsLabel(d)}</span>
       </div>
       <div class="items" style="grid-template-columns:repeat(${itemCols},1fr)">`;
@@ -655,7 +678,7 @@ function render(){
       const num=`(${i+1})`;
       const units=spaceUnitsFor(p);
       const h=units*mult;
-      const wide=!pack || isWide(p,units);
+      const wide=widths[i]==='full';
       const utag=d.mixed?`<span class="dunit" style="margin-right:4px">［${esc(p.unit)}］</span>`:'';
       const qShow=solve?stripSolveTail(p.q):p.q;   // 「解きなさい」系は冗長な末尾を除去
       // グリッド大問は問題側に空白を作らず、下の解答欄にまとめる
@@ -835,8 +858,23 @@ $('printBtn').onclick=()=>{
   el.addEventListener(ev,()=>{applyPageStyle();if(exam)render();});
 });
 
+/* ---------- 学年切り替え ---------- */
+function setGrade(g){
+  GRADE=g; UNIT_ORDER=UNITS_BY_GRADE[g];
+  document.querySelectorAll('#gradeSel .gradebtn').forEach(b=>{
+    const on=b.dataset.grade===g;
+    b.style.background=on?'var(--accent)':'#fff';
+    b.style.color=on?'#fff':'var(--accent)';
+  });
+  const t=$('gradeTitle'); if(t) t.textContent=g+' 数学';
+  buildUnitUI();
+  exam=null;
+  $('paper').innerHTML='<div class="empty">左の設定で範囲を選び「テストを自動作成」を押してください。</div>';
+}
+document.querySelectorAll('#gradeSel .gradebtn').forEach(b=>{ b.onclick=()=>setGrade(b.dataset.grade); });
+
 /* ---------- init ---------- */
-buildUnitUI();
+setGrade('中1');
 syncRatio();
 applyPageStyle();
 </script>
