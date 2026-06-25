@@ -85,14 +85,15 @@
   .daimon .dhead .dpts{margin-left:auto;font-size:12px;color:var(--sub);font-weight:600}
   .daimon.knowd .dhead{border-color:var(--know)}
   .daimon.thinkd .dhead{border-color:var(--think)}
-  .items{display:grid;grid-template-columns:1fr 1fr;gap:6px 26px;align-items:start}
+  .items{display:grid;grid-template-columns:1fr 1fr;gap:6px 26px;align-items:stretch}
   .items.single{grid-template-columns:1fr}
-  .qit{position:relative;font-size:13.5px;padding:3px 0}
+  .qit{display:flex;flex-direction:column;position:relative;font-size:13.5px;padding:3px 0}
   .qit.wide{grid-column:1/-1}
-  .qit .qn{font-weight:700;display:inline-block;width:28px;vertical-align:top}
-  .qit .qbody{display:inline-block;width:calc(100% - 34px);vertical-align:top}
+  .qit .qrow{display:flex;gap:6px;align-items:flex-start}
+  .qit .qn{font-weight:700;min-width:28px}
+  .qit .qbody{flex:1;min-width:0}
   .qit .qpt{font-size:10.5px;color:var(--sub);margin-left:4px}
-  .calc-space{margin:3px 0 7px 34px;border-bottom:1px solid #aaa}
+  .calc-space{flex:1;border-bottom:1px solid #aaa;margin:3px 0 0 34px}
   .spc-ctl{position:absolute;right:32px;bottom:0;font-size:10px;color:var(--accent);opacity:0;background:#fff;padding:0 2px}
   .qit:hover .spc-ctl{opacity:1}
   .spc-ctl b{cursor:pointer;border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-left:4px;background:#fff}
@@ -252,12 +253,28 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 /* $...$ で囲まれた部分だけ KaTeX で数式組版し、残りは通常どおりエスケープ。
    ・$ が無い問題は従来どおり（既存データを書き換えなくてよい）
    ・$ の数が奇数（閉じ忘れ）や KaTeX 未読込のときは素のテキストにフォールバック */
+/* 平文の中の「a/b」分数を自動で KaTeX の縦組み分数にする（データに $...$ が無くてもOK）。
+   符号(- − －)付きにも対応。数字/数字のみ対象なので "km/h" 等は変換しない。 */
+function autoFrac(text){
+  if(typeof katex==='undefined') return esc(text);
+  const re=/([\-−－]?)(\d+)\s*\/\s*(\d+)/g;
+  let out='',last=0,m;
+  while((m=re.exec(text))){
+    out+=esc(text.slice(last,m.index));
+    const sign=m[1]?'-':'';
+    try{ out+=katex.renderToString(`${sign}\\frac{${m[2]}}{${m[3]}}`,{throwOnError:false}); }
+    catch(e){ out+=esc(m[0]); }
+    last=m.index+m[0].length;
+  }
+  return out+esc(text.slice(last));
+}
 function mathify(s){
   s=String(s);
-  if(s.indexOf('$')===-1 || typeof katex==='undefined') return esc(s);
-  if((s.split('$').length-1)%2!==0) return esc(s);   // $ が奇数＝閉じ忘れ → そのまま表示
+  if(typeof katex==='undefined') return esc(s);
+  if(s.indexOf('$')===-1) return autoFrac(s);
+  if((s.split('$').length-1)%2!==0) return autoFrac(s);   // $ が奇数＝閉じ忘れ → 分数だけ自動変換
   return s.split('$').map((part,idx)=>{
-    if(idx%2===0) return esc(part);                   // 偶数番＝通常テキスト
+    if(idx%2===0) return autoFrac(part);                  // 偶数番＝通常テキスト（分数は自動変換）
     try{ return katex.renderToString(part,{throwOnError:false}); }
     catch(e){ return esc('$'+part+'$'); }
   }).join('');
@@ -490,7 +507,7 @@ function summaryHtml(cfg,{knowPts,thinkPts,totPts}){
 }
 
 /* ---------- 計算スペース＆2列パッキング（Phase2） ---------- */
-const SPACE_EM={none:0,small:1.1,std:1.6,large:2.2};   // 1行あたりの高さ(em)
+const SPACE_EM={none:0,small:1.4,std:2.0,large:2.8};   // 1行あたりの高さ(em)
 function spaceMult(){const v=SPACE_EM[$('calcSpace').value]; return v==null?1.6:v;}
 /* 問題が必要とする計算スペースの「行数」。手動上書き(p.spaceLines)を最優先。 */
 function spaceUnitsFor(p){
@@ -500,7 +517,7 @@ function spaceUnitsFor(p){
   if(f==='証明') return 6;
   if(f==='文章題') return 5;
   if(p.cognitive==='思考・判断・表現') return Math.max(3,lvl+1);
-  if(f==='計算'||f==='一行問題') return lvl>=3?3:(lvl>=2?2:1);
+  if(f==='計算'||f==='一行問題') return lvl>=3?3:2;   // 基礎・標準=2行ぶん、応用=3行ぶん
   return 2;
 }
 /* 全幅(1列)で出すべき「難しい/長い」問題か。簡単なものは半幅で2つ並ぶ。 */
@@ -576,10 +593,9 @@ function render(){
       const wide=!pack || isWide(p,units);
       const utag=d.mixed?`<span class="dunit" style="margin-right:4px">［${esc(p.unit)}］</span>`:'';
       // グリッド大問は問題側に空白を作らず、下の解答欄にまとめる
-      const spaceHtml=(!useGrid && h>0)?`<div class="calc-space" style="height:${h.toFixed(1)}em"></div>`:'';
+      const spaceHtml=(!useGrid && h>0)?`<div class="calc-space" style="min-height:${h.toFixed(1)}em"></div>`:'';
       html+=`<div class="qit ${wide?'wide':''}" data-d="${d.no}" data-i="${i}">
-        <span class="qn">${num}</span>
-        <span class="qbody">${utag}${mathify(p.q)}<span class="qpt">[${p.pts}点]</span></span>
+        <div class="qrow"><span class="qn">${num}</span><span class="qbody">${utag}${mathify(p.q)}<span class="qpt">[${p.pts}点]</span></span></div>
         ${spaceHtml}
         <span class="spc-ctl noprint">空白<b data-act="dec">−</b><b data-act="inc">＋</b></span>
         <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
