@@ -94,7 +94,11 @@
   .qit .qn{font-weight:700;min-width:28px}
   .qit .qbody{flex:1;min-width:0}
   .qit .qpt{font-size:10.5px;color:var(--sub);margin-left:4px}
-  .calc-space{flex:1;border-bottom:1px solid #aaa;margin:3px 0 0 34px}
+  .calc-space{flex:1;border-bottom:1px solid #aaa;margin:3px 0 0 34px;position:relative}
+  .space-grip{position:absolute;left:0;right:0;bottom:-5px;height:10px;cursor:ns-resize;opacity:0;touch-action:none}
+  .calc-space:hover .space-grip{opacity:1}
+  .space-grip::after{content:'';position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:28px;height:3px;background:var(--accent);border-radius:2px}
+  .page-guide{font-family:system-ui,sans-serif}
   .spc-ctl{position:absolute;right:32px;bottom:0;font-size:10px;color:var(--accent);opacity:0;background:#fff;padding:0 2px}
   .qit:hover .spc-ctl{opacity:1}
   .spc-ctl b{cursor:pointer;border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-left:4px;background:#fff}
@@ -122,7 +126,7 @@
   .kanten-summary .kcell{flex:1;border:1px solid #111;border-right:0;min-width:0}
   .kanten-summary .kcell:last-child{border-right:1px solid #111}
   .kanten-summary .klab{font-size:10px;line-height:1.15;text-align:center;border-bottom:1px solid #111;padding:2px 4px;background:#f3f4f6}
-  .kanten-summary .kval{font-size:13px;text-align:right;padding:6px 8px 6px 4px;min-height:22px}
+  .kanten-summary .kval{font-size:13px;display:flex;align-items:flex-end;justify-content:flex-end;padding:4px 8px 3px 4px;min-height:3em}
   .kanten-summary .kcell.total .klab{font-weight:800}
   .problems .daimon{break-inside:avoid}
   .paper .katex{font-size:0.92em}   /* KaTeXの数字を本文よりやや小さく */
@@ -135,7 +139,8 @@
     body{background:#fff}
     .noprint{display:none !important}
     .wrap{display:block;max-width:none;padding:0;margin:0}
-    .paper{border:0;border-radius:0;padding:0}
+    .paper{border:0!important;border-radius:0;padding:0!important;min-height:0!important;width:auto!important;margin:0!important;box-shadow:none!important}
+    .page-guide{display:none!important}
     header{display:none}
     @page{margin:14mm 12mm}
   }
@@ -227,16 +232,16 @@
             <option value="t-k-s-sum">思判・知技・(主体)・合計</option>
           </select></div>
       </div>
-      <label style="margin-top:14px">計算スペース（自動・問題ごと）</label>
+      <label style="margin-top:14px">空白（計算スペース）</label>
       <select id="calcSpace"><option value="none">なし</option><option value="small">小</option><option value="std" selected>標準</option><option value="large">大</option></select>
       <label><input type="checkbox" id="pack2up" checked style="width:auto"> 簡単な問題は1列に2つ並べる（難問は1つ）</label>
-      <label>解答欄の形式</label>
+      <label>解答欄（枠）※空白とは別に付けられます</label>
       <select id="answerStyle">
-        <option value="auto" selected>自動（計算・短答は枠／記述は空白）</option>
-        <option value="inline">すべて空白（計算スペース）</option>
-        <option value="grid">すべて解答欄グリッド</option>
+        <option value="none" selected>なし</option>
+        <option value="auto">計算・短答の大問に付ける</option>
+        <option value="grid">すべての大問に付ける</option>
       </select>
-      <p class="hint">並び順の細かい入れ替えは後で追加できます。各問題は作成後、マウスを乗せると出る「空白 −／＋」で個別に調整できます。</p>
+      <p class="hint">「空白」と「解答欄(枠)」は独立。各問の空白は、作成後にマウスを乗せると出る「−／＋」か、空白の下線をドラッグして伸縮できます。</p>
     </div>
 
     <div class="card">
@@ -263,7 +268,7 @@
 
 <script src="problem_bank.js"></script>
 <script src="problem_bank_extra.js"></script>
-<script src="problem_bank_g2g3.js"></script>
+<script src="problem_bank_g2g3.js?v=1500"></script>
 <script src="applied_bank.js"></script>
 <script src="applied_adapter.js"></script>
 <script>
@@ -541,6 +546,37 @@ function applyPageStyle(cfg){
   paper.style.width=w+'mm';
   paper.style.maxWidth='100%';
   paper.style.margin='0 auto';
+  paper.style.padding='14mm 12mm';        // 余白を実寸に（印刷と一致）
+  paper.style.position='relative';
+  drawPageGuides(cfg);
+}
+/* 指定用紙で何枚になるか・ページ境界を視覚化（画面のみ／印刷には出ない） */
+function drawPageGuides(cfg){
+  cfg=cfg||readLayout();
+  const paper=$('paper'); if(!paper) return;
+  paper.querySelectorAll('.page-guide').forEach(e=>e.remove());
+  const [s,l]=PAPER[cfg.paperSize]||PAPER.A4;
+  const wmm=cfg.orientation==='landscape'?l:s, hmm=cfg.orientation==='landscape'?s:l;
+  const rect=paper.getBoundingClientRect(); if(!rect.width) return;
+  const pxPerMm=rect.width/wmm;
+  const pageContent=(hmm-28)*pxPerMm;                 // 上下余白14mm×2を除いた1枚の高さ
+  const cssp=getComputedStyle(paper);
+  const padTop=parseFloat(cssp.paddingTop)||0, padBot=parseFloat(cssp.paddingBottom)||0;
+  paper.style.minHeight=(pageContent+padTop+padBot)+'px';   // 短くても1枚ぶんは枠を見せる
+  const contentH=Math.max(0,paper.scrollHeight-padTop-padBot);
+  const pages=Math.max(1,Math.ceil(contentH/pageContent-0.02));
+  for(let i=1;i<pages;i++){
+    const ln=document.createElement('div');
+    ln.className='page-guide noprint';
+    ln.style.cssText='position:absolute;left:0;right:0;top:'+(padTop+i*pageContent)+'px;border-top:2px dashed #f59e0b;z-index:6;pointer-events:none';
+    ln.innerHTML='<span style="position:absolute;right:4px;top:0;font-size:10px;color:#b45309;background:#fffbeb;padding:0 6px;border-radius:0 0 6px 6px">'+(i+1)+'枚目 ▼</span>';
+    paper.appendChild(ln);
+  }
+  const badge=document.createElement('div');
+  badge.className='page-guide noprint';
+  badge.style.cssText='position:absolute;left:0;top:-20px;font-size:11px;color:#b45309;font-weight:700';
+  badge.textContent=cfg.paperSize+(cfg.orientation==='landscape'?' 横':' 縦')+'：約'+pages+'枚に収まります';
+  paper.appendChild(badge);
 }
 /* 「解きなさい」系の大問（方程式）は、各問の冗長な末尾（…を解きなさい。/ x=？）を消して
    大問見出しに集約する。 */
@@ -685,7 +721,8 @@ function render(){
       const utag=d.mixed?`<span class="dunit" style="margin-right:4px">［${esc(p.unit)}］</span>`:'';
       const qShow=solve?stripSolveTail(p.q):p.q;   // 「解きなさい」系は冗長な末尾を除去
       // グリッド大問は問題側に空白を作らず、下の解答欄にまとめる
-      const spaceHtml=(!useGrid && h>0)?`<div class="calc-space" style="min-height:${h.toFixed(1)}em"></div>`:'';
+      // 空白(計算スペース)は解答欄(枠)とは独立に付ける
+      const spaceHtml=(h>0)?`<div class="calc-space" style="min-height:${h.toFixed(1)}em"><span class="space-grip noprint" data-d="${d.no}" data-i="${i}"></span></div>`:'';
       html+=`<div class="qit ${wide?'wide':''}" data-d="${d.no}" data-i="${i}">
         <div class="qrow"><span class="qn" draggable="true" title="番号をドラッグして問題を入れ替え">${mathify(num)}</span><span class="qbody">${utag}${mathify(qShow)}<span class="qpt">[${p.pts}点]</span></span></div>
         ${spaceHtml}
@@ -717,6 +754,7 @@ function render(){
   bindSwap();
   try{ localStorage.setItem('em_exam', JSON.stringify({grade:typeof GRADE!=='undefined'?GRADE:'中1', exam})); }catch(_){}
   if(window.mountPendingFigure) window.mountPendingFigure();   // 再生成後も前面の図形を残す
+  drawPageGuides();   // 内容に合わせてページ境界を再計算
 }
 function renderDiffBar(daimon, totPts){
   const items=daimon.flatMap(d=>d.items);
@@ -791,6 +829,25 @@ function bindSwap(){
   $('paper').querySelectorAll('.colsel').forEach(b=>b.onclick=()=>{
     const d=exam.daimon.find(x=>x.no===+b.dataset.d); if(!d) return;
     d.forceSingle=!d.forceSingle; render();
+  });
+  // 空白の下線をドラッグして直感的に伸縮
+  $('paper').querySelectorAll('.space-grip').forEach(g=>g.onpointerdown=e=>{
+    e.preventDefault(); e.stopPropagation();
+    const cs=g.closest('.calc-space'), qit=g.closest('.qit');
+    const dno=+qit.dataset.d, idx=+qit.dataset.i;
+    const startY=e.clientY, startH=cs.getBoundingClientRect().height;
+    const fontPx=parseFloat(getComputedStyle(qit).fontSize)||13.5;
+    const perUnit=Math.max(1,spaceMult()*fontPx);
+    let lastH=startH;
+    try{g.setPointerCapture(e.pointerId);}catch(_){}
+    g.onpointermove=ev=>{ lastH=Math.max(0,startH+(ev.clientY-startY)); cs.style.minHeight=lastH+'px'; };
+    g.onpointerup=ev=>{
+      try{g.releasePointerCapture(ev.pointerId);}catch(_){}
+      g.onpointermove=null; g.onpointerup=null;
+      const d=exam.daimon.find(x=>x.no===dno);
+      if(d&&d.items[idx]) d.items[idx].spaceLines=Math.max(0,Math.round(lastH/perUnit));
+      render();
+    };
   });
   $('paper').querySelectorAll('.spc-ctl b').forEach(b=>b.onclick=()=>{
     const qit=b.closest('.qit'); const dno=+qit.dataset.d, idx=+qit.dataset.i;
