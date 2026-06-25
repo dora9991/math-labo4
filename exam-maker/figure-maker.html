@@ -19,71 +19,68 @@
     background:var(--bg); color:var(--ink);
     display:flex; flex-direction:column; height:100dvh; overflow:hidden;
   }
-  header{padding:10px 14px 4px; }
+  header{padding:10px 14px 4px;}
   header h1{font-size:16px;margin:0 0 2px}
   header p{margin:0;font-size:12px;color:var(--sub);line-height:1.5}
-  .toolbar{
-    display:flex;flex-wrap:wrap;gap:8px;padding:8px 14px;
-    border-bottom:1px solid #e2e8f0; background:var(--panel);
-  }
-  button{
-    font:inherit;font-size:14px;font-weight:600;
-    padding:9px 14px;border-radius:11px;border:1px solid #cbd5e1;
-    background:#fff;color:var(--ink);cursor:pointer; touch-action:manipulation;
-  }
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:8px 14px;border-bottom:1px solid #e2e8f0;background:var(--panel)}
+  button{font:inherit;font-size:14px;font-weight:600;padding:9px 14px;border-radius:11px;border:1px solid #cbd5e1;background:#fff;color:var(--ink);cursor:pointer;touch-action:manipulation}
   button:active{transform:translateY(1px)}
   button.primary{background:var(--vtx);border-color:var(--vtx);color:#fff}
+  button.go{background:#059669;border-color:#059669;color:#fff}
   button.danger{color:#b91c1c;border-color:#fecaca;background:#fff5f5}
   button.ghost{background:transparent;border-color:transparent;color:var(--sub)}
   .spacer{flex:1}
   .stage{flex:1;position:relative;overflow:hidden;background:
      linear-gradient(#eef2f7 1px,transparent 1px) 0 0/24px 24px,
-     linear-gradient(90deg,#eef2f7 1px,transparent 1px) 0 0/24px 24px,
-     #fff;}
+     linear-gradient(90deg,#eef2f7 1px,transparent 1px) 0 0/24px 24px,#fff;}
   svg{display:block;width:100%;height:100%;touch-action:none}
-  polygon.body{fill:var(--fill);stroke:none}
+  polygon.body{fill:var(--fill);stroke:none;cursor:move}
   line.edge{stroke:var(--line);stroke-width:var(--line-w);stroke-linecap:round}
   line.hit{stroke:transparent;stroke-width:22;stroke-linecap:round;cursor:move}
+  path.dim{fill:none;stroke:var(--line);stroke-width:1.6}
   circle.vtx{fill:#fff;stroke:var(--vtx);stroke-width:2.5;cursor:grab}
   circle.vtx.active{fill:var(--vtx-active);stroke:var(--vtx-active)}
+  circle.vtx.snap{fill:#16a34a;stroke:#16a34a}
+  g.shape:not(.sel) circle.vtx{display:none}
   g.shape.sel polygon.body{fill:rgba(245,158,11,.10)}
   g.shape.sel line.edge{stroke:var(--sel)}
-  g.shape.sel circle.vtx{stroke:var(--sel)}
   text.lbl{font-size:15px;font-weight:700;fill:#111;paint-order:stroke;
     stroke:#fff;stroke-width:4px;stroke-linejoin:round;
     text-anchor:middle;dominant-baseline:middle;user-select:none;pointer-events:none}
+  text.len{stroke-width:7px}
   text.albl{fill:#b91c1c}
+  text.nm{font-size:17px;font-weight:800;fill:#1e3a8a;paint-order:stroke;
+    stroke:#fff;stroke-width:4px;stroke-linejoin:round;
+    text-anchor:middle;dominant-baseline:middle;user-select:none;pointer-events:auto;cursor:pointer}
   #editor{position:fixed;display:none;z-index:50;transform:translate(-50%,-130%)}
-  #editor input{
-    width:96px;font:inherit;font-size:15px;font-weight:700;text-align:center;
-    padding:6px 8px;border:2px solid var(--vtx);border-radius:9px;
-    box-shadow:0 6px 22px rgba(0,0,0,.18);background:#fff;
-  }
+  #editor input{width:96px;font:inherit;font-size:15px;font-weight:700;text-align:center;
+    padding:6px 8px;border:2px solid var(--vtx);border-radius:9px;box-shadow:0 6px 22px rgba(0,0,0,.18);background:#fff}
   .hint{position:absolute;left:12px;bottom:10px;font-size:11px;color:var(--sub);
     background:rgba(255,255,255,.85);padding:4px 8px;border-radius:8px;pointer-events:none}
-  .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    color:#94a3b8;font-size:14px;pointer-events:none}
+  .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:14px;pointer-events:none}
 </style>
 </head>
 <body>
 <header>
   <h1>図形メーカー <span style="font-size:11px;color:var(--sub);font-weight:400">プロトタイプ</span></h1>
-  <p>ボタンで図形を出す ／ <b>頂点</b>をドラッグで変形 ／ <b>辺</b>をドラッグで移動 ／ <b>辺をタップ</b>で長さ ／ <b>頂点をタップ</b>で角度</p>
+  <p>図形をタップで<b>選択</b>→頂点ドラッグで変形 ／ 中／辺ドラッグで移動 ／ 選択中に<b>辺タップ</b>=長さ・<b>頂点タップ</b>=角度・<b>名前タップ</b>=名前変更</p>
 </header>
 
 <div class="toolbar">
   <button class="primary" data-add="3">▲ 三角形</button>
   <button class="primary" data-add="4">■ 四角形</button>
   <button class="primary" data-add="5">⬠ 五角形</button>
+  <button class="primary" id="seg">／ 線分</button>
   <span class="spacer"></span>
   <button class="danger" id="del">選択を削除</button>
   <button class="ghost" id="clear">全消去</button>
+  <button class="go" id="export">出力 → exam-maker へ ▶</button>
 </div>
 
 <div class="stage" id="stage">
   <svg id="svg" viewBox="0 0 800 560" preserveAspectRatio="xMidYMid meet"></svg>
   <div class="empty" id="empty">上のボタンから図形を追加してください</div>
-  <div class="hint">タップ＝ラベル入力 ／ ドラッグ＝動かす</div>
+  <div class="hint">タップ＝選択／入力 ／ ドラッグ＝動かす ／ 線分の端は頂点にスナップ</div>
 </div>
 
 <div id="editor"><input id="lblInput" type="text" inputmode="text" autocomplete="off"></div>
@@ -91,7 +88,6 @@
 <script>
 const SVGNS="http://www.w3.org/2000/svg";
 const svg=document.getElementById("svg");
-const stage=document.getElementById("stage");
 const emptyEl=document.getElementById("empty");
 const editor=document.getElementById("editor");
 const lblInput=document.getElementById("lblInput");
@@ -100,25 +96,32 @@ let shapes=[];
 let uid=1;
 let selId=null;
 const TAP_DIST=6;
+const DIM_OFF=26;
+const SNAP=14;
 
 function regular(n,cx,cy,r,rot){
   const p=[];
-  for(let i=0;i<n;i++){
-    const a=rot + i*2*Math.PI/n;
-    p.push({x:cx+r*Math.cos(a), y:cy+r*Math.sin(a)});
-  }
+  for(let i=0;i<n;i++){const a=rot+i*2*Math.PI/n; p.push({x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)});}
   return p;
+}
+function letters(n){return Array.from({length:n},(_,i)=>String.fromCharCode(65+i));}
+function EC(s){return s.closed?s.pts.length:s.pts.length-1;}
+
+function makeShape(o){
+  const s=Object.assign({id:uid++,dom:null},o);
+  shapes.push(s); selId=s.id; buildDom(s); refreshEmpty(); return s;
 }
 function addShape(n){
   const off=(shapes.length%4)*26;
   let pts;
   if(n===4) pts=[{x:-80,y:-70},{x:80,y:-70},{x:80,y:70},{x:-80,y:70}].map(p=>({x:p.x+400+off,y:p.y+260+off}));
   else pts=regular(n,400+off,260+off,95,-Math.PI/2);
-  const s={id:uid++, pts, elen:Array(n).fill(""), ang:Array(n).fill(""), dom:null};
-  shapes.push(s);
-  selId=s.id;
-  buildDom(s);
-  refreshEmpty();
+  makeShape({closed:true, pts, name:letters(n), elen:Array(n).fill(""), ang:Array(n).fill("")});
+}
+function addSegment(){
+  const off=(shapes.length%4)*26;
+  const pts=[{x:300+off,y:300+off},{x:500+off,y:300+off}];
+  makeShape({closed:false, pts, name:["",""], elen:["",""], ang:["",""]});
 }
 
 function el(tag,attrs){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
@@ -126,91 +129,96 @@ function el(tag,attrs){const e=document.createElementNS(SVGNS,tag);for(const k i
 function buildDom(s){
   const g=el("g",{class:"shape"}); g.dataset.id=s.id;
   const body=el("polygon",{class:"body"});
+  if(s.closed){ body.dataset.kind="body"; body.dataset.id=s.id; } else body.style.display="none";
   g.appendChild(body);
-  const edges=[],verts=[];
-  const n=s.pts.length;
-  for(let i=0;i<n;i++){
-    const edge=el("line",{class:"edge"});
-    const hit=el("line",{class:"hit"}); hit.dataset.kind="edge"; hit.dataset.id=s.id; hit.dataset.idx=i;
-    g.appendChild(edge); g.appendChild(hit);
-    edges.push(edge);
-  }
-  const et=[],at=[];
-  for(let i=0;i<n;i++){
-    const t=el("text",{class:"lbl"}); g.appendChild(t); et.push(t);
-    const a=el("text",{class:"lbl albl"}); g.appendChild(a); at.push(a);
+  const n=s.pts.length, ec=EC(s);
+  const arc=[],edge=[],hit=[],elen=[],verts=[],nm=[],ang=[];
+  for(let i=0;i<ec;i++){
+    arc.push(g.appendChild(el("path",{class:"dim"})));
+    edge.push(g.appendChild(el("line",{class:"edge"})));
+    const h=el("line",{class:"hit"}); h.dataset.kind="edge"; h.dataset.id=s.id; h.dataset.idx=i;
+    hit.push(g.appendChild(h));
+    elen.push(g.appendChild(el("text",{class:"lbl len"})));
   }
   for(let i=0;i<n;i++){
     const c=el("circle",{class:"vtx",r:9}); c.dataset.kind="vtx"; c.dataset.id=s.id; c.dataset.idx=i;
-    g.appendChild(c); verts.push(c);
+    verts.push(g.appendChild(c));
+  }
+  for(let i=0;i<n;i++){
+    ang.push(g.appendChild(el("text",{class:"lbl albl"})));
+    const t=el("text",{class:"nm"}); t.dataset.kind="name"; t.dataset.id=s.id; t.dataset.idx=i;
+    nm.push(g.appendChild(t));
   }
   svg.appendChild(g);
-  s.dom={g,body,edges,verts,elen:et,ang:at,hits:[...g.querySelectorAll("line.hit")]};
-  updateDom(s);
-  markSel();
+  s.dom={g,body,arc,edge,hit,elen,verts,nm,ang};
+  updateDom(s); markSel();
 }
 
-function centroid(pts){
-  let x=0,y=0; pts.forEach(p=>{x+=p.x;y+=p.y;}); return {x:x/pts.length,y:y/pts.length};
-}
+function centroid(pts){let x=0,y=0;pts.forEach(p=>{x+=p.x;y+=p.y;});return {x:x/pts.length,y:y/pts.length};}
+function show(e,on){e.style.display=on?"":"none";}
 
 function updateDom(s){
-  const p=s.pts,n=p.length,d=s.dom,c=centroid(p);
-  const ptsStr=p.map(q=>q.x+","+q.y).join(" ");
-  d.body.setAttribute("points",ptsStr);
-  for(let i=0;i<n;i++){
+  const p=s.pts,n=p.length,d=s.dom,c=centroid(p),ec=EC(s);
+  if(s.closed) d.body.setAttribute("points",p.map(q=>q.x+","+q.y).join(" "));
+  for(let i=0;i<ec;i++){
     const a=p[i], b=p[(i+1)%n];
-    d.edges[i].setAttribute("x1",a.x);d.edges[i].setAttribute("y1",a.y);
-    d.edges[i].setAttribute("x2",b.x);d.edges[i].setAttribute("y2",b.y);
-    d.hits[i].setAttribute("x1",a.x);d.hits[i].setAttribute("y1",a.y);
-    d.hits[i].setAttribute("x2",b.x);d.hits[i].setAttribute("y2",b.y);
-    const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
-    let ox=mx-c.x,oy=my-c.y; const ol=Math.hypot(ox,oy)||1; ox/=ol;oy/=ol;
-    const t=d.elen[i];
-    t.textContent=s.elen[i]||"";
-    t.setAttribute("x",mx+ox*18); t.setAttribute("y",my+oy*18);
+    d.edge[i].setAttribute("x1",a.x);d.edge[i].setAttribute("y1",a.y);
+    d.edge[i].setAttribute("x2",b.x);d.edge[i].setAttribute("y2",b.y);
+    d.hit[i].setAttribute("x1",a.x);d.hit[i].setAttribute("y1",a.y);
+    d.hit[i].setAttribute("x2",b.x);d.hit[i].setAttribute("y2",b.y);
+    const txt=s.elen[i]||"";
+    d.elen[i].textContent=txt;
+    show(d.arc[i],!!txt);
+    if(txt){
+      const ex=b.x-a.x,ey=b.y-a.y,L=Math.hypot(ex,ey)||1;
+      let nx=-ey/L,ny=ex/L; const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+      if((mx-c.x)*nx+(my-c.y)*ny<0){nx=-nx;ny=-ny;}
+      const cpx=mx+nx*2*DIM_OFF, cpy=my+ny*2*DIM_OFF;
+      const apx=mx+nx*DIM_OFF, apy=my+ny*DIM_OFF;
+      d.arc[i].setAttribute("d","M "+a.x+" "+a.y+" Q "+cpx+" "+cpy+" "+b.x+" "+b.y);
+      d.elen[i].setAttribute("x",apx); d.elen[i].setAttribute("y",apy);
+    }
   }
   for(let i=0;i<n;i++){
-    d.verts[i].setAttribute("cx",p[i].x); d.verts[i].setAttribute("cy",p[i].y);
-    let ix=c.x-p[i].x, iy=c.y-p[i].y; const il=Math.hypot(ix,iy)||1; ix/=il;iy/=il;
-    const a=d.ang[i];
-    a.textContent=s.ang[i]||"";
-    a.setAttribute("x",p[i].x+ix*26); a.setAttribute("y",p[i].y+iy*26);
+    const v=p[i];
+    d.verts[i].setAttribute("cx",v.x); d.verts[i].setAttribute("cy",v.y);
+    let ox=v.x-c.x,oy=v.y-c.y; const ol=Math.hypot(ox,oy)||1; ox/=ol;oy/=ol;
+    d.nm[i].textContent=s.name[i]||"";
+    d.nm[i].setAttribute("x",v.x+ox*22); d.nm[i].setAttribute("y",v.y+oy*22);
+    d.ang[i].textContent=s.ang[i]||"";
+    d.ang[i].setAttribute("x",v.x-ox*26); d.ang[i].setAttribute("y",v.y-oy*26);
   }
 }
 
-function markSel(){
-  shapes.forEach(s=>{ if(s.dom) s.dom.g.classList.toggle("sel", s.id===selId); });
-}
+function markSel(){shapes.forEach(s=>{if(s.dom)s.dom.g.classList.toggle("sel",s.id===selId);});}
 function getShape(id){return shapes.find(s=>s.id==id);}
 function refreshEmpty(){emptyEl.style.display=shapes.length?"none":"flex";}
 
-function toSvg(clientX,clientY){
-  const m=svg.getScreenCTM().inverse();
-  const p=svg.createSVGPoint(); p.x=clientX;p.y=clientY;
-  const r=p.matrixTransform(m); return {x:r.x,y:r.y};
-}
-function toScreen(x,y){
-  const m=svg.getScreenCTM();
-  const p=svg.createSVGPoint(); p.x=x;p.y=y;
-  const r=p.matrixTransform(m); return {x:r.x,y:r.y};
+function toSvg(cx,cy){const m=svg.getScreenCTM().inverse();const p=svg.createSVGPoint();p.x=cx;p.y=cy;const r=p.matrixTransform(m);return{x:r.x,y:r.y};}
+function toScreen(x,y){const m=svg.getScreenCTM();const p=svg.createSVGPoint();p.x=x;p.y=y;const r=p.matrixTransform(m);return{x:r.x,y:r.y};}
+
+function snapPoint(np, selfShape, selfIdx){
+  let bd=SNAP, best=null;
+  shapes.forEach(s=>s.pts.forEach((q,j)=>{
+    if(s===selfShape && j===selfIdx) return;
+    const dd=Math.hypot(q.x-np.x,q.y-np.y);
+    if(dd<bd){bd=dd; best={x:q.x,y:q.y};}
+  }));
+  return best;
 }
 
 let act=null;
 svg.addEventListener("pointerdown",e=>{
-  const t=e.target;
-  const kind=t.dataset && t.dataset.kind;
-  if(!kind){ selId=null; markSel(); hideEditor(); return; }
+  const t=e.target, kind=t.dataset&&t.dataset.kind;
+  if(!kind){selId=null;markSel();hideEditor();return;}
   const s=getShape(t.dataset.id); if(!s) return;
-  const idx=+t.dataset.idx;
-  selId=s.id; markSel();
-  svg.appendChild(s.dom.g);
+  const idx=t.dataset.idx!=null?+t.dataset.idx:-1;
+  const wasSel=(selId===s.id);
+  selId=s.id; markSel(); svg.appendChild(s.dom.g);
   const p=toSvg(e.clientX,e.clientY);
-  act={kind,s,idx,sx:p.x,sy:p.y,moved:false,
-       orig:s.pts.map(q=>({x:q.x,y:q.y}))};
+  act={kind,s,idx,wasSel,sx:p.x,sy:p.y,moved:false,orig:s.pts.map(q=>({x:q.x,y:q.y}))};
   if(kind==="vtx") s.dom.verts[idx].classList.add("active");
-  svg.setPointerCapture(e.pointerId);
-  hideEditor();
+  svg.setPointerCapture(e.pointerId); hideEditor();
 });
 svg.addEventListener("pointermove",e=>{
   if(!act) return;
@@ -220,64 +228,121 @@ svg.addEventListener("pointermove",e=>{
   if(!act.moved) return;
   const s=act.s;
   if(act.kind==="vtx"){
-    s.pts[act.idx]={x:act.orig[act.idx].x+dx, y:act.orig[act.idx].y+dy};
-  }else{
-    s.pts=act.orig.map(q=>({x:q.x+dx,y:q.y+dy}));
+    let np={x:act.orig[act.idx].x+dx, y:act.orig[act.idx].y+dy};
+    const sn=snapPoint(np,s,act.idx);
+    const cl=s.dom.verts[act.idx].classList;
+    if(sn){np=sn; cl.add("snap");} else cl.remove("snap");
+    s.pts[act.idx]=np; updateDom(s);
+  }else if(act.kind==="edge"||act.kind==="body"){
+    s.pts=act.orig.map(q=>({x:q.x+dx,y:q.y+dy})); updateDom(s);
   }
-  updateDom(s);
 });
 svg.addEventListener("pointerup",e=>{
   if(!act) return;
   const a=act; act=null;
-  if(a.kind==="vtx") a.s.dom.verts[a.idx].classList.remove("active");
+  if(a.kind==="vtx"){a.s.dom.verts[a.idx].classList.remove("active");a.s.dom.verts[a.idx].classList.remove("snap");}
   try{svg.releasePointerCapture(e.pointerId);}catch(_){}
-  if(!a.moved){
+  if(!a.moved && a.wasSel){
     if(a.kind==="edge") openEditor(a.s,"elen",a.idx);
-    else openEditor(a.s,"ang",a.idx);
+    else if(a.kind==="vtx" && a.s.closed) openEditor(a.s,"ang",a.idx);
+    else if(a.kind==="name") openEditor(a.s,"name",a.idx);
   }
 });
 
 let edTarget=null;
 function openEditor(s,field,idx){
   edTarget={s,field,idx};
-  const cur=(field==="elen"?s.elen[idx]:s.ang[idx])||"";
+  const cur=(field==="elen"?s.elen[idx]:field==="ang"?s.ang[idx]:s.name[idx])||"";
   lblInput.value=cur;
-  lblInput.placeholder=field==="elen"?"長さ 例:6cm":"角度 例:60";
-  let px,py;
-  if(field==="elen"){const a=s.pts[idx],b=s.pts[(idx+1)%s.pts.length];px=(a.x+b.x)/2;py=(a.y+b.y)/2;}
-  else {px=s.pts[idx].x;py=s.pts[idx].y;}
+  lblInput.placeholder=field==="elen"?"長さ 例:6cm":field==="ang"?"角度 例:60":"名前 例:A";
+  const c=centroid(s.pts); let px,py;
+  if(field==="elen"){
+    const a=s.pts[idx],b=s.pts[(idx+1)%s.pts.length];
+    let nx=-(b.y-a.y),ny=(b.x-a.x);const nl=Math.hypot(nx,ny)||1;nx/=nl;ny/=nl;
+    const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    if((mx-c.x)*nx+(my-c.y)*ny<0){nx=-nx;ny=-ny;}
+    px=mx+nx*DIM_OFF; py=my+ny*DIM_OFF;
+  }else{const v=s.pts[idx];px=v.x;py=v.y;}
   const sc=toScreen(px,py);
-  editor.style.left=sc.x+"px"; editor.style.top=sc.y+"px"; editor.style.display="block";
-  setTimeout(()=>{lblInput.focus(); lblInput.select();},0);
+  editor.style.left=sc.x+"px";editor.style.top=sc.y+"px";editor.style.display="block";
+  setTimeout(()=>{lblInput.focus();lblInput.select();},0);
 }
 function commitEditor(){
   if(!edTarget) return;
   let v=lblInput.value.trim();
-  const o=edTarget; const s=o.s, field=o.field, idx=o.idx;
-  if(field==="ang" && v && /^-?\d+(\.\d+)?$/.test(v)) v=v+"°";
-  if(field==="elen") s.elen[idx]=v; else s.ang[idx]=v;
+  const o=edTarget,s=o.s;
+  if(o.field==="ang" && v && /^-?\d+(\.\d+)?$/.test(v)) v=v+"°";
+  if(o.field==="elen") s.elen[o.idx]=v; else if(o.field==="ang") s.ang[o.idx]=v; else s.name[o.idx]=v;
   updateDom(s); hideEditor();
 }
-function hideEditor(){editor.style.display="none"; edTarget=null;}
-lblInput.addEventListener("keydown",e=>{
-  if(e.key==="Enter"){e.preventDefault();commitEditor();}
-  if(e.key==="Escape"){hideEditor();}
-});
+function hideEditor(){editor.style.display="none";edTarget=null;}
+lblInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();commitEditor();}if(e.key==="Escape")hideEditor();});
 lblInput.addEventListener("blur",commitEditor);
 
-document.querySelectorAll("[data-add]").forEach(b=>{
-  b.addEventListener("click",()=>addShape(+b.dataset.add));
-});
+function esc(t){return String(t).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+function buildExportSVG(){
+  if(!shapes.length) return null;
+  let minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
+  shapes.forEach(s=>s.pts.forEach(p=>{minx=Math.min(minx,p.x);miny=Math.min(miny,p.y);maxx=Math.max(maxx,p.x);maxy=Math.max(maxy,p.y);}));
+  const pad=55; minx-=pad;miny-=pad;maxx+=pad;maxy+=pad;
+  const w=Math.round(maxx-minx), h=Math.round(maxy-miny);
+  let bd="";
+  shapes.forEach(s=>{
+    const n=s.pts.length,c=centroid(s.pts),ec=EC(s);
+    for(let i=0;i<ec;i++){
+      const a=s.pts[i],b=s.pts[(i+1)%n];
+      bd+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round"/>';
+      const txt=s.elen[i]||"";
+      if(txt){
+        const ex=b.x-a.x,ey=b.y-a.y,L=Math.hypot(ex,ey)||1;
+        let nx=-ey/L,ny=ex/L; const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+        if((mx-c.x)*nx+(my-c.y)*ny<0){nx=-nx;ny=-ny;}
+        const cpx=mx+nx*2*DIM_OFF,cpy=my+ny*2*DIM_OFF,apx=mx+nx*DIM_OFF,apy=my+ny*DIM_OFF;
+        bd+='<path d="M '+a.x+' '+a.y+' Q '+cpx+' '+cpy+' '+b.x+' '+b.y+'" fill="none" stroke="#1f2937" stroke-width="1.6"/>';
+        bd+='<text x="'+apx+'" y="'+apy+'" text-anchor="middle" dominant-baseline="middle" style="paint-order:stroke" stroke="#fff" stroke-width="7" stroke-linejoin="round" fill="#111" font-size="15" font-weight="700" font-family="sans-serif">'+esc(txt)+'</text>';
+      }
+    }
+    for(let i=0;i<n;i++){
+      const v=s.pts[i];let ox=v.x-c.x,oy=v.y-c.y;const ol=Math.hypot(ox,oy)||1;ox/=ol;oy/=ol;
+      if(s.name[i]) bd+='<text x="'+(v.x+ox*22)+'" y="'+(v.y+oy*22)+'" text-anchor="middle" dominant-baseline="middle" style="paint-order:stroke" stroke="#fff" stroke-width="4" fill="#1e3a8a" font-size="17" font-weight="800" font-family="sans-serif">'+esc(s.name[i])+'</text>';
+      if(s.ang[i]) bd+='<text x="'+(v.x-ox*26)+'" y="'+(v.y-oy*26)+'" text-anchor="middle" dominant-baseline="middle" style="paint-order:stroke" stroke="#fff" stroke-width="4" fill="#b91c1c" font-size="15" font-weight="700" font-family="sans-serif">'+esc(s.ang[i])+'</text>';
+    }
+  });
+  const svgStr='<svg xmlns="http://www.w3.org/2000/svg" viewBox="'+minx+' '+miny+' '+w+' '+h+'" width="'+w+'" height="'+h+'">'+bd+'</svg>';
+  return {svg:svgStr,w,h};
+}
+function serializeDoc(){return shapes.map(s=>({closed:s.closed,pts:s.pts,name:s.name,elen:s.elen,ang:s.ang}));}
+function loadDoc(doc){
+  shapes.forEach(s=>s.dom&&s.dom.g.remove()); shapes=[]; selId=null;
+  doc.forEach(o=>makeShape(o)); selId=null; markSel(); refreshEmpty();
+}
+
+document.querySelectorAll("[data-add]").forEach(b=>b.addEventListener("click",()=>addShape(+b.dataset.add)));
+document.getElementById("seg").addEventListener("click",addSegment);
 document.getElementById("del").addEventListener("click",()=>{
-  if(selId==null) return;
-  const s=getShape(selId); if(s){s.dom.g.remove(); shapes=shapes.filter(x=>x!==s);}
-  selId=null; refreshEmpty();
+  if(selId==null)return;const s=getShape(selId);if(s){s.dom.g.remove();shapes=shapes.filter(x=>x!==s);}selId=null;refreshEmpty();
 });
-document.getElementById("clear").addEventListener("click",()=>{
-  shapes.forEach(s=>s.dom.g.remove()); shapes=[]; selId=null; refreshEmpty();
+document.getElementById("clear").addEventListener("click",()=>{shapes.forEach(s=>s.dom.g.remove());shapes=[];selId=null;refreshEmpty();});
+document.getElementById("export").addEventListener("click",()=>{
+  const ex=buildExportSVG();
+  if(!ex){alert("図形がありません");return;}
+  try{
+    localStorage.setItem("figmaker_doc",JSON.stringify(serializeDoc()));
+    localStorage.setItem("figmaker_pending",JSON.stringify(ex));
+  }catch(_){}
+  location.href="./index.html";
 });
 
-addShape(3);
+(function init(){
+  const params=new URLSearchParams(location.search);
+  if(params.get("edit")==="1"){
+    try{
+      const doc=JSON.parse(localStorage.getItem("figmaker_doc")||"[]");
+      if(doc.length){loadDoc(doc); return;}
+    }catch(_){}
+  }
+  addShape(3);
+})();
 </script>
 </body>
 </html>

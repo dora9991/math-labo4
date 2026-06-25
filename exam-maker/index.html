@@ -123,6 +123,7 @@
   .kanten-summary .kval{font-size:13px;text-align:center;padding:8px;min-height:24px}
   .kanten-summary .kcell.total .klab{font-weight:800}
   .problems .daimon{break-inside:avoid}
+  .paper .katex{font-size:0.92em}   /* KaTeXの数字を本文よりやや小さく */
   /* 解答欄グリッド（Phase3） */
   .answer-grid{display:grid;gap:0;border-top:1px solid #111;border-left:1px solid #111;margin:8px 0 4px}
   .acell{border-right:1px solid #111;border-bottom:1px solid #111;min-height:2.4em;padding:2px 6px}
@@ -250,9 +251,11 @@
 
 <script src="problem_bank.js"></script>
 <script src="problem_bank_extra.js"></script>
+<script src="applied_bank.js"></script>
+<script src="applied_adapter.js"></script>
 <script>
 const BANK = (window.PROBLEM_BANK||[]).map(p=>({...p}));
-const UNIT_ORDER=['正の数・負の数','文字の式','方程式','比例と反比例','平面図形','空間図形','データの活用'];
+const UNIT_ORDER=['正の数・負の数','文字の式','方程式','比例と反比例','平面図形','空間図形','データの活用','応用問題'];
 let exam=null;
 let dragSrc=null;   // ドラッグ並べ替えの掴んでいる問題 {d,i}
 
@@ -265,7 +268,8 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
    ・$ の数が奇数（閉じ忘れ）や KaTeX 未読込のときは素のテキストにフォールバック */
 /* 数式ランを LaTeX へ変換（×÷・指数²³・√・分数a/b・不等号などを KaTeX 記法に） */
 function runToTex(run){
-  return run
+  let s = run
+    .replace(/(cm|mm|km|kg|mL|dL|kL|ha)/g,'\\text{$1}')   // 単位はローマン体で保護
     .replace(/−/g,'-')                       // 全角マイナス→-
     .replace(/\.\.\.|…/g,' \\cdots ')
     .replace(/×/g,' \\times ')
@@ -276,17 +280,22 @@ function runToTex(run){
     .replace(/π/g,' \\pi ')
     .replace(/√\s*(\d+)/g,' \\sqrt{$1}')
     .replace(/√/g,' \\sqrt{\\,}')
-    .replace(/⁴/g,'^{4}').replace(/³/g,'^{3}').replace(/²/g,'^{2}')
-    .replace(/(\d+)\s*\/\s*(\d+)/g,'\\dfrac{$1}{$2}');
+    .replace(/\^([0-9A-Za-z]+)/g,'^{$1}')                                  // ASCIIの指数 2^2022 → 2^{2022}
+    .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ]+/g,function(m){var S={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','ⁿ':'n'};var r='';for(var i=0;i<m.length;i++)r+=S[m[i]];return '^{'+r+'}';});  // 上付き → ^{…}
+  // 分数は必ず \dfrac（数値でも文字でも、( )つきの項でも縦組み）
+  const TERM='(\\([^()]*\\)|[A-Za-z0-9.^{}]+)';
+  s=s.replace(new RegExp(TERM+'\\s*/\\s*'+TERM,'g'),'\\dfrac{$1}{$2}');
+  return s;
 }
-/* このランを「式」として組版すべきか：演算子/関係/指数/√/分数を含む、または単独の変数1文字 */
+/* このランを KaTeX 組版すべきか：数字か文字を含めば式扱い（単位はrunToTex内で\textに保護）。
+   演算子だけ（= や ... 単独）は組版しない。 */
 function qualifyMath(t){
-  return /[+−*×÷·・/=<>≦≧≤≥^²³⁴√]/.test(t) || /^[A-Za-z]$/.test(t);
+  return /[0-9A-Za-z]/.test(t);
 }
 /* 平文の中の「式のかたまり」だけを KaTeX で組版する。日本語の文・単位(cm等)・数字の羅列はそのまま。 */
 function autoTypeset(text){
   if(typeof katex==='undefined') return esc(text);
-  const re=/[0-9A-Za-z+−*×÷·・=<>≦≧≤≥().,^²³⁴√π \/\-]+/g;
+  const re=/[0-9A-Za-z+−*×÷·・=<>≦≧≤≥:().,^²³⁴⁰¹⁵⁶⁷⁸⁹ⁿ√π \/\-]+/g;
   let out='',last=0,m;
   while((m=re.exec(text))){
     out+=esc(text.slice(last,m.index));
@@ -631,7 +640,7 @@ function render(){
       // グリッド大問は問題側に空白を作らず、下の解答欄にまとめる
       const spaceHtml=(!useGrid && h>0)?`<div class="calc-space" style="min-height:${h.toFixed(1)}em"></div>`:'';
       html+=`<div class="qit ${wide?'wide':''}" data-d="${d.no}" data-i="${i}">
-        <div class="qrow"><span class="qn" draggable="true" title="番号をドラッグして問題を入れ替え">${num}</span><span class="qbody">${utag}${mathify(p.q)}<span class="qpt">[${p.pts}点]</span></span></div>
+        <div class="qrow"><span class="qn" draggable="true" title="番号をドラッグして問題を入れ替え">${mathify(num)}</span><span class="qbody">${utag}${mathify(p.q)}<span class="qpt">[${p.pts}点]</span></span></div>
         ${spaceHtml}
         <span class="spc-ctl noprint">空白<b data-act="dec">−</b><b data-act="inc">＋</b></span>
         <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
@@ -809,6 +818,67 @@ $('printBtn').onclick=()=>{
 buildUnitUI();
 syncRatio();
 applyPageStyle();
+</script>
+
+<!-- ===== 図形メーカーからの前面図形 受け取り ===== -->
+<script>
+(function(){
+  let pending;
+  try{ pending=JSON.parse(localStorage.getItem("figmaker_pending")||"null"); }catch(_){ pending=null; }
+  if(!pending || !pending.svg) return;
+
+  const paper=document.getElementById("paper");
+  if(getComputedStyle(paper).position==="static") paper.style.position="relative";
+
+  // フローティング図形
+  const box=document.createElement("div");
+  box.className="fig-float noprint-edit";
+  box.style.cssText="position:absolute;left:40px;top:40px;width:"+pending.w+"px;height:"+pending.h+"px;"
+    +"z-index:20;touch-action:none;cursor:move;border:1px dashed #cbd5e1;";
+  box.innerHTML=pending.svg;
+  const inner=box.querySelector("svg");
+  if(inner){ inner.removeAttribute("width"); inner.removeAttribute("height");
+    inner.style.width="100%"; inner.style.height="100%"; inner.style.display="block"; inner.style.pointerEvents="none"; }
+
+  // 角の拡大縮小ハンドル
+  const handle=document.createElement("div");
+  handle.className="noprint-edit";
+  handle.style.cssText="position:absolute;right:-7px;bottom:-7px;width:16px;height:16px;border-radius:50%;"
+    +"background:#059669;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:nwse-resize;";
+  box.appendChild(handle);
+
+  paper.appendChild(box);
+
+  const baseW=pending.w, baseH=pending.h, ratio=baseH/baseW;
+  let mode=null, sx, sy, ox, oy, ow;
+
+  box.addEventListener("pointerdown",e=>{
+    if(e.target===handle) return;
+    mode="move"; sx=e.clientX; sy=e.clientY; ox=box.offsetLeft; oy=box.offsetTop;
+    box.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  handle.addEventListener("pointerdown",e=>{
+    mode="resize"; sx=e.clientX; ow=box.offsetWidth;
+    handle.setPointerCapture(e.pointerId); e.stopPropagation(); e.preventDefault();
+  });
+  function mv(e){
+    if(mode==="move"){ box.style.left=(ox+e.clientX-sx)+"px"; box.style.top=(oy+e.clientY-sy)+"px"; }
+    else if(mode==="resize"){ const w=Math.max(40, ow+(e.clientX-sx)); box.style.width=w+"px"; box.style.height=(w*ratio)+"px"; }
+  }
+  box.addEventListener("pointermove",mv);
+  handle.addEventListener("pointermove",mv);
+  function up(){ mode=null; }
+  box.addEventListener("pointerup",up);
+  handle.addEventListener("pointerup",up);
+
+  // ダブルクリック / ダブルタップで図形編集に戻る
+  box.addEventListener("dblclick",()=>{ location.href="./figure-maker.html?edit=1"; });
+
+  // 印刷時は枠とハンドルを消す
+  const st=document.createElement("style");
+  st.textContent="@media print{.fig-float{border:0!important} .noprint-edit{display:none!important}}";
+  document.head.appendChild(st);
+})();
 </script>
 </body>
 </html>
