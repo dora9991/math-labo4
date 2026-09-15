@@ -65,9 +65,16 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
   /* ===== 試験用紙レイアウト ===== */
-  .paper{background:#fff;border:1px solid var(--line);border-radius:10px;padding:30px 34px;
-       font-size:14px;color:#111;
+  /* B4/A3などプレビュー欄より横幅が広い用紙は、縮めず実寸のまま横スクロールで見せる
+     （画面上で縮めてしまうと、改ページ計算の元になっている寸法と実際の見た目がズレてしまうため）。 */
+  .previewCol{overflow-x:auto}
+  /* #paper は複数ページ(.paper-page)を並べる素のラッパー。見た目(白紙・枠)は各.paper-pageが持つ。 */
+  .paper-page{background:#fff;border:1px solid var(--line);border-radius:10px;box-sizing:border-box;
+       font-size:14px;color:#111;position:relative;margin:0 auto 28px;
        font-family:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"MS Mincho",serif}
+  .page-row{display:flex;gap:22px;align-items:stretch}
+  .pcol{flex:1;min-width:0;box-sizing:border-box}
+  .pcol:not(:last-child){border-right:1px solid #111}
   .examhead{border-bottom:2.5px solid #111;padding-bottom:10px;margin-bottom:6px}
   .examhead .ttl{font-size:21px;font-weight:800;text-align:center;letter-spacing:.06em}
   .examhead .meta{display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px;font-size:12.5px}
@@ -110,7 +117,7 @@
   .qit .qn[draggable]:active{cursor:grabbing}
   .qit.dragover{outline:2px dashed var(--accent);outline-offset:2px;background:#eef4ff}
   .colsel{font-size:10px;color:var(--accent);border:1px solid var(--line);border-radius:5px;padding:0 5px;margin-left:6px;cursor:pointer;font-weight:600}
-  .answerkey{margin-top:26px;border-top:2px dashed #999;padding-top:14px;page-break-before:always}
+  .answerkey{}   /* 解答は独立した.paper-pageに入るので、改ページ用の飾りは不要 */
   .answerkey h3{margin:0 0 10px;font-size:15px}
   .akgrid{columns:2;font-size:12.5px;color:#111}
   .akgrid .akd{break-inside:avoid;margin-bottom:8px}
@@ -129,7 +136,7 @@
   .kanten-summary .kval{font-size:13px;display:flex;align-items:flex-end;justify-content:flex-end;padding:4px 8px 3px 4px;min-height:3em}
   .kanten-summary .kcell.total .klab{font-weight:800}
   .problems .daimon{break-inside:avoid}
-  .paper .katex{font-size:0.92em}   /* KaTeXの数字を本文よりやや小さく */
+  .paper-page .katex{font-size:0.92em}   /* KaTeXの数字を本文よりやや小さく */
   /* 解答欄グリッド（Phase3） */
   .answer-grid{display:grid;gap:0;border-top:1px solid #111;border-left:1px solid #111;margin:8px 0 4px}
   .acell{border-right:1px solid #111;border-bottom:1px solid #111;min-height:2.4em;padding:2px 6px}
@@ -139,7 +146,11 @@
     body{background:#fff}
     .noprint{display:none !important}
     .wrap{display:block;max-width:none;padding:0;margin:0}
-    .paper{border:0!important;border-radius:0;padding:0!important;min-height:0!important;width:auto!important;margin:0!important;box-shadow:none!important}
+    #paper{width:auto!important;max-width:none!important;margin:0!important}
+    /* 各ページは画面プレビューの時点でJSが実寸(mm)で分割済み。印刷では紙の枠を消し、
+       ページの継ぎ目でそのまま改ページする（新聞のような段組の再現はもう不要）。 */
+    .paper-page{border:0!important;border-radius:0;box-shadow:none!important;margin:0!important;padding:0!important;width:auto!important;max-width:none!important}
+    .paper-page:not(:last-child){page-break-after:always;break-after:page}
     .page-guide{display:none!important}
     header{display:none}
     @page{margin:14mm 12mm}
@@ -255,10 +266,10 @@
   </div>
 
   <!-- 右：プレビュー -->
-  <div>
+  <div class="previewCol">
     <div class="stats noprint" id="stats"></div>
     <div class="noprint" id="diffwrap"></div>
-    <div class="paper" id="paper">
+    <div id="paper">
       <div class="empty">左の設定で範囲を選び「テストを自動作成」を押してください。</div>
     </div>
   </div>
@@ -271,6 +282,8 @@
 <script src="problem_bank_g2g3.js?v=1500"></script>
 <script src="applied_bank.js"></script>
 <script src="applied_adapter.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="cloud_sync.js"></script>
 <script>
 const BANK = (window.PROBLEM_BANK||[]).map(p=>({...p}));
 const UNITS_BY_GRADE={
@@ -535,6 +548,8 @@ function readLayout(){
     sumOrder:$('sumOrder').value,
   };
 }
+/* #paper自体は素のラッパー。幅(mm→px換算の基準)と、図形メーカーの重ね描画の基準位置だけを持つ。
+   実際の用紙の見た目・ページ分割は render() が .paper-page を必要枚数ぶん組み立てて行う。 */
 function applyPageStyle(cfg){
   cfg=cfg||readLayout();
   const [s,l]=PAPER[cfg.paperSize]||PAPER.A4;
@@ -543,40 +558,41 @@ function applyPageStyle(cfg){
   if(!st){st=document.createElement('style');st.id='pageStyle';document.head.appendChild(st);}
   st.textContent=`@media print{@page{size:${w}mm ${h}mm;margin:14mm 12mm}}`;
   const paper=$('paper');
-  paper.style.width=w+'mm';
-  paper.style.maxWidth='100%';
-  paper.style.margin='0 auto';
-  paper.style.padding='14mm 12mm';        // 余白を実寸に（印刷と一致）
-  paper.style.position='relative';
-  drawPageGuides(cfg);
+  paper.style.position='relative';   // 図形メーカーの重ね描画（絶対配置）の基準
 }
-/* 指定用紙で何枚になるか・ページ境界を視覚化（画面のみ／印刷には出ない） */
-function drawPageGuides(cfg){
-  cfg=cfg||readLayout();
-  const paper=$('paper'); if(!paper) return;
-  paper.querySelectorAll('.page-guide').forEach(e=>e.remove());
-  const [s,l]=PAPER[cfg.paperSize]||PAPER.A4;
-  const wmm=cfg.orientation==='landscape'?l:s, hmm=cfg.orientation==='landscape'?s:l;
-  const rect=paper.getBoundingClientRect(); if(!rect.width) return;
-  const pxPerMm=rect.width/wmm;
-  const pageContent=(hmm-28)*pxPerMm;                 // 上下余白14mm×2を除いた1枚の高さ
-  const cssp=getComputedStyle(paper);
-  const padTop=parseFloat(cssp.paddingTop)||0, padBot=parseFloat(cssp.paddingBottom)||0;
-  paper.style.minHeight=(pageContent+padTop+padBot)+'px';   // 短くても1枚ぶんは枠を見せる
-  const contentH=Math.max(0,paper.scrollHeight-padTop-padBot);
-  const pages=Math.max(1,Math.ceil(contentH/pageContent-0.02));
-  for(let i=1;i<pages;i++){
-    const ln=document.createElement('div');
-    ln.className='page-guide noprint';
-    ln.style.cssText='position:absolute;left:0;right:0;top:'+(padTop+i*pageContent)+'px;border-top:2px dashed #f59e0b;z-index:6;pointer-events:none';
-    ln.innerHTML='<span style="position:absolute;right:4px;top:0;font-size:10px;color:#b45309;background:#fffbeb;padding:0 6px;border-radius:0 0 6px 6px">'+(i+1)+'枚目 ▼</span>';
-    paper.appendChild(ln);
-  }
-  const badge=document.createElement('div');
-  badge.className='page-guide noprint';
-  badge.style.cssText='position:absolute;left:0;top:-20px;font-size:11px;color:#b45309;font-weight:700';
-  badge.textContent=cfg.paperSize+(cfg.orientation==='landscape'?' 横':' 縦')+'：約'+pages+'枚に収まります';
-  paper.appendChild(badge);
+/* 1mm=96/25.4px は画面・印刷どちらでもブラウザが必ず使う固定換算（CSS仕様のreference pixel）。
+   #paperの実測幅から求めると、プレビュー欄が用紙より狭い時に縮小されて数値がズレ、
+   改ページ計算と実際の印刷結果が食い違ってしまうため、固定値を使う。 */
+const PX_PER_MM=96/25.4;
+/* 大問（＋区切り直後ならセクション見出し）のHTMLを1ブロックずつ計測し、
+   実際にB4/A4等の1ページに収まる分だけ左列→右列…の順に詰めていく。
+   ＝画面プレビューでも印刷と同じ場所で本当に改ページ・改列させるための下準備。 */
+function measureBlockHeights(htmlList, widthPx){
+  const probe=document.createElement('div');
+  probe.className='paper-page';
+  probe.style.cssText='position:absolute;left:-99999px;top:0;visibility:hidden;pointer-events:none;'
+    +'width:'+widthPx+'px;padding:0;border:0;margin:0;box-sizing:border-box;';
+  document.body.appendChild(probe);
+  const heights=htmlList.map(h=>{ probe.innerHTML=h; return probe.getBoundingClientRect().height; });
+  probe.remove();
+  return heights;
+}
+function paginateBlocks(blocks, cols, pageContentPx, colWidthPx, headerHeightPx){
+  const heights=measureBlockHeights(blocks, colWidthPx);
+  const pages=[Array.from({length:cols},()=>[])];
+  let page=0, col=0, used=0;
+  const budgetFor=p=>Math.max(40, (p===0 ? pageContentPx-headerHeightPx : pageContentPx) - 4);
+  blocks.forEach((html,i)=>{
+    const h=heights[i];
+    if(used>0 && used+h>budgetFor(page)){
+      col++;
+      if(col>=cols){ page++; pages[page]=Array.from({length:cols},()=>[]); col=0; }
+      used=0;
+    }
+    pages[page][col].push(html);
+    used+=h;
+  });
+  return pages;
 }
 /* 「解きなさい」系の大問（方程式）は、各問の冗長な末尾（…を解きなさい。/ x=？）を消して
    大問見出しに集約する。 */
@@ -645,6 +661,62 @@ function isWide(p,units){
   if((p.q||'').length>=40) return true;
   return false;
 }
+/* 大問1つぶんのHTML（改ページ判定では分割しない最小単位）。 */
+function daimonHtml(d,cfg){
+  const isKnow=d.cog==='知識・技能';
+  const mode=$('answerStyle').value;
+  // 解答欄グリッドにする大問か：知識・技能の計算/一行/選択だけで構成された大問は枠、それ以外は空白
+  const useGrid = mode==='grid' || (mode==='auto' && d.cog==='知識・技能' && d.items.every(p=>['計算','一行問題','選択'].includes(p.format||'')));
+  const pack=$('pack2up').checked && cfg.pageCols<=2 && !d.forceSingle;   // 段組3列/この大問を1列指定なら2up無効
+  const itemCols=pack?2:1;
+  const mult=spaceMult();
+  const solve=isSolveDaimon(d);
+  const dInstr=solve?'次の方程式を解きなさい。':d.instr;
+  // 2列パッキング: 隣と組めない問題は半分を空けず全幅で出す
+  const widths=new Array(d.items.length).fill('full');
+  if(pack){
+    const narrow=d.items.map(p=>!isWide(p,spaceUnitsFor(p)));
+    let i2=0;
+    while(i2<d.items.length){
+      if(narrow[i2] && i2+1<d.items.length && narrow[i2+1]){ widths[i2]='half'; widths[i2+1]='half'; i2+=2; }
+      else { widths[i2]='full'; i2++; }
+    }
+  }
+  let html=`<div class="daimon ${isKnow?'knowd':'thinkd'}">
+    <div class="dhead">
+      <span class="dno">${d.no}</span>
+      <span>${esc(dInstr)}</span>
+      ${cfg.pageCols<=2?`<span class="colsel noprint" data-d="${d.no}" title="この大問を1列／2列で切替">${d.forceSingle?'⇆2列に':'⇆1列に'}</span>`:''}
+      <span class="dpts">${ptsLabel(d)}</span>
+    </div>
+    <div class="items" style="grid-template-columns:repeat(${itemCols},1fr)">`;
+  d.items.forEach((p,i)=>{
+    const num=`(${i+1})`;
+    const units=spaceUnitsFor(p);
+    const h=units*mult;
+    const wide=widths[i]==='full';
+    const utag=d.mixed?`<span class="dunit" style="margin-right:4px">［${esc(p.unit)}］</span>`:'';
+    const qShow=solve?stripSolveTail(p.q):p.q;   // 「解きなさい」系は冗長な末尾を除去
+    // グリッド大問は問題側に空白を作らず、下の解答欄にまとめる
+    // 空白(計算スペース)は解答欄(枠)とは独立に付ける
+    const spaceHtml=(h>0)?`<div class="calc-space" style="min-height:${h.toFixed(1)}em"><span class="space-grip noprint" data-d="${d.no}" data-i="${i}"></span></div>`:'';
+    html+=`<div class="qit ${wide?'wide':''}" data-d="${d.no}" data-i="${i}">
+      <div class="qrow"><span class="qn" draggable="true" title="番号をドラッグして問題を入れ替え">${mathify(num)}</span><span class="qbody">${utag}${mathify(qShow)}<span class="qpt">[${p.pts}点]</span></span></div>
+      ${spaceHtml}
+      <span class="spc-ctl noprint">空白<b data-act="dec">−</b><b data-act="inc">＋</b></span>
+      <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
+    </div>`;
+  });
+  html+=`</div>`; // close .items
+  if(useGrid){
+    const n=d.items.length;
+    const gcols=cfg.pageCols>=2?Math.min(3,n):Math.min(5,n);
+    const cells=d.items.map((p,i)=>`<div class="acell"><span class="anum">(${i+1})</span></div>`).join('');
+    html+=`<div class="answer-grid" style="grid-template-columns:repeat(${gcols||1},1fr)">${cells}</div>`;
+  }
+  html+=`</div>`; // close .daimon
+  return html;
+}
 
 /* ---------- 描画 ---------- */
 function render(){
@@ -673,88 +745,64 @@ function render(){
   // 用紙（レイアウト設定を反映）
   const cfg=readLayout();
   applyPageStyle(cfg);
-  let html=headerHtml(cfg,{title,minutes,points});
-  const sumTbl=cfg.sumShow?summaryHtml(cfg,{knowPts,thinkPts,totPts}):'';
-  const colStyle=cfg.pageCols>1?`column-count:${cfg.pageCols};column-gap:22px;column-rule:1px solid #111;`:'';
-  html+=`<div class="problems" style="${colStyle}">`;
-  if(cfg.sumShow && cfg.sumPos==='top') html+=sumTbl;   // 集計表を2列の中（先頭）に収める
 
+  // 実寸(mm)→px換算。画面と印刷で必ず同じ換算(PX_PER_MM)を使うことで、
+  // プレビューで区切った位置と、実際に印刷される位置を一致させる。
+  const [ps,pl]=PAPER[cfg.paperSize]||PAPER.A4;
+  const wmm=cfg.orientation==='landscape'?pl:ps, hmm=cfg.orientation==='landscape'?ps:pl;
+  const pxPerMm=PX_PER_MM;
+  const padTopMm=14, padSideMm=12, gapPx=22;
+  const pageContentPx=(hmm-padTopMm*2)*pxPerMm;              // 1枚の中身の高さ(上下余白を除く)
+  const contentWPx=(wmm-padSideMm*2)*pxPerMm;                // 1枚の中身の幅
+  const colWidthPx=cfg.pageCols>1 ? (contentWPx-(cfg.pageCols-1)*gapPx)/cfg.pageCols : contentWPx;
+
+  const headerHtmlStr=headerHtml(cfg,{title,minutes,points});
+  const headerHeightPx=measureBlockHeights([headerHtmlStr], contentWPx)[0]||0;
+  const sumTbl=cfg.sumShow?summaryHtml(cfg,{knowPts,thinkPts,totPts}):'';
+
+  // 改ページで割らない最小単位に分解（セクション見出しは直後の大問とセットで移動させ、見出しだけが
+  // ページ末尾に取り残されないようにする）
+  const blocks=[];
+  if(cfg.sumShow && cfg.sumPos==='top') blocks.push(sumTbl);
   let lastCog=null;
   daimon.forEach(d=>{
+    let pre='';
     if(d.cog!==lastCog){
       const isKnow=d.cog==='知識・技能';
-      html+=`<div class="sectiontag ${isKnow?'know':'think'}">${isKnow?'【知識・技能】':'【思考・判断・表現】'}</div>`;
+      pre=`<div class="sectiontag ${isKnow?'know':'think'}">${isKnow?'【知識・技能】':'【思考・判断・表現】'}</div>`;
       lastCog=d.cog;
     }
-    const isKnow=d.cog==='知識・技能';
-    const mode=$('answerStyle').value;
-    // 解答欄グリッドにする大問か：知識・技能の計算/一行/選択だけで構成された大問は枠、それ以外は空白
-    const useGrid = mode==='grid' || (mode==='auto' && d.cog==='知識・技能' && d.items.every(p=>['計算','一行問題','選択'].includes(p.format||'')));
-    const pack=$('pack2up').checked && cfg.pageCols<=2 && !d.forceSingle;   // 段組3列/この大問を1列指定なら2up無効
-    const itemCols=pack?2:1;
-    const mult=spaceMult();
-    const solve=isSolveDaimon(d);
-    const dInstr=solve?'次の方程式を解きなさい。':d.instr;
-    // 2列パッキング: 隣と組めない問題は半分を空けず全幅で出す
-    const widths=new Array(d.items.length).fill('full');
-    if(pack){
-      const narrow=d.items.map(p=>!isWide(p,spaceUnitsFor(p)));
-      let i2=0;
-      while(i2<d.items.length){
-        if(narrow[i2] && i2+1<d.items.length && narrow[i2+1]){ widths[i2]='half'; widths[i2+1]='half'; i2+=2; }
-        else { widths[i2]='full'; i2++; }
-      }
-    }
-    html+=`<div class="daimon ${isKnow?'knowd':'thinkd'}">
-      <div class="dhead">
-        <span class="dno">${d.no}</span>
-        <span>${esc(dInstr)}</span>
-        ${cfg.pageCols<=2?`<span class="colsel noprint" data-d="${d.no}" title="この大問を1列／2列で切替">${d.forceSingle?'⇆2列に':'⇆1列に'}</span>`:''}
-        <span class="dpts">${ptsLabel(d)}</span>
-      </div>
-      <div class="items" style="grid-template-columns:repeat(${itemCols},1fr)">`;
-    d.items.forEach((p,i)=>{
-      const num=`(${i+1})`;
-      const units=spaceUnitsFor(p);
-      const h=units*mult;
-      const wide=widths[i]==='full';
-      const utag=d.mixed?`<span class="dunit" style="margin-right:4px">［${esc(p.unit)}］</span>`:'';
-      const qShow=solve?stripSolveTail(p.q):p.q;   // 「解きなさい」系は冗長な末尾を除去
-      // グリッド大問は問題側に空白を作らず、下の解答欄にまとめる
-      // 空白(計算スペース)は解答欄(枠)とは独立に付ける
-      const spaceHtml=(h>0)?`<div class="calc-space" style="min-height:${h.toFixed(1)}em"><span class="space-grip noprint" data-d="${d.no}" data-i="${i}"></span></div>`:'';
-      html+=`<div class="qit ${wide?'wide':''}" data-d="${d.no}" data-i="${i}">
-        <div class="qrow"><span class="qn" draggable="true" title="番号をドラッグして問題を入れ替え">${mathify(num)}</span><span class="qbody">${utag}${mathify(qShow)}<span class="qpt">[${p.pts}点]</span></span></div>
-        ${spaceHtml}
-        <span class="spc-ctl noprint">空白<b data-act="dec">−</b><b data-act="inc">＋</b></span>
-        <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
-      </div>`;
-    });
-    html+=`</div>`; // close .items
-    if(useGrid){
-      const n=d.items.length;
-      const gcols=cfg.pageCols>=2?Math.min(3,n):Math.min(5,n);
-      const cells=d.items.map((p,i)=>`<div class="acell"><span class="anum">(${i+1})</span></div>`).join('');
-      html+=`<div class="answer-grid" style="grid-template-columns:repeat(${gcols||1},1fr)">${cells}</div>`;
-    }
-    html+=`</div>`; // close .daimon
+    blocks.push(pre+daimonHtml(d,cfg));
   });
-  html+=`</div>`; // .problems を閉じる
-  if(cfg.sumShow && cfg.sumPos==='bottom') html+=sumTbl;
+  if(cfg.sumShow && cfg.sumPos==='bottom') blocks.push(sumTbl);
 
-  // 解答
+  // 用紙1枚に収まる分だけ左列→右列…の順に詰め、収まりきらない分は次のページへ
+  // （画面プレビューでも、これで実際に「1枚目の左→1枚目の右→2枚目の左…」の順で区切られる）
+  const pages=paginateBlocks(blocks, cfg.pageCols, pageContentPx, colWidthPx, headerHeightPx);
+  const pageStyle=`width:${wmm}mm;max-width:100%;padding:${padTopMm}mm ${padSideMm}mm;`;
+
+  let html=`<div class="page-guide noprint" style="font-size:11px;color:#b45309;font-weight:700;margin-bottom:6px">`
+    +`${cfg.paperSize}${cfg.orientation==='landscape'?' 横':' 縦'}：${pages.length}枚に分かれます（${cfg.pageCols>1?cfg.pageCols+'列':'1列'}）</div>`;
+  pages.forEach((cols,pi)=>{
+    html+=`<div class="paper-page" style="${pageStyle}">`;
+    if(pi===0) html+=headerHtmlStr;
+    html+=`<div class="page-row">`+cols.map(colBlocks=>`<div class="problems pcol">${colBlocks.join('')}</div>`).join('')+`</div>`;
+    html+=`</div>`;
+  });
+
+  // 解答（独立した1ページとして追加）
   if($('showAns').checked){
-    html+=answerKeyHtml(daimon);
+    html+=`<div class="paper-page" style="${pageStyle}">${answerKeyHtml(daimon)}</div>`;
   }else{
-    // 印刷時だけ解答ページを別途付けるため、非表示で持たせる
-    html+=`<div class="answerkey" style="display:none" id="ansForPrint">${answerKeyBody(daimon)}</div>`;
+    // 印刷時だけ解答ページを別途出すため、非表示で持たせる
+    html+=`<div class="paper-page" id="ansForPrint" style="${pageStyle};display:none">${answerKeyBody(daimon)}</div>`;
   }
 
   $('paper').innerHTML=html;
   bindSwap();
   try{ localStorage.setItem('em_exam', JSON.stringify({grade:typeof GRADE!=='undefined'?GRADE:'中1', exam})); }catch(_){}
   if(window.mountPendingFigure) window.mountPendingFigure();   // 再生成後も前面の図形を残す
-  drawPageGuides();   // 内容に合わせてページ境界を再計算
+  scheduleCloudSave();
 }
 function renderDiffBar(daimon, totPts){
   const items=daimon.flatMap(d=>d.items);
@@ -937,22 +985,77 @@ function setGrade(g){
   exam=null;
   $('paper').innerHTML='<div class="empty">左の設定で範囲を選び「テストを自動作成」を押してください。</div>';
 }
-document.querySelectorAll('#gradeSel .gradebtn').forEach(b=>{ b.onclick=()=>{ try{localStorage.removeItem('em_exam');}catch(_){} setGrade(b.dataset.grade); }; });
+document.querySelectorAll('#gradeSel .gradebtn').forEach(b=>{ b.onclick=()=>{ try{localStorage.removeItem('em_exam');}catch(_){} setGrade(b.dataset.grade); scheduleCloudSave(); }; });
+
+/* ---------- クラウド保存（作業中データ＝左パネルの設定＋生成済みテスト） ----------
+   cloud_sync.js がSupabase設定済みのときだけ実際に送信される（未設定なら no-op）。 */
+const SETTING_IDS=['points','minutes','thinkRatio','volume','r1','r2','r3','r4','normPts',
+  'paperSize','orientation','pageCols','headerType','nameText',
+  'sumShow','sumShutai','sumPos','sumOrder','calcSpace','pack2up','answerStyle','title','showAns'];
+function collectWorkingState(){
+  const settings={};
+  SETTING_IDS.forEach(id=>{ const el=$(id); if(!el) return; settings[id]=(el.type==='checkbox')?el.checked:el.value; });
+  const unitChecked={}; document.querySelectorAll('.uchk').forEach(c=>{ unitChecked[c.dataset.unit]=c.checked; });
+  const subOff=[]; document.querySelectorAll('.subchip').forEach(s=>{ if(!s.classList.contains('on')) subOff.push(s.dataset.unit+''+s.dataset.sub); });
+  return {grade:GRADE, settings, unitChecked, subOff, exam};
+}
+function applyWorkingState(state){
+  if(!state) return;
+  if(state.grade && state.grade!==GRADE) setGrade(state.grade); else buildUnitUI();
+  const s=state.settings||{};
+  SETTING_IDS.forEach(id=>{ if(!(id in s)) return; const el=$(id); if(!el) return; if(el.type==='checkbox') el.checked=!!s[id]; else el.value=s[id]; });
+  if(state.unitChecked){
+    document.querySelectorAll('.uchk').forEach(c=>{
+      if(state.unitChecked[c.dataset.unit]!=null){ c.checked=state.unitChecked[c.dataset.unit]; c.dispatchEvent(new Event('change')); }
+    });
+  }
+  if(state.subOff && state.subOff.length){
+    const offSet=new Set(state.subOff);
+    document.querySelectorAll('.subchip').forEach(s=>{
+      if(offSet.has(s.dataset.unit+''+s.dataset.sub)) s.classList.remove('on');
+    });
+    document.querySelectorAll('.unitrow').forEach(row=>{
+      const any=[...row.querySelectorAll('.subchip')].some(x=>x.classList.contains('on'));
+      row.querySelector('.uchk').checked=any;
+    });
+  }
+  syncRatio();
+  applyPageStyle();
+  exam=state.exam||null;
+  if(exam) render();
+  else $('paper').innerHTML='<div class="empty">左の設定で範囲を選び「テストを自動作成」を押してください。</div>';
+}
+function scheduleCloudSave(){
+  if(window.cloudSync && window.cloudSync.ready) window.cloudSync.save(collectWorkingState());
+}
+// 左パネル（範囲・配点・レイアウト・仕上げ）のどの操作でも作業中データをクラウドに自動保存
+document.querySelectorAll('.wrap > div.noprint').forEach(panel=>{
+  panel.addEventListener('input',scheduleCloudSave);
+  panel.addEventListener('change',scheduleCloudSave);
+});
 
 /* ---------- init ---------- */
 setGrade('中1');
 syncRatio();
 applyPageStyle();
 // ナビゲーション（図形メーカー往復など）で消えないよう、保存済みのテストを復元。
+// クラウド（Supabase）に下書きがあればそちらを優先し、無ければ従来どおりlocalStorageから復元。
 // KaTeX は defer 読込のため、式が素テキストにならないよう load 後に描画する。
 window.addEventListener('load',()=>{
-  try{
-    const sv=JSON.parse(localStorage.getItem('em_exam')||'null');
-    if(sv && sv.exam && sv.exam.daimon){
-      if(sv.grade && sv.grade!=='中1') setGrade(sv.grade);
-      exam=sv.exam; render();
+  (async()=>{
+    let cloudState=null;
+    if(window.cloudSync && window.cloudSync.ready){
+      try{ cloudState=await window.cloudSync.load(); }catch(_){}
     }
-  }catch(_){}
+    if(cloudState){ applyWorkingState(cloudState); return; }
+    try{
+      const sv=JSON.parse(localStorage.getItem('em_exam')||'null');
+      if(sv && sv.exam && sv.exam.daimon){
+        if(sv.grade && sv.grade!=='中1') setGrade(sv.grade);
+        exam=sv.exam; render();
+      }
+    }catch(_){}
+  })();
 });
 </script>
 
