@@ -15,8 +15,8 @@
 //      （anon/publishable key。RLSで保護されるので公開して問題ない値）
 // ============================================================
 (function () {
-  const SUPABASE_URL = '';
-  const SUPABASE_ANON_KEY = '';
+  const SUPABASE_URL = 'https://mtzhbiadzqjhvhzzdsbn.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10emhiaWFkenFqaHZoenpkc2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMzQ4NDMsImV4cCI6MjA5ODkxMDg0M30.Qk7y9_6trAYMePQC1VUh1A3_ciq-5xgMSMHtxBHmdaw';
   const SAVE_DEBOUNCE_MS = 1200;
 
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY || typeof window.supabase === 'undefined') {
