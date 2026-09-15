@@ -142,6 +142,10 @@
     .paper{border:0!important;border-radius:0;padding:0!important;min-height:0!important;width:auto!important;margin:0!important;box-shadow:none!important}
     .page-guide{display:none!important}
     header{display:none}
+    /* 段組は既定(balance)だと用紙全体の分量で列の高さを決めてしまい、
+       1ページ目の左列だけで数ページ分流れ込んで右列がほぼ空欄になることがある。
+       auto指定で各ページの残りスペース分だけ左列→右列の順に詰めさせる（新聞形式の段組）。 */
+    .problems{column-fill:auto}
     @page{margin:14mm 12mm}
   }
 </style>
