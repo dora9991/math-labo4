@@ -275,6 +275,8 @@
 <script src="problem_bank_g2g3.js?v=1500"></script>
 <script src="applied_bank.js"></script>
 <script src="applied_adapter.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="cloud_sync.js"></script>
 <script>
 const BANK = (window.PROBLEM_BANK||[]).map(p=>({...p}));
 const UNITS_BY_GRADE={
@@ -759,6 +761,7 @@ function render(){
   try{ localStorage.setItem('em_exam', JSON.stringify({grade:typeof GRADE!=='undefined'?GRADE:'中1', exam})); }catch(_){}
   if(window.mountPendingFigure) window.mountPendingFigure();   // 再生成後も前面の図形を残す
   drawPageGuides();   // 内容に合わせてページ境界を再計算
+  scheduleCloudSave();
 }
 function renderDiffBar(daimon, totPts){
   const items=daimon.flatMap(d=>d.items);
@@ -941,22 +944,77 @@ function setGrade(g){
   exam=null;
   $('paper').innerHTML='<div class="empty">左の設定で範囲を選び「テストを自動作成」を押してください。</div>';
 }
-document.querySelectorAll('#gradeSel .gradebtn').forEach(b=>{ b.onclick=()=>{ try{localStorage.removeItem('em_exam');}catch(_){} setGrade(b.dataset.grade); }; });
+document.querySelectorAll('#gradeSel .gradebtn').forEach(b=>{ b.onclick=()=>{ try{localStorage.removeItem('em_exam');}catch(_){} setGrade(b.dataset.grade); scheduleCloudSave(); }; });
+
+/* ---------- クラウド保存（作業中データ＝左パネルの設定＋生成済みテスト） ----------
+   cloud_sync.js がSupabase設定済みのときだけ実際に送信される（未設定なら no-op）。 */
+const SETTING_IDS=['points','minutes','thinkRatio','volume','r1','r2','r3','r4','normPts',
+  'paperSize','orientation','pageCols','headerType','nameText',
+  'sumShow','sumShutai','sumPos','sumOrder','calcSpace','pack2up','answerStyle','title','showAns'];
+function collectWorkingState(){
+  const settings={};
+  SETTING_IDS.forEach(id=>{ const el=$(id); if(!el) return; settings[id]=(el.type==='checkbox')?el.checked:el.value; });
+  const unitChecked={}; document.querySelectorAll('.uchk').forEach(c=>{ unitChecked[c.dataset.unit]=c.checked; });
+  const subOff=[]; document.querySelectorAll('.subchip').forEach(s=>{ if(!s.classList.contains('on')) subOff.push(s.dataset.unit+''+s.dataset.sub); });
+  return {grade:GRADE, settings, unitChecked, subOff, exam};
+}
+function applyWorkingState(state){
+  if(!state) return;
+  if(state.grade && state.grade!==GRADE) setGrade(state.grade); else buildUnitUI();
+  const s=state.settings||{};
+  SETTING_IDS.forEach(id=>{ if(!(id in s)) return; const el=$(id); if(!el) return; if(el.type==='checkbox') el.checked=!!s[id]; else el.value=s[id]; });
+  if(state.unitChecked){
+    document.querySelectorAll('.uchk').forEach(c=>{
+      if(state.unitChecked[c.dataset.unit]!=null){ c.checked=state.unitChecked[c.dataset.unit]; c.dispatchEvent(new Event('change')); }
+    });
+  }
+  if(state.subOff && state.subOff.length){
+    const offSet=new Set(state.subOff);
+    document.querySelectorAll('.subchip').forEach(s=>{
+      if(offSet.has(s.dataset.unit+''+s.dataset.sub)) s.classList.remove('on');
+    });
+    document.querySelectorAll('.unitrow').forEach(row=>{
+      const any=[...row.querySelectorAll('.subchip')].some(x=>x.classList.contains('on'));
+      row.querySelector('.uchk').checked=any;
+    });
+  }
+  syncRatio();
+  applyPageStyle();
+  exam=state.exam||null;
+  if(exam) render();
+  else $('paper').innerHTML='<div class="empty">左の設定で範囲を選び「テストを自動作成」を押してください。</div>';
+}
+function scheduleCloudSave(){
+  if(window.cloudSync && window.cloudSync.ready) window.cloudSync.save(collectWorkingState());
+}
+// 左パネル（範囲・配点・レイアウト・仕上げ）のどの操作でも作業中データをクラウドに自動保存
+document.querySelectorAll('.wrap > div.noprint').forEach(panel=>{
+  panel.addEventListener('input',scheduleCloudSave);
+  panel.addEventListener('change',scheduleCloudSave);
+});
 
 /* ---------- init ---------- */
 setGrade('中1');
 syncRatio();
 applyPageStyle();
 // ナビゲーション（図形メーカー往復など）で消えないよう、保存済みのテストを復元。
+// クラウド（Supabase）に下書きがあればそちらを優先し、無ければ従来どおりlocalStorageから復元。
 // KaTeX は defer 読込のため、式が素テキストにならないよう load 後に描画する。
 window.addEventListener('load',()=>{
-  try{
-    const sv=JSON.parse(localStorage.getItem('em_exam')||'null');
-    if(sv && sv.exam && sv.exam.daimon){
-      if(sv.grade && sv.grade!=='中1') setGrade(sv.grade);
-      exam=sv.exam; render();
+  (async()=>{
+    let cloudState=null;
+    if(window.cloudSync && window.cloudSync.ready){
+      try{ cloudState=await window.cloudSync.load(); }catch(_){}
     }
-  }catch(_){}
+    if(cloudState){ applyWorkingState(cloudState); return; }
+    try{
+      const sv=JSON.parse(localStorage.getItem('em_exam')||'null');
+      if(sv && sv.exam && sv.exam.daimon){
+        if(sv.grade && sv.grade!=='中1') setGrade(sv.grade);
+        exam=sv.exam; render();
+      }
+    }catch(_){}
+  })();
 });
 </script>
 
