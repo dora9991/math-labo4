@@ -106,6 +106,18 @@
   .swap{position:absolute;right:-6px;top:2px;font-size:10px;color:var(--accent);cursor:pointer;
        opacity:0;border:1px solid var(--line);border-radius:5px;padding:0 4px;background:#fff}
   .qit:hover .swap{opacity:1}
+  .rmman{position:absolute;right:-6px;top:20px;font-size:10px;color:var(--bad);cursor:pointer;
+       opacity:0;border:1px solid var(--line);border-radius:5px;padding:0 4px;background:#fff}
+  .qit:hover .rmman{opacity:1}
+  .screslt{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;background:#fff}
+  .screslt .scmeta{color:var(--sub);font-size:10.5px;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:3px}
+  .screslt .scq{font-size:12.5px;line-height:1.45}
+  .screslt .scq .katex{font-size:0.95em}
+  .screslt .scadd{margin-top:5px;display:block;width:100%;padding:4px;border-radius:6px;
+       border:1px solid var(--accent);background:#fff;color:var(--accent);font-weight:700;font-size:11.5px;cursor:pointer}
+  .screslt .scadd:hover{background:#eef4ff}
+  .screslt.added .scadd{border-color:var(--ok);color:var(--ok);cursor:default}
+  .screslt.added .scadd:hover{background:#fff}
   .qit .qn[draggable]{cursor:grab}
   .qit .qn[draggable]:active{cursor:grabbing}
   .qit.dragover{outline:2px dashed var(--accent);outline-offset:2px;background:#eef4ff}
@@ -164,6 +176,20 @@
         🏆 応用チャレンジ（数オリ・全国学テ・自作の良問）のプリントを作る →
       </a>
     </div>
+
+    <div class="card" id="shinchuCard" style="background:#fff7ed;border-color:#fed7aa">
+      <h2>📖 市販問題集から検索して追加</h2>
+      <label style="margin-top:0">問題集</label>
+      <select id="scBook"></select>
+      <label>章・単元</label>
+      <select id="scUnit"><option value="">すべて</option></select>
+      <label>キーワード（問題文・単元・スキル）</label>
+      <input type="text" id="scKw" placeholder="例：移項、比例定数、円錐 など">
+      <p class="hint" id="scCount" style="margin-top:8px"></p>
+      <div id="scResults" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-top:4px"></div>
+      <p class="hint">追加した問題は用紙の末尾に「追加した問題」として入ります（削除は各問題右下の✕削除）。「テストを自動作成」をやり直すと消えるのでご注意ください。</p>
+    </div>
+
     <div class="card">
       <h2>① テスト範囲</h2>
       <label style="margin-top:0">学年</label>
@@ -271,6 +297,7 @@
 <script src="problem_bank_g2g3.js?v=1500"></script>
 <script src="applied_bank.js"></script>
 <script src="applied_adapter.js"></script>
+<script src="shinchu_bank.js"></script>
 <script>
 const BANK = (window.PROBLEM_BANK||[]).map(p=>({...p}));
 const UNITS_BY_GRADE={
@@ -727,7 +754,8 @@ function render(){
         <div class="qrow"><span class="qn" draggable="true" title="番号をドラッグして問題を入れ替え">${mathify(num)}</span><span class="qbody">${utag}${mathify(qShow)}<span class="qpt">[${p.pts}点]</span></span></div>
         ${spaceHtml}
         <span class="spc-ctl noprint">空白<b data-act="dec">−</b><b data-act="inc">＋</b></span>
-        <span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>
+        ${p._manual?'':'<span class="swap noprint" title="同じ範囲の別問題に差し替え">差替</span>'}
+        ${p._manual?'<span class="rmman noprint" title="この問題を削除">✕削除</span>':''}
       </div>`;
     });
     html+=`</div>`; // close .items
@@ -857,6 +885,11 @@ function bindSwap(){
     p.spaceLines=Math.max(0,Math.min(14,cur+(b.dataset.act==='inc'?1:-1)));
     render();
   });
+  $('paper').querySelectorAll('.rmman').forEach(b=>b.onclick=()=>{
+    const qit=b.closest('.qit');
+    removeManualItem(+qit.dataset.d, +qit.dataset.i);
+    toast('削除しました');
+  });
   $('paper').querySelectorAll('.swap').forEach(b=>b.onclick=()=>{
     const qit=b.closest('.qit');
     const dno=+qit.dataset.d, idx=+qit.dataset.i;
@@ -936,6 +969,7 @@ function setGrade(g){
   buildUnitUI();
   exam=null;
   $('paper').innerHTML='<div class="empty">左の設定で範囲を選び「テストを自動作成」を押してください。</div>';
+  if(typeof buildScBookUI==='function'){ buildScBookUI(); renderScResults(); }
 }
 document.querySelectorAll('#gradeSel .gradebtn').forEach(b=>{ b.onclick=()=>{ try{localStorage.removeItem('em_exam');}catch(_){} setGrade(b.dataset.grade); }; });
 
@@ -954,6 +988,105 @@ window.addEventListener('load',()=>{
     }
   }catch(_){}
 });
+</script>
+
+<!-- ===== 市販問題集（新中学問題集など）から検索して追加 ===== -->
+<script>
+const SHINCHU_ALL = (window.SHINCHU_BANK||[]).map(p=>({...p}));
+function scBooks(){
+  return [...new Set(SHINCHU_ALL.filter(p=>p.grade===GRADE).map(p=>p.source&&p.source.file).filter(Boolean))];
+}
+function buildScBookUI(){
+  const sel=$('scBook'); if(!sel) return;
+  const books=scBooks();
+  sel.innerHTML = books.length
+    ? books.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('')
+    : `<option value="">（${esc(GRADE)}の問題集データがまだありません）</option>`;
+  buildScUnitUI();
+}
+function buildScUnitUI(){
+  const book=$('scBook').value;
+  const units=[...new Set(SHINCHU_ALL.filter(p=>p.grade===GRADE && p.source && p.source.file===book).map(p=>p.unit))];
+  $('scUnit').innerHTML = '<option value="">すべて</option>'+units.map(u=>`<option value="${esc(u)}">${esc(u)}</option>`).join('');
+}
+function scMatches(){
+  const book=$('scBook').value, unit=$('scUnit').value, kw=$('scKw').value.trim();
+  let list = SHINCHU_ALL.filter(p=>p.grade===GRADE && p.source && p.source.file===book);
+  if(unit) list = list.filter(p=>p.unit===unit);
+  if(kw){
+    list = list.filter(p=>
+      (p.q||'').includes(kw) ||
+      (p.unit||'').includes(kw) || (p.subunit||'').includes(kw) ||
+      (p.skillTags||[]).some(t=>t.includes(kw)) ||
+      (p.misconception||'').includes(kw)
+    );
+  }
+  return list;
+}
+function usedShinchuIds(){
+  if(!exam) return new Set();
+  return new Set(exam.daimon.flatMap(d=>d.items.filter(p=>p._manual).map(p=>p.id)));
+}
+function renderScResults(){
+  if(!$('scResults')) return;
+  const list=scMatches();
+  const used=usedShinchuIds();
+  const LIMIT=40;
+  $('scCount').textContent = list.length ? `${list.length}件ヒット${list.length>LIMIT?`（先頭${LIMIT}件を表示）`:''}` : '該当する問題がありません';
+  $('scResults').innerHTML = list.slice(0,LIMIT).map(p=>{
+    const src=p.source||{};
+    const isAdded=used.has(p.id);
+    return `<div class="screslt${isAdded?' added':''}">
+      <div class="scmeta">
+        <span>${esc(p.unit||'')}${p.subunit?'・'+esc(p.subunit):''}</span>
+        <span>${esc(p.difficulty||'')}</span>
+        ${src.page?`<span>P${esc(String(src.page))}${src.number?' '+esc(src.number):''}</span>`:''}
+      </div>
+      <div class="scq">${mathify(p.q)}</div>
+      <button class="scadd" data-id="${esc(p.id)}" ${isAdded?'disabled':''}>${isAdded?'✓ 追加済み':'＋ このテストに追加'}</button>
+    </div>`;
+  }).join('');
+  $('scResults').querySelectorAll('.scadd:not([disabled])').forEach(b=>{
+    b.onclick=()=>{
+      const p=SHINCHU_ALL.find(x=>x.id===b.dataset.id);
+      if(p) addManualItem(p);
+    };
+  });
+}
+function addManualItem(p){
+  if(!exam){
+    exam={daimon:[], minutes:+$('minutes').value||50, points:+$('points').value||100,
+          pace:+$('volume').value||1.8, ratios:getRatios()};
+  }
+  const cog=p.cognitive||'知識・技能';
+  let d=exam.daimon.find(x=>x.manual && x.cog===cog);
+  if(!d){
+    d={cog, unit:'追加した問題', instr:'次の問いに答えなさい。',
+       items:[], manual:true, mixed:true, forceSingle:false};
+    exam.daimon.push(d);
+  }
+  d.items.push({...p, pts:p.points||2, _manual:true});
+  exam.daimon.forEach((x,i)=>{x.no=i+1; x.total=x.items.reduce((s,y)=>s+y.pts,0);});
+  render();
+  renderScResults();
+  toast('テストに追加しました');
+}
+function removeManualItem(dno,idx){
+  if(!exam) return;
+  const d=exam.daimon.find(x=>x.no===dno); if(!d) return;
+  d.items.splice(idx,1);
+  if(!d.items.length) exam.daimon=exam.daimon.filter(x=>x!==d);
+  exam.daimon.forEach((x,i)=>{x.no=i+1; x.total=x.items.reduce((s,y)=>s+y.pts,0);});
+  render();
+  renderScResults();
+}
+if($('scBook')){
+  $('scBook').addEventListener('change',()=>{buildScUnitUI();renderScResults();});
+  $('scUnit').addEventListener('change',renderScResults);
+  $('scKw').addEventListener('input',renderScResults);
+  buildScBookUI();
+  renderScResults();
+}
 </script>
 
 <!-- ===== 図形メーカーからの前面図形 受け取り ===== -->
